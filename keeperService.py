@@ -15,7 +15,7 @@ print "in ", os.getcwd(), 'secrets from ', secretsDir
 
 from secrets import secrets
 
-serviceName = 'cmsFlaskTemplate'
+serviceName = 'myService'
 
 def getEncryptionString():
     return secrets[serviceName]['encString']

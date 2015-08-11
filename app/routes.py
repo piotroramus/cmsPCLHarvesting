@@ -14,6 +14,9 @@ from os.path import join
 
 from .models import User
 
+from flask_httpauth import HTTPBasicAuth
+auth = HTTPBasicAuth()
+
 # This app relies on authentication being done in the frontend process via SSO.
 
 # --- GET index
