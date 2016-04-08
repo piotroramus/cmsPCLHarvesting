@@ -1,12 +1,13 @@
-from rrapi import RRApi, RRApiError
-from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float, Date, Time, DateTime
-from sqlalchemy.orm import sessionmaker
 import datetime
-from logger import setup_logging
-import logging
 
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+import logging
+from rrapi import RRApi, RRApiError
+from logs.logger import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class RunInfo(Base):
 
 
 db_path = "runs.db"
-engine = create_engine('sqlite:///%s' % db_path, echo=True)
+engine = create_engine('sqlite:///%s' % db_path, echo=False)
 Base.metadata.create_all(engine, checkfirst=True)
 
 Session = sessionmaker(bind=engine)
