@@ -28,7 +28,8 @@ class RunInfo(Base):
     #TODO: probably no need for LS
     ls_count = Column(Integer)
 
-    run_blocks = relationship("RunBlock") #, back_populates="run_info")
+    run_blocks = relationship("RunBlock")
+    multirun = Column(Integer, ForeignKey('multirun.id'))
 
     def __repr__(self):
         return "RunInfo(number='%s', run_class_name='%s', bfield='%s' start_time='%s', end_time='%s', ls_count='%s')" % (
@@ -36,12 +37,32 @@ class RunInfo(Base):
 
 
 class RunBlock(Base):
-    __tablename__ = 'run_blocks'
+    __tablename__ = 'run_block'
 
     id = Column(Integer, primary_key=True)
     block_name = Column(String)
 
     run_number = Column(Integer, ForeignKey('run_info.number'))
+
+
+class Multirun(Base):
+    __tablename__ = 'multirun'
+
+    id = Column(Integer, primary_key=True)
+    number_of_events = Column(Integer)
+    dataset = Column(String)
+
+    run_numbers = relationship("RunInfo")
+    filenames = relationship("Filename")
+
+
+class Filename(Base):
+    __tablename__ = 'filename'
+
+    id = Column(Integer, primary_key=True)
+    filename = Column(String)
+
+    multirun = Column(Integer, ForeignKey('multirun.id'))
 
 
 url="https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
@@ -127,7 +148,6 @@ for run in valid_runs:
 
 
 complete_runs = session.query(RunInfo.number).filter(RunInfo.stop_time != None).all()
-
 
 for run, in complete_runs:
     #get already harvested blocks
