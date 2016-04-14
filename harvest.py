@@ -1,9 +1,11 @@
 import datetime
 
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from dbs.apis.dbsClient import DbsApi
+
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 
 import logging
 from rrapi import RRApi, RRApiError
@@ -23,11 +25,27 @@ class RunInfo(Base):
     bfield = Column(Float)
     start_time = Column(DateTime)
     stop_time = Column(DateTime)
+    #TODO: probably no need for LS
     ls_count = Column(Integer)
+
+    run_blocks = relationship("RunBlock") #, back_populates="run_info")
 
     def __repr__(self):
         return "RunInfo(number='%s', run_class_name='%s', bfield='%s' start_time='%s', end_time='%s', ls_count='%s')" % (
             self.number, self.run_class_name, self.bfield, self.start_time, self.stop_time, self.ls_count)
+
+
+class RunBlock(Base):
+    __tablename__ = 'run_blocks'
+
+    id = Column(Integer, primary_key=True)
+    block_name = Column(String)
+
+    run_number = Column(Integer, ForeignKey('run_info.number'))
+
+
+url="https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
+dbsApi=DbsApi(url=url)
 
 
 db_path = "runs.db"
@@ -72,7 +90,6 @@ valid_runs = (r for r in runs_with_classname if r[u'startTime'])
 # get week old runs from local DB
 local_runs = session.query(RunInfo).filter(RunInfo.start_time > week_ago).all()
 
-# list of numbers of complete and incomplete runs
 complete_runs = [run.number for run in local_runs if run.stop_time]
 incomplete_runs = [run.number for run in local_runs if not run.stop_time]
 
@@ -99,6 +116,7 @@ for run in valid_runs:
         try:
             stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
         except TypeError:
+            # if there is not stop date we can ignore it
             pass
         ls_count = run[u'lsCount'] if run[u'lsCount'] else 0
         run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
@@ -107,8 +125,22 @@ for run in valid_runs:
 
     session.commit()
 
-# from dbs.apis.dbsClient import DbsApi
-# url="https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
-# dbsApi=DbsApi(url=url)
 
-# dbsApi.listDatasets
+complete_runs = session.query(RunInfo.number).filter(RunInfo.stop_time != None).all()
+
+
+for run, in complete_runs:
+    #get already harvested blocks
+    harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run)
+
+    datasets = dbsApi.listDatasets(run_num=run, dataset='/*/*/ALCAPROMPT')
+    # TODO: extract workflow out of a dataset and put it somewhere
+    for dataset in datasets:
+        blocks = dbsApi.listBlocks(run_num=run, dataset=dataset['dataset'])
+        for block in blocks:
+            if block['block_name'] not in harvested_blocks:
+                run_block = RunBlock(block_name=block['block_name'], run_number=run)
+                session.add(run_block)
+
+session.commit()
+
