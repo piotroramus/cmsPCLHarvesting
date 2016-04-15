@@ -2,7 +2,7 @@ import datetime
 
 from dbs.apis.dbsClient import DbsApi
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -51,6 +51,7 @@ class Multirun(Base):
     id = Column(Integer, primary_key=True)
     number_of_events = Column(Integer)
     dataset = Column(String)
+    closed = Column(Boolean)
 
     run_numbers = relationship("RunInfo")
     filenames = relationship("Filename")
@@ -146,21 +147,45 @@ for run in valid_runs:
 
     session.commit()
 
-
+#TODO: extract to some external config
+events_limit = 50000
 complete_runs = session.query(RunInfo.number).filter(RunInfo.stop_time != None).all()
 
 for run, in complete_runs:
+
     #get already harvested blocks
     harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run)
 
     datasets = dbsApi.listDatasets(run_num=run, dataset='/*/*/ALCAPROMPT')
     # TODO: extract workflow out of a dataset and put it somewhere
     for dataset in datasets:
+
+        files, number_of_events = [], 0
+
+        #get multirun for the dataset
+        multirun = session.query(Multirun).filter(Multirun.dataset==dataset, Multirun.closed == False).one_or_none()
+        if not multirun:
+            multirun = Multirun(number_of_events=number_of_events, dataset=dataset, closed=False)
+            session.add(multirun)
+
         blocks = dbsApi.listBlocks(run_num=run, dataset=dataset['dataset'])
         for block in blocks:
             if block['block_name'] not in harvested_blocks:
                 run_block = RunBlock(block_name=block['block_name'], run_number=run)
                 session.add(run_block)
+                block_files = dbsApi.listFiles(run_num=run, block_name=block['block_name'])
+                files.extend(block_files)
+                file_summaries = dbsApi.listFileSummaries(run_num=run, block_name=block['block_name'])
+                number_of_events += file_summaries[0]['num_event']
+
+        #add gathered data to multirun and check if it can be run
+        if number_of_events > 0 and files:
+            multirun.number_of_events += number_of_events
+            for file in files:
+                multirun_file = Filename(filename=file['logical_file_name'], multirun=multirun.id)
+            if multirun.number_of_events > events_limit:
+                multirun.closed = True
+
+            session.commit()
 
 session.commit()
-
