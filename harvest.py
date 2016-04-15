@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 Base = declarative_base()
 
 
+# TODO: decouple model from this script
 class RunInfo(Base):
     __tablename__ = 'run_info'
 
@@ -77,7 +78,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 rrapi_url = "http://runregistry.web.cern.ch/runregistry/"
-api = RRApi(rrapi_url, debug=True)
+rrapi = RRApi(rrapi_url, debug=True)
 
 # just for filling the DB in for the first time
 first_run = False
@@ -88,28 +89,30 @@ columns = ['number', 'startTime', 'stopTime', 'runClassName', 'bfield', 'lsCount
 table = "runsummary"
 template = 'json'
 filters = {}
-week_ago = datetime.date.fromordinal(datetime.date.today().toordinal() - 7).strftime("%Y-%m-%d")
+days_old_runs = 7
+days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - days_old_runs).strftime("%Y-%m-%d")
 if first_run:
     filters['number'] = "> %s" % 230000
 else:
-    filters['startTime'] = "> %s" % (week_ago)
+    filters['startTime'] = "> %s" % (days_old_runs_date)
 weekly_runs = []
 try:
-    weekly_runs = api.data(workspace=workspace, columns=columns, table=table, template=template, filter=filters)
+    logger.info("Fetching Run Registry records from last %d days" % days_old_runs)
+    weekly_runs = rrapi.data(workspace=workspace, columns=columns, table=table, template=template, filter=filters)
 except RRApiError, e:
-    logger.error("Error while querying RR API for week old runs", exc_info=True)
+    logger.error("Error while querying RR API for %d days old runs" % days_old_runs, exc_info=True)
 
-# ignore runs without className
+logger.info("Ignoring runs with no runClassName specified")
 runs_with_classname = [r for r in weekly_runs if r[u'runClassName']]
 
-# ignore runs without a startTime - report an error
+logger.info("Checking if all the runs have start date")
 for run in runs_with_classname:
     if u'startTime' not in run:
         logger.error("Run without a start date: %s. Ignoring." % run[u'number'])
 valid_runs = (r for r in runs_with_classname if r[u'startTime'])
 
-# get week old runs from local DB
-local_runs = session.query(RunInfo).filter(RunInfo.start_time > week_ago).all()
+logger.info("Getting %d days old runs form local database" % days_old_runs)
+local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
 complete_runs = [run.number for run in local_runs if run.stop_time]
 incomplete_runs = [run.number for run in local_runs if not run.stop_time]
@@ -166,6 +169,10 @@ for run, in complete_runs:
         if not multirun:
             multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], closed=False)
             session.add(multirun)
+            # force generation of multirun.id which is accessed later on in this code
+            session.flush()
+            session.refresh(multirun)
+            logger.info("Created new multirun %d for dataset %s" % (multirun.id, dataset['dataset']))
 
         blocks = dbsApi.listBlocks(run_num=run, dataset=dataset['dataset'])
         for block in blocks:
@@ -180,9 +187,11 @@ for run, in complete_runs:
         # add gathered data to multirun and check if it can be run
         if number_of_events > 0 and files:
             multirun.number_of_events += number_of_events
-            for file in files:
-                multirun_file = Filename(filename=file['logical_file_name'], multirun=multirun.id)
+            for f in files:
+                multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
+                session.add(multirun_file)
             if multirun.number_of_events > events_limit:
+                logger.info("Multirun %d with %d events ready to be processed" % (multirun.id, number_of_events))
                 multirun.closed = True
                 # TODO: inform some other service, that this multirun can be executed
 
