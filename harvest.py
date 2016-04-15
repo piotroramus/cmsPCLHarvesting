@@ -25,7 +25,7 @@ class RunInfo(Base):
     bfield = Column(Float)
     start_time = Column(DateTime)
     stop_time = Column(DateTime)
-    #TODO: probably no need for LS
+    # TODO: probably no need for LS
     ls_count = Column(Integer)
 
     run_blocks = relationship("RunBlock")
@@ -66,9 +66,8 @@ class Filename(Base):
     multirun = Column(Integer, ForeignKey('multirun.id'))
 
 
-url="https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
-dbsApi=DbsApi(url=url)
-
+url = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
+dbsApi = DbsApi(url=url)
 
 db_path = "runs.db"
 engine = create_engine('sqlite:///%s' % db_path, echo=False)
@@ -147,14 +146,14 @@ for run in valid_runs:
 
     session.commit()
 
-#TODO: extract to some external config
+# TODO: extract to some external config
 events_limit = 50000
 complete_runs = session.query(RunInfo.number).filter(RunInfo.stop_time != None).all()
 
 for run, in complete_runs:
 
-    #get already harvested blocks
-    harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run)
+    # get already harvested blocks
+    harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run).all()
 
     datasets = dbsApi.listDatasets(run_num=run, dataset='/*/*/ALCAPROMPT')
     # TODO: extract workflow out of a dataset and put it somewhere
@@ -162,10 +161,10 @@ for run, in complete_runs:
 
         files, number_of_events = [], 0
 
-        #get multirun for the dataset
-        multirun = session.query(Multirun).filter(Multirun.dataset==dataset, Multirun.closed == False).one_or_none()
+        # get multirun for the dataset
+        multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False).one_or_none()
         if not multirun:
-            multirun = Multirun(number_of_events=number_of_events, dataset=dataset, closed=False)
+            multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], closed=False)
             session.add(multirun)
 
         blocks = dbsApi.listBlocks(run_num=run, dataset=dataset['dataset'])
@@ -178,13 +177,14 @@ for run, in complete_runs:
                 file_summaries = dbsApi.listFileSummaries(run_num=run, block_name=block['block_name'])
                 number_of_events += file_summaries[0]['num_event']
 
-        #add gathered data to multirun and check if it can be run
+        # add gathered data to multirun and check if it can be run
         if number_of_events > 0 and files:
             multirun.number_of_events += number_of_events
             for file in files:
                 multirun_file = Filename(filename=file['logical_file_name'], multirun=multirun.id)
             if multirun.number_of_events > events_limit:
                 multirun.closed = True
+                # TODO: inform some other service, that this multirun can be executed
 
             session.commit()
 
