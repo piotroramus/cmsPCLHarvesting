@@ -13,7 +13,7 @@ first_run_number = 230000  # respects all 2015 and following runs
 
 # things to search for in the Run Registry
 workspace = "GLOBAL"
-columns = ['number', 'startTime', 'stopTime', 'runClassName', 'bfield', 'lsCount']
+columns = ['number', 'startTime', 'stopTime', 'runClassName', 'bfield']
 table = "runsummary"
 template = 'json'
 filters = {}

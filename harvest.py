@@ -72,7 +72,6 @@ for run in valid_runs:
             old_run.bfield = run[u'bfield']
             old_run.start_time = start
             old_run.stop_time = stop
-            old_run.ls_count = run[u'lsCount'] if run[u'lsCount'] else 0
         else:
             logger.debug("Run {} still without stop time".format(run[u'number']))
             continue
@@ -86,9 +85,8 @@ for run in valid_runs:
         except TypeError:
             # if there is not stop date we can ignore it
             pass
-        ls_count = run[u'lsCount'] if run[u'lsCount'] else 0
         run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
-                           start_time=start, stop_time=stop, ls_count=ls_count)
+                           start_time=start, stop_time=stop)
         session.add(run_info)
 
     session.commit()

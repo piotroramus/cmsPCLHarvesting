@@ -14,8 +14,6 @@ class RunInfo(Base):
     bfield = Column(Float)
     start_time = Column(DateTime)
     stop_time = Column(DateTime)
-    # TODO: probably no need for LS
-    ls_count = Column(Integer)
 
     run_blocks = relationship("RunBlock")
     multirun = Column(Integer, ForeignKey('multirun.id'))
