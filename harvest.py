@@ -92,7 +92,8 @@ for run in valid_runs:
     session.commit()
 
 logger.info("Getting complete runs from local database")
-complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None).all()
+complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None, RunInfo.start_time > days_old_runs_date).all()
+# TODO: test if the date comparison works properly
 
 logger.info("Starting creating multiruns...")
 for run in complete_runs:
