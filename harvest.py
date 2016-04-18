@@ -10,47 +10,34 @@ from rrapi import RRApi, RRApiError
 from logs.logger import setup_logging
 
 from model import Base, RunInfo, RunBlock, Multirun, Filename
-
+from config import dbsapi_url, rrapi_url, runs_db_path, first_run_number, harvest_all_runs, days_old_runs
+from config import workspace, columns, table, template, filters, events_threshold
 
 setup_logging()
 logger = logging.getLogger(__name__)
 
-url = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
-dbsApi = DbsApi(url=url)
-
-db_path = "runs.db"
-engine = create_engine('sqlite:///{}'.format(db_path), echo=False)
+engine = create_engine('sqlite:///{}'.format(runs_db_path), echo=False)
 Base.metadata.create_all(engine, checkfirst=True)
-
 Session = sessionmaker(bind=engine)
 session = Session()
 
-rrapi_url = "http://runregistry.web.cern.ch/runregistry/"
 rrapi = RRApi(rrapi_url, debug=True)
+dbsApi = DbsApi(url=dbsapi_url)
 
-# just for filling the DB in for the first time
-first_run = False
-
-workspace = "GLOBAL"
-columns = ['number', 'startTime', 'stopTime', 'runClassName', 'bfield', 'lsCount']
-table = "runsummary"
-template = 'json'
-filters = {}
-days_old_runs = 7
 days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - days_old_runs).strftime("%Y-%m-%d")
-if first_run:
-    filters['number'] = "> {}".format(230000)
+if harvest_all_runs:
+    filters['number'] = "> {}".format(first_run_number)
 else:
     filters['startTime'] = "> {}".format(days_old_runs_date)
-weekly_runs = []
+recent_runs = []
 try:
     logger.info("Fetching Run Registry records from last {} days".format(days_old_runs))
-    weekly_runs = rrapi.data(workspace=workspace, columns=columns, table=table, template=template, filter=filters)
+    recent_runs = rrapi.data(workspace=workspace, columns=columns, table=table, template=template, filter=filters)
 except RRApiError, e:
     logger.error("Error while querying RR API for {} days old runs".format(days_old_runs), exc_info=True)
 
 logger.info("Ignoring runs with no runClassName specified")
-runs_with_classname = [r for r in weekly_runs if r[u'runClassName']]
+runs_with_classname = [r for r in recent_runs if r[u'runClassName']]
 
 logger.info("Checking if all the runs have start date")
 for run in runs_with_classname:
@@ -106,8 +93,6 @@ for run in valid_runs:
 
     session.commit()
 
-# TODO: extract to some external config
-events_limit = 50000
 logger.info("Getting complete runs from local database")
 complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None).all()
 
@@ -153,7 +138,7 @@ for run in complete_runs:
             for f in files:
                 multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
                 session.add(multirun_file)
-            if multirun.number_of_events > events_limit:
+            if multirun.number_of_events > events_threshold:
                 logger.info("Multirun {} with {} events ready to be processed".format(multirun.id, number_of_events))
                 multirun.closed = True
                 # TODO: inform some other service, that this multirun can be executed
