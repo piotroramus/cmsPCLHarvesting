@@ -52,6 +52,8 @@ class Multirun(Base):
     id = Column(Integer, primary_key=True)
     number_of_events = Column(Integer)
     dataset = Column(String)
+    bfield = Column(Float)
+    run_class_name = Column(String)
     closed = Column(Boolean)
 
     run_numbers = relationship("RunInfo")
@@ -161,38 +163,42 @@ for run in valid_runs:
 # TODO: extract to some external config
 events_limit = 50000
 logger.info("Getting complete runs from local database")
-complete_runs = session.query(RunInfo.number).filter(RunInfo.stop_time != None).all()
+complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None).all()
 
 logger.info("Starting creating multiruns...")
-for run, in complete_runs:
+for run in complete_runs:
 
-    logger.debug("Getting already harvested blocks for run %d" % run)
-    harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run).all()
+    logger.debug("Getting already harvested blocks for run %d" % run.number)
+    harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run.number).all()
 
-    datasets = dbsApi.listDatasets(run_num=run, dataset='/*/*/ALCAPROMPT')
+    datasets = dbsApi.listDatasets(run_num=run.number, dataset='/*/*/ALCAPROMPT')
     for dataset in datasets:
 
         files, number_of_events = [], 0
 
-        logger.debug("Getting multirun for the dataset %s for run %d" % (dataset['dataset'], run))
-        multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False).one_or_none()
+        logger.debug("Getting multirun for the dataset %s for run %d" % (dataset['dataset'], run.number))
+        multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
+                                                  Multirun.bfield == run.bfield,
+                                                  Multirun.run_class_name == run.run_class_name).one_or_none()
         if not multirun:
-            multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], closed=False)
+            multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
+                                run_class_name=run.run_class_name, closed=False)
             session.add(multirun)
             # force generation of multirun.id which is accessed later on in this code
             session.flush()
             session.refresh(multirun)
-            logger.info("Created new multirun %d for dataset %s" % (multirun.id, dataset['dataset']))
+            logger.info("Created new multirun %d for dataset %s with bfield %f and runClasssName %s" % (
+                multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name))
 
         logger.debug("Getting files and number of events from new blocks for multirun %d" % multirun.id)
-        blocks = dbsApi.listBlocks(run_num=run, dataset=dataset['dataset'])
+        blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
         for block in blocks:
             if block['block_name'] not in harvested_blocks:
-                run_block = RunBlock(block_name=block['block_name'], run_number=run)
+                run_block = RunBlock(block_name=block['block_name'], run_number=run.number)
                 session.add(run_block)
-                block_files = dbsApi.listFiles(run_num=run, block_name=block['block_name'])
+                block_files = dbsApi.listFiles(run_num=run.number, block_name=block['block_name'])
                 files.extend(block_files)
-                file_summaries = dbsApi.listFileSummaries(run_num=run, block_name=block['block_name'])
+                file_summaries = dbsApi.listFileSummaries(run_num=run.number, block_name=block['block_name'])
                 number_of_events += file_summaries[0]['num_event']
 
         logger.debug("Adding gathered data to multirun %d" % multirun.id)
