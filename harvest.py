@@ -83,7 +83,6 @@ rrapi = RRApi(rrapi_url, debug=True)
 # just for filling the DB in for the first time
 first_run = False
 
-# take runs from last week (as for the starting date)
 workspace = "GLOBAL"
 columns = ['number', 'startTime', 'stopTime', 'runClassName', 'bfield', 'lsCount']
 table = "runsummary"
@@ -117,12 +116,20 @@ local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_da
 complete_runs = [run.number for run in local_runs if run.stop_time]
 incomplete_runs = [run.number for run in local_runs if not run.stop_time]
 
+logger.info("Updating local database of new fetched runs")
 for run in valid_runs:
+
+    logger.debug("Checking run %d fetched from Run Registry" % run[u'number'])
+
     if run[u'number'] in complete_runs:
+        logger.debug("Run %d already exists in local database" % run[u'number'])
         continue
+
     if run[u'number'] in incomplete_runs:
+        logger.debug("Run %d already exists in local database but does not has a stop date" % run[u'number'])
+
         if run[u'stopTime']:
-            logger.info("Updating incomplete run %d since it is finished" % run[u'number'])
+            logger.info("Updating incomplete run %d " % run[u'number'])
             start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
             stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
             old_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
@@ -132,7 +139,9 @@ for run in valid_runs:
             old_run.stop_time = stop
             old_run.ls_count = run[u'lsCount'] if run[u'lsCount'] else 0
         else:
+            logger.debug("Run %d still without stop time" % run[u'number'])
             continue
+
     else:
         logger.info("New run: %d" % run[u'number'])
         start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
@@ -151,20 +160,21 @@ for run in valid_runs:
 
 # TODO: extract to some external config
 events_limit = 50000
+logger.info("Getting complete runs from local database")
 complete_runs = session.query(RunInfo.number).filter(RunInfo.stop_time != None).all()
 
+logger.info("Starting creating multiruns...")
 for run, in complete_runs:
 
-    # get already harvested blocks
+    logger.debug("Getting already harvested blocks for run %d" % run)
     harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run).all()
 
     datasets = dbsApi.listDatasets(run_num=run, dataset='/*/*/ALCAPROMPT')
-    # TODO: extract workflow out of a dataset and put it somewhere
     for dataset in datasets:
 
         files, number_of_events = [], 0
 
-        # get multirun for the dataset
+        logger.debug("Getting multirun for the dataset %s for run %d" % (dataset['dataset'], run))
         multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False).one_or_none()
         if not multirun:
             multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], closed=False)
@@ -174,6 +184,7 @@ for run, in complete_runs:
             session.refresh(multirun)
             logger.info("Created new multirun %d for dataset %s" % (multirun.id, dataset['dataset']))
 
+        logger.debug("Getting files and number of events from new blocks for multirun %d" % multirun.id)
         blocks = dbsApi.listBlocks(run_num=run, dataset=dataset['dataset'])
         for block in blocks:
             if block['block_name'] not in harvested_blocks:
@@ -184,7 +195,7 @@ for run, in complete_runs:
                 file_summaries = dbsApi.listFileSummaries(run_num=run, block_name=block['block_name'])
                 number_of_events += file_summaries[0]['num_event']
 
-        # add gathered data to multirun and check if it can be run
+        logger.debug("Adding gathered data to multirun %d" % multirun.id)
         if number_of_events > 0 and files:
             multirun.number_of_events += number_of_events
             for f in files:
