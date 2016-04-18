@@ -33,7 +33,7 @@ class RunInfo(Base):
     multirun = Column(Integer, ForeignKey('multirun.id'))
 
     def __repr__(self):
-        return "RunInfo(number='%s', run_class_name='%s', bfield='%s' start_time='%s', end_time='%s', ls_count='%s')" % (
+        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={}, end_time={}, ls_count={})".format(
             self.number, self.run_class_name, self.bfield, self.start_time, self.stop_time, self.ls_count)
 
 
@@ -73,7 +73,7 @@ url = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
 dbsApi = DbsApi(url=url)
 
 db_path = "runs.db"
-engine = create_engine('sqlite:///%s' % db_path, echo=False)
+engine = create_engine('sqlite:///{}'.format(db_path), echo=False)
 Base.metadata.create_all(engine, checkfirst=True)
 
 Session = sessionmaker(bind=engine)
@@ -93,15 +93,15 @@ filters = {}
 days_old_runs = 7
 days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - days_old_runs).strftime("%Y-%m-%d")
 if first_run:
-    filters['number'] = "> %s" % 230000
+    filters['number'] = "> {}".format(230000)
 else:
-    filters['startTime'] = "> %s" % (days_old_runs_date)
+    filters['startTime'] = "> {}".format(days_old_runs_date)
 weekly_runs = []
 try:
-    logger.info("Fetching Run Registry records from last %d days" % days_old_runs)
+    logger.info("Fetching Run Registry records from last {} days".format(days_old_runs))
     weekly_runs = rrapi.data(workspace=workspace, columns=columns, table=table, template=template, filter=filters)
 except RRApiError, e:
-    logger.error("Error while querying RR API for %d days old runs" % days_old_runs, exc_info=True)
+    logger.error("Error while querying RR API for {} days old runs".format(days_old_runs), exc_info=True)
 
 logger.info("Ignoring runs with no runClassName specified")
 runs_with_classname = [r for r in weekly_runs if r[u'runClassName']]
@@ -109,10 +109,10 @@ runs_with_classname = [r for r in weekly_runs if r[u'runClassName']]
 logger.info("Checking if all the runs have start date")
 for run in runs_with_classname:
     if u'startTime' not in run:
-        logger.error("Run without a start date: %s. Ignoring." % run[u'number'])
+        logger.error("Run without a start date: {}. Ignoring.".format(run[u'number']))
 valid_runs = (r for r in runs_with_classname if r[u'startTime'])
 
-logger.info("Getting %d days old runs form local database" % days_old_runs)
+logger.info("Getting {} days old runs form local database".format(days_old_runs))
 local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
 complete_runs = [run.number for run in local_runs if run.stop_time]
@@ -121,17 +121,17 @@ incomplete_runs = [run.number for run in local_runs if not run.stop_time]
 logger.info("Updating local database of new fetched runs")
 for run in valid_runs:
 
-    logger.debug("Checking run %d fetched from Run Registry" % run[u'number'])
+    logger.debug("Checking run {} fetched from Run Registry".format(run[u'number']))
 
     if run[u'number'] in complete_runs:
-        logger.debug("Run %d already exists in local database" % run[u'number'])
+        logger.debug("Run {} already exists in local database".format(run[u'number']))
         continue
 
     if run[u'number'] in incomplete_runs:
-        logger.debug("Run %d already exists in local database but does not has a stop date" % run[u'number'])
+        logger.debug("Run {} already exists in local database but does not has a stop date".format(run[u'number']))
 
         if run[u'stopTime']:
-            logger.info("Updating incomplete run %d " % run[u'number'])
+            logger.info("Updating incomplete run {} ".format(run[u'number']))
             start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
             stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
             old_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
@@ -141,11 +141,11 @@ for run in valid_runs:
             old_run.stop_time = stop
             old_run.ls_count = run[u'lsCount'] if run[u'lsCount'] else 0
         else:
-            logger.debug("Run %d still without stop time" % run[u'number'])
+            logger.debug("Run {} still without stop time".format(run[u'number']))
             continue
 
     else:
-        logger.info("New run: %d" % run[u'number'])
+        logger.info("New run: {}".format(run[u'number']))
         start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
         stop = None
         try:
@@ -168,7 +168,7 @@ complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None).all()
 logger.info("Starting creating multiruns...")
 for run in complete_runs:
 
-    logger.debug("Getting already harvested blocks for run %d" % run.number)
+    logger.debug("Getting already harvested blocks for run {}".format(run.number))
     harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run.number).all()
 
     datasets = dbsApi.listDatasets(run_num=run.number, dataset='/*/*/ALCAPROMPT')
@@ -176,7 +176,7 @@ for run in complete_runs:
 
         files, number_of_events = [], 0
 
-        logger.debug("Getting multirun for the dataset %s for run %d" % (dataset['dataset'], run.number))
+        logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
         multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
                                                   Multirun.bfield == run.bfield,
                                                   Multirun.run_class_name == run.run_class_name).one_or_none()
@@ -187,10 +187,10 @@ for run in complete_runs:
             # force generation of multirun.id which is accessed later on in this code
             session.flush()
             session.refresh(multirun)
-            logger.info("Created new multirun %d for dataset %s with bfield %f and runClasssName %s" % (
+            logger.info("Created new multirun {} for dataset {} with bfield {} and run classs name {}".format(
                 multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name))
 
-        logger.debug("Getting files and number of events from new blocks for multirun %d" % multirun.id)
+        logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
         blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
         for block in blocks:
             if block['block_name'] not in harvested_blocks:
@@ -201,14 +201,14 @@ for run in complete_runs:
                 file_summaries = dbsApi.listFileSummaries(run_num=run.number, block_name=block['block_name'])
                 number_of_events += file_summaries[0]['num_event']
 
-        logger.debug("Adding gathered data to multirun %d" % multirun.id)
+        logger.debug("Adding gathered data to multirun {}".format(multirun.id))
         if number_of_events > 0 and files:
             multirun.number_of_events += number_of_events
             for f in files:
                 multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
                 session.add(multirun_file)
             if multirun.number_of_events > events_limit:
-                logger.info("Multirun %d with %d events ready to be processed" % (multirun.id, number_of_events))
+                logger.info("Multirun {} with {} events ready to be processed".format(multirun.id, number_of_events))
                 multirun.closed = True
                 # TODO: inform some other service, that this multirun can be executed
 
