@@ -35,7 +35,7 @@ def harvest():
     try:
         logger.info("Fetching Run Registry records from last {} days".format(days_old_runs))
         recent_runs = rrapi.data(workspace=workspace, columns=columns, table=table, template=template, filter=filters)
-    except RRApiError, e:
+    except RRApiError:
         logger.error("Error while querying RR API for {} days old runs".format(days_old_runs), exc_info=True)
 
     logger.info("Ignoring runs with no runClassName specified")
@@ -151,5 +151,3 @@ def harvest():
     session.commit()
 
 
-if __name__ == '__main__':
-    harvest()

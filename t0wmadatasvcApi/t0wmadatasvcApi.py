@@ -12,7 +12,7 @@ class Tier0Api(object):
         request = Request('GET', self.base_url)
         self.request = self.session.prepare_request(request)
 
-    def get_run_info(self, run):
+    def get_run_express_config(self, run):
         url = self.base_url + '?run=' + str(run)
         self.request.url = url
 
@@ -23,6 +23,6 @@ class Tier0Api(object):
         return response.json()
 
     def get_run_release(self, run):
-        info = self.get_run_info(run)
+        info = self.get_run_express_config(run)
         return info[u'result'][0][u'reco_cmssw']
 
