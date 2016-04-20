@@ -96,7 +96,7 @@ def harvest():
     logger.info("Getting complete runs from local database")
     complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None,
                                                   RunInfo.start_time > days_old_runs_date).all()
-    # TODO: test if the date comparison works properly
+    # TODO #1: test if the date comparison works properly
 
     logger.info("Starting creating multiruns...")
     for run in complete_runs:
@@ -144,7 +144,7 @@ def harvest():
                     logger.info(
                         "Multirun {} with {} events ready to be processed".format(multirun.id, number_of_events))
                     multirun.closed = True
-                    # TODO: inform some other service, that this multirun can be executed
+                    # TODO #2: inform some other service, that this multirun can be executed
 
                 session.commit()
 
