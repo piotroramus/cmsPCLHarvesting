@@ -12,6 +12,7 @@ from logs.logger import setup_logging
 from model import Base, RunInfo, RunBlock, Multirun, Filename
 from config import dbsapi_url, rrapi_url, runs_db_path, first_run_number, harvest_all_runs, days_old_runs
 from config import workspace, columns, table, template, filters, events_threshold
+from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
 
 
 def harvest():
@@ -26,7 +27,8 @@ def harvest():
     rrapi = RRApi(rrapi_url, debug=True)
     dbsApi = DbsApi(url=dbsapi_url)
 
-    days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - days_old_runs).strftime("%Y-%m-%d")
+    days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - days_old_runs).strftime(
+        "%Y-%m-%d")
     if harvest_all_runs:
         filters['number'] = "> {}".format(first_run_number)
     else:
@@ -98,8 +100,12 @@ def harvest():
                                                   RunInfo.start_time > days_old_runs_date).all()
     # TODO #1: test if the date comparison works properly
 
+    t0api = Tier0Api()
     logger.info("Starting creating multiruns...")
     for run in complete_runs:
+
+        logger.debug("Retrieving express config for run {}".format(run.number))
+        release = t0api.get_run_release_and_arch(run.number)
 
         logger.debug("Getting already harvested blocks for run {}".format(run.number))
         harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run.number).all()
@@ -112,16 +118,22 @@ def harvest():
             logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
             multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
                                                       Multirun.bfield == run.bfield,
-                                                      Multirun.run_class_name == run.run_class_name).one_or_none()
+                                                      Multirun.run_class_name == run.run_class_name,
+                                                      Multirun.reco_cmssw == release['reco_cmssw'],
+                                                      Multirun.scram_arch == release['scram_arch']).one_or_none()
+            # TODO #4 - release should be equal up to 2 digits?
             if not multirun:
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
-                                    run_class_name=run.run_class_name, closed=False)
+                                    run_class_name=run.run_class_name, closed=False, reco_cmssw=release['reco_cmssw'],
+                                    scram_arch=release['scram_arch'])
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
                 session.refresh(multirun)
-                logger.info("Created new multirun {} for dataset {} with bfield {} and run classs name {}".format(
-                    multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name))
+                logger.info(
+                    "Created new multirun {} dataset: {} bfield: {} run classs name: {} reco_cmssw: {} scram_arch: {}".format(
+                        multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name,
+                        release['reco_cmssw'], release['scram_arch']))
 
             logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
@@ -149,5 +161,3 @@ def harvest():
                 session.commit()
 
     session.commit()
-
-

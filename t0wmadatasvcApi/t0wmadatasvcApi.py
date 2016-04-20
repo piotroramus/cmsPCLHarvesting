@@ -23,6 +23,13 @@ class Tier0Api(object):
         return response.json()
 
     def get_run_release(self, run):
-        info = self.get_run_express_config(run)
-        return info[u'result'][0][u'reco_cmssw']
+        cfg = self.get_run_express_config(run)
+        return cfg[u'result'][0][u'reco_cmssw']
+
+    def get_run_release_and_arch(self, run):
+        cfg = self.get_run_express_config(run)
+        result = {}
+        result['reco_cmssw'] = cfg[u'result'][0][u'reco_cmssw']
+        result['scram_arch'] = cfg[u'result'][0][u'scram_arch']
+        return result
 
