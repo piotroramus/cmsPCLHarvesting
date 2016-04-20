@@ -1,3 +1,4 @@
 python-cjson==1.1.0
 PyYAML==3.11
+requests==2.9.1
 SQLAlchemy==1.0.12
