@@ -32,9 +32,10 @@ class Tier0Api(object):
         cfg = self.get_run_express_config(run)
         try:
             result = dict()
-            result['reco_cmssw'] = cfg[u'result'][0][u'reco_cmssw']
-            result['scram_arch'] = cfg[u'result'][0][u'scram_arch']
+            result['cmssw'] = cfg[u'result'][0][u'reco_cmssw']
+            result['scram_arch'] = cfg[u'result'][0][u'reco_scram_arch']
             result['scenario'] = cfg[u'result'][0][u'scenario']
+            result['global_tag'] = cfg[u'result'][0][u'global_tag']
             return result
         except (KeyError, IndexError):
             self.logger.debug('Express config not available for run {}'.format(run))

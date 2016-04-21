@@ -122,22 +122,25 @@ def discover():
             multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
                                                       Multirun.bfield == run.bfield,
                                                       Multirun.run_class_name == run.run_class_name,
-                                                      Multirun.reco_cmssw == release['reco_cmssw'],
+                                                      Multirun.cmssw == release['cmssw'],
                                                       Multirun.scram_arch == release['scram_arch'],
-                                                      Multirun.scenario == release['scenario']).one_or_none()
+                                                      Multirun.scenario == release['scenario'],
+                                                      Multirun.global_tag == release['global_tag']).one_or_none()
             # TODO #4 - release should be equal up to 2 digits?
             if not multirun:
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
-                                    run_class_name=run.run_class_name, closed=False, reco_cmssw=release['reco_cmssw'],
-                                    scram_arch=release['scram_arch'], scenario=release['scenario'])
+                                    run_class_name=run.run_class_name, closed=False, cmssw=release['cmssw'],
+                                    scram_arch=release['scram_arch'], scenario=release['scenario'],
+                                    global_tag=release['global_tag'])
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
                 session.refresh(multirun)
                 logger.info(
-                    "Created new multirun {} dataset: {} bfield: {} run classs name: {} reco_cmssw: {} scram_arch: {} scenario: {}".format(
+                    """Created new multirun {} dataset: {} bfield: {} run classs name: {} cmssw: {}
+                       scram_arch: {} scenario: {} global_tag: {}""".format(
                         multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name,
-                        release['reco_cmssw'], release['scram_arch'], release['scenario']))
+                        release['cmssw'], release['scram_arch'], release['scenario'], release['global_tag']))
 
             logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])

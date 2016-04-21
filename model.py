@@ -40,9 +40,10 @@ class Multirun(Base):
     dataset = Column(String)
     bfield = Column(Float)
     run_class_name = Column(String)
-    reco_cmssw = Column(String)
+    cmssw = Column(String)
     scram_arch = Column(String)
     scenario = Column(String)
+    global_tag = Column(String)
     closed = Column(Boolean)
 
     run_numbers = relationship("RunInfo")
