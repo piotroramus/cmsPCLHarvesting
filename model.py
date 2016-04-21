@@ -19,8 +19,8 @@ class RunInfo(Base):
     multirun = Column(Integer, ForeignKey('multirun.id'))
 
     def __repr__(self):
-        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={}, end_time={}, ls_count={})".format(
-            self.number, self.run_class_name, self.bfield, self.start_time, self.stop_time, self.ls_count)
+        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={}, end_time={})".format(
+            self.number, self.run_class_name, self.bfield, self.start_time, self.stop_time)
 
 
 class RunBlock(Base):
@@ -42,6 +42,7 @@ class Multirun(Base):
     run_class_name = Column(String)
     reco_cmssw = Column(String)
     scram_arch = Column(String)
+    scenario = Column(String)
     closed = Column(Boolean)
 
     run_numbers = relationship("RunInfo")

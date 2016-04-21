@@ -1,11 +1,11 @@
 import datetime
+import logging
 
 from dbs.apis.dbsClient import DbsApi
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import logging
 from rrapi import RRApi, RRApiError
 from logs.logger import setup_logging
 
@@ -105,7 +105,10 @@ def harvest():
     for run in complete_runs:
 
         logger.debug("Retrieving express config for run {}".format(run.number))
-        release = t0api.get_run_release_and_arch(run.number)
+        release = t0api.get_run_info(run.number)
+        if not release:
+            logger.debug("Express config for run {} is not available".format(run.number))
+            continue
 
         logger.debug("Getting already harvested blocks for run {}".format(run.number))
         harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run.number).all()
@@ -120,20 +123,21 @@ def harvest():
                                                       Multirun.bfield == run.bfield,
                                                       Multirun.run_class_name == run.run_class_name,
                                                       Multirun.reco_cmssw == release['reco_cmssw'],
-                                                      Multirun.scram_arch == release['scram_arch']).one_or_none()
+                                                      Multirun.scram_arch == release['scram_arch'],
+                                                      Multirun.scenario == release['scenario']).one_or_none()
             # TODO #4 - release should be equal up to 2 digits?
             if not multirun:
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
                                     run_class_name=run.run_class_name, closed=False, reco_cmssw=release['reco_cmssw'],
-                                    scram_arch=release['scram_arch'])
+                                    scram_arch=release['scram_arch'], scenario=release['scenario'])
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
                 session.refresh(multirun)
                 logger.info(
-                    "Created new multirun {} dataset: {} bfield: {} run classs name: {} reco_cmssw: {} scram_arch: {}".format(
+                    "Created new multirun {} dataset: {} bfield: {} run classs name: {} reco_cmssw: {} scram_arch: {} scenario: {}".format(
                         multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name,
-                        release['reco_cmssw'], release['scram_arch']))
+                        release['reco_cmssw'], release['scram_arch'], release['scenario']))
 
             logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
