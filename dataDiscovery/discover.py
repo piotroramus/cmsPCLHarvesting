@@ -137,8 +137,15 @@ def discover():
                 session.flush()
                 session.refresh(multirun)
                 logger.info(
-                    """Created new multirun {} dataset: {} bfield: {} run classs name: {} cmssw: {}
-                       scram_arch: {} scenario: {} global_tag: {}""".format(
+                    ("Created new multirun {} "
+                     "dataset: {} "
+                     "bfield: {} "
+                     "run classs name: {} "
+                     "cmssw: {} "
+                     "scram_arch: {} "
+                     "scenario: {} "
+                     "global_tag: {}")
+                        .format(
                         multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name,
                         release['cmssw'], release['scram_arch'], release['scenario'], release['global_tag']))
 
