@@ -1,16 +1,22 @@
 import os
+import logging
+
 from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.packages.urllib3 import disable_warnings
+
+from logs.logger import setup_logging
 
 
 class Tier0Api(object):
     def __init__(self):
         self.base_url = 'https://cmsweb.cern.ch/t0wmadatasvc/prod/express_config'
         self.session = Session()
-        disable_warnings(InsecureRequestWarning)
         request = Request('GET', self.base_url)
         self.request = self.session.prepare_request(request)
+        disable_warnings(InsecureRequestWarning)
+        setup_logging()
+        self.logger = logging.getLogger(__name__)
 
     def get_run_express_config(self, run):
         url = self.base_url + '?run=' + str(run)
@@ -22,14 +28,14 @@ class Tier0Api(object):
         response = self.session.send(self.request, verify=False, cert=(cert, cert))
         return response.json()
 
-    def get_run_release(self, run):
+    def get_run_info(self, run):
         cfg = self.get_run_express_config(run)
-        return cfg[u'result'][0][u'reco_cmssw']
-
-    def get_run_release_and_arch(self, run):
-        cfg = self.get_run_express_config(run)
-        result = {}
-        result['reco_cmssw'] = cfg[u'result'][0][u'reco_cmssw']
-        result['scram_arch'] = cfg[u'result'][0][u'scram_arch']
-        return result
-
+        try:
+            result = dict()
+            result['reco_cmssw'] = cfg[u'result'][0][u'reco_cmssw']
+            result['scram_arch'] = cfg[u'result'][0][u'scram_arch']
+            result['scenario'] = cfg[u'result'][0][u'scenario']
+            return result
+        except (KeyError, IndexError):
+            self.logger.debug('Express config not available for run {}'.format(run))
+            return None
