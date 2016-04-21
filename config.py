@@ -2,7 +2,7 @@ dbsapi_url = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
 rrapi_url = "http://runregistry.web.cern.ch/runregistry/"
 
 # path to database containing all the harvesting information
-runs_db_path = "runs.db"
+runs_db_path = "multiruns.db"
 
 # how far in the past should we look for new runs
 days_old_runs = 7
