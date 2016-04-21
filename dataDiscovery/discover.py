@@ -15,7 +15,7 @@ from config import workspace, columns, table, template, filters, events_threshol
 from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
 
 
-def harvest():
+def discover():
     setup_logging()
     logger = logging.getLogger(__name__)
 

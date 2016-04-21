@@ -1,6 +1,6 @@
 import logging
 
-from dataDiscovery.harvest import harvest
+from dataDiscovery.discover import discover
 from logs.logger import setup_logging
 
 
@@ -11,5 +11,5 @@ if __name__ == '__main__':
 
     # TODO #3: consider calling setup.sh here
     logger.info("Starting data discovery")
-    harvest()
+    discover()
     logger.info("Data discovery has been finished")
