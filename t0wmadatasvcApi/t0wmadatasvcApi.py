@@ -36,6 +36,8 @@ class Tier0Api(object):
             result['scram_arch'] = cfg[u'result'][0][u'reco_scram_arch']
             result['scenario'] = cfg[u'result'][0][u'scenario']
             result['global_tag'] = cfg[u'result'][0][u'global_tag']
+            workflows = cfg[u'result'][0][u'alca_skim'].split(',')
+            result['workflows'] = [w for w in workflows if w.startswith('PromptCalibProd')]
             return result
         except (KeyError, IndexError):
             self.logger.debug('Express config not available for run {}'.format(run))

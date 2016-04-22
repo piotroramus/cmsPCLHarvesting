@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from rrapi import RRApi, RRApiError
 from logs.logger import setup_logging
 
-from model import Base, RunInfo, RunBlock, Multirun, Filename
+from model import Base, RunInfo, RunBlock, Multirun, Filename, Workflow
 from config import dbsapi_url, rrapi_url, runs_db_path, first_run_number, harvest_all_runs, days_old_runs
 from config import workspace, columns, table, template, filters, events_threshold
 from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
@@ -119,14 +119,21 @@ def discover():
             files, number_of_events = [], 0
 
             logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
-            multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
-                                                      Multirun.bfield == run.bfield,
-                                                      Multirun.run_class_name == run.run_class_name,
-                                                      Multirun.cmssw == release['cmssw'],
-                                                      Multirun.scram_arch == release['scram_arch'],
-                                                      Multirun.scenario == release['scenario'],
-                                                      Multirun.global_tag == release['global_tag']).one_or_none()
+            multiruns = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
+                                                       Multirun.bfield == run.bfield,
+                                                       Multirun.run_class_name == run.run_class_name,
+                                                       Multirun.cmssw == release['cmssw'],
+                                                       Multirun.scram_arch == release['scram_arch'],
+                                                       Multirun.scenario == release['scenario'],
+                                                       Multirun.global_tag == release['global_tag']).all()
             # TODO #4 - release should be equal up to 2 digits?
+
+            multirun = None
+            for m in multiruns:
+                # TODO #7: test it, I am pretty sure it is NOT working properly
+                if set(m.workflows) == set(release['workflows']):
+                    multirun = m
+
             if not multirun:
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
                                     run_class_name=run.run_class_name, closed=False, cmssw=release['cmssw'],
@@ -136,18 +143,22 @@ def discover():
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
                 session.refresh(multirun)
+                for workflow in release['workflows']:
+                    session.add(Workflow(workflow=workflow, multirun_id=multirun.id))
                 logger.info(
-                    ("Created new multirun {} "
+                    ("Created new multirun with "
+                     "id: {} "
                      "dataset: {} "
                      "bfield: {} "
                      "run classs name: {} "
                      "cmssw: {} "
                      "scram_arch: {} "
                      "scenario: {} "
-                     "global_tag: {}")
+                     "global_tag: {} "
+                     "workflows: {}")
                         .format(
-                        multirun.id, dataset['dataset'], multirun.bfield, multirun.run_class_name,
-                        release['cmssw'], release['scram_arch'], release['scenario'], release['global_tag']))
+                        multirun.id, multirun.dataset, multirun.bfield, multirun.run_class_name, multirun.cmssw,
+                        multirun.scram_arch, multirun.scenario, multirun.global_tag, multirun.workflows))
 
             logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])

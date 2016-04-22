@@ -2,9 +2,10 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Foreig
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-
 Base = declarative_base()
 
+
+# TODO #5: order this alphabetically by a name
 
 class RunInfo(Base):
     __tablename__ = 'run_info'
@@ -48,6 +49,8 @@ class Multirun(Base):
 
     run_numbers = relationship("RunInfo")
     filenames = relationship("Filename")
+    # TODO #6: many-to-many relationship
+    workflows = relationship("Workflow", back_populates="multirun")
 
 
 class Filename(Base):
@@ -57,3 +60,13 @@ class Filename(Base):
     filename = Column(String)
 
     multirun = Column(Integer, ForeignKey('multirun.id'))
+
+
+class Workflow(Base):
+    __tablename__ = 'workflow'
+
+    id = Column(Integer, primary_key=True)
+    workflow = Column(String)
+
+    multirun_id = Column(Integer, ForeignKey('multirun.id'))
+    multirun = relationship("Multirun", back_populates="workflows")
