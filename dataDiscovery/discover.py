@@ -130,8 +130,8 @@ def discover():
 
             multirun = None
             for m in multiruns:
-                # TODO #7: test it, I am pretty sure it is NOT working properly
-                if set(m.workflows) == set(release['workflows']):
+                workflows = [w.workflow for w in m.workflows]
+                if set(workflows) == set(release['workflows']):
                     multirun = m
 
             if not multirun:
