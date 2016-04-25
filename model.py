@@ -32,6 +32,9 @@ class RunBlock(Base):
 
     run_number = Column(Integer, ForeignKey('run_info.number'))
 
+    def __repr__(self):
+        return "RunBlock(id={}, block_name={}, run_number={}".format(self.id, self.block_name, self.run_number)
+
 
 class Multirun(Base):
     __tablename__ = 'multirun'
@@ -52,6 +55,23 @@ class Multirun(Base):
     # TODO #6: many-to-many relationship
     workflows = relationship("Workflow", back_populates="multirun")
 
+    def __repr__(self):
+        return ("Multirun(id={}, "
+                "number_of_events={}, "
+                "dataset={}, "
+                "bfield={}, "
+                "run_class_name={}, "
+                "cmssw={}, "
+                "scram_arch={}, "
+                "scenario={}, "
+                "global_tag={}, "
+                "closed={}, "
+                "run_numbers={}, "
+                "filenames={}, "
+                "workflows={}").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
+                                       self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
+                                       self.run_numbers, self.filenames, self.workflows)
+
 
 class Filename(Base):
     __tablename__ = 'filename'
@@ -60,6 +80,9 @@ class Filename(Base):
     filename = Column(String)
 
     multirun = Column(Integer, ForeignKey('multirun.id'))
+
+    def __repr__(self):
+        return self.filename
 
 
 class Workflow(Base):
@@ -70,3 +93,6 @@ class Workflow(Base):
 
     multirun_id = Column(Integer, ForeignKey('multirun.id'))
     multirun = relationship("Multirun", back_populates="workflows")
+
+    def __repr__(self):
+        return self.workflow

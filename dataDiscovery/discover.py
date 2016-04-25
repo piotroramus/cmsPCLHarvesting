@@ -13,6 +13,7 @@ from model import Base, RunInfo, RunBlock, Multirun, Filename, Workflow
 from config import dbsapi_url, rrapi_url, runs_db_path, first_run_number, harvest_all_runs, days_old_runs
 from config import workspace, columns, table, template, filters, events_threshold
 from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
+from alcaHarvesting.runner import alca_harvest
 
 
 def discover():
@@ -145,20 +146,7 @@ def discover():
                 session.refresh(multirun)
                 for workflow in release['workflows']:
                     session.add(Workflow(workflow=workflow, multirun_id=multirun.id))
-                logger.info(
-                    ("Created new multirun with "
-                     "id: {} "
-                     "dataset: {} "
-                     "bfield: {} "
-                     "run classs name: {} "
-                     "cmssw: {} "
-                     "scram_arch: {} "
-                     "scenario: {} "
-                     "global_tag: {} "
-                     "workflows: {}")
-                        .format(
-                        multirun.id, multirun.dataset, multirun.bfield, multirun.run_class_name, multirun.cmssw,
-                        multirun.scram_arch, multirun.scenario, multirun.global_tag, multirun.workflows))
+                logger.info("Created new multirun {}".format(multirun))
 
             logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
