@@ -63,8 +63,9 @@ class RunAlcaHarvesting:
             msg += str(ex)
             raise RuntimeError(msg)
 
-        process.source.fileNames.append(self.inputLFN)
 
+        for f in self.inputLFN:
+            process.source.fileNames.append(f)
 
         psetFile = open("RunAlcaHarvestingCfg.py", "w")
         psetFile.write(process.dumpPython())
