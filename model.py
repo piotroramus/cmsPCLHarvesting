@@ -5,7 +5,6 @@ from sqlalchemy.schema import Table
 
 Base = declarative_base()
 
-
 # TODO #5: order this alphabetically by a name
 
 
@@ -56,6 +55,7 @@ class Multirun(Base):
     scenario = Column(String)
     global_tag = Column(String)
     closed = Column(Boolean)
+    processed = Column(Boolean)
 
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc, back_populates="multiruns")
     filenames = relationship("Filename")
@@ -73,11 +73,12 @@ class Multirun(Base):
                 "scenario={}, "
                 "global_tag={}, "
                 "closed={}, "
+                "processed={}, "
                 "run_numbers={}, "
                 "filenames={}, "
                 "workflow={}").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
-                                       self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
-                                       self.run_numbers, self.filenames, self.workflow)
+                                      self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
+                                      self.processed, self.run_numbers, self.filenames, self.workflow)
 
 
 class Filename(Base):
