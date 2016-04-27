@@ -129,9 +129,9 @@ def discover():
             files, number_of_events = [], 0
 
             logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
-            workflow = extract_workflow(dataset['dataset'])
-            if workflow not in release['workflows']:
-                logger.warning("Dataset workflow {} is different than run workflows {}".format(workflow, release['workflows']))
+            dataset_workflow = extract_workflow(dataset['dataset'])
+            if dataset_workflow not in release['workflows']:
+                logger.warning("Dataset workflow {} is different than run workflows {}".format(dataset_workflow, release['workflows']))
                 continue
 
             multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
@@ -144,10 +144,14 @@ def discover():
             # TODO #4 - release should be equal up to 2 digits?
 
             if not multirun:
+                workflow = session.query(Workflow).filter(Workflow.workflow == dataset_workflow).one_or_none()
+                if not workflow:
+                    workflow = Workflow(workflow=dataset_workflow)
+                    logger.info("Creted new workflow entry: {}".format(workflow))
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
                                     run_class_name=run.run_class_name, closed=False, cmssw=release['cmssw'],
                                     scram_arch=release['scram_arch'], scenario=release['scenario'],
-                                    global_tag=release['global_tag'], workflow=Workflow(workflow=workflow))
+                                    global_tag=release['global_tag'], workflow=workflow)
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
