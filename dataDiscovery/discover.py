@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 
 from dbs.apis.dbsClient import DbsApi
 
@@ -13,7 +14,15 @@ from model import Base, RunInfo, RunBlock, Multirun, Filename, Workflow
 from config import dbsapi_url, rrapi_url, runs_db_path, first_run_number, harvest_all_runs, days_old_runs
 from config import workspace, columns, table, template, filters, events_threshold
 from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
-from alcaHarvesting.runner import alca_harvest
+
+
+def extract_workflow(dataset):
+    pattern = r'/(?P<primary_dataset>.*)/(?P<acquisition_era>.*?)-(?P<workflow>.*?)-(?P<version>.*)/ALCAPROMPT'
+    workflow = re.match(pattern, dataset)
+    if not workflow:
+        raise ValueError("Couldn't determine workflow out of dataset name {}".format(dataset))
+    # TODO #9: check if workflow is correct in autoPCL
+    return workflow.group('workflow')
 
 
 def discover():
@@ -120,35 +129,32 @@ def discover():
             files, number_of_events = [], 0
 
             logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
-            multiruns = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
+            workflow = extract_workflow(dataset['dataset'])
+            if workflow not in release['workflows']:
+                logger.warning("Dataset workflow {} is different than run workflows {}".format(workflow, release['workflows']))
+                continue
+
+            multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
                                                        Multirun.bfield == run.bfield,
                                                        Multirun.run_class_name == run.run_class_name,
                                                        Multirun.cmssw == release['cmssw'],
                                                        Multirun.scram_arch == release['scram_arch'],
                                                        Multirun.scenario == release['scenario'],
-                                                       Multirun.global_tag == release['global_tag']).all()
+                                                       Multirun.global_tag == release['global_tag']).one_or_none()
             # TODO #4 - release should be equal up to 2 digits?
-
-            multirun = None
-            for m in multiruns:
-                workflows = [w.workflow for w in m.workflows]
-                if set(workflows) == set(release['workflows']):
-                    multirun = m
-                    # TODO #8: this shouldn't be here, because unrelated multirun can be modified
-                    multirun.run_numbers.append(run)
 
             if not multirun:
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
                                     run_class_name=run.run_class_name, closed=False, cmssw=release['cmssw'],
                                     scram_arch=release['scram_arch'], scenario=release['scenario'],
-                                    global_tag=release['global_tag'], run_numbers=[run])
+                                    global_tag=release['global_tag'], workflow=Workflow(workflow=workflow))
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
                 session.refresh(multirun)
-                for workflow in release['workflows']:
-                    session.add(Workflow(workflow=workflow, multirun_id=multirun.id))
                 logger.info("Created new multirun {}".format(multirun))
+
+            multirun.run_numbers.append(run)
 
             logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
