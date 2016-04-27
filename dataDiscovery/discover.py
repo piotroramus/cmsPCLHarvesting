@@ -134,12 +134,14 @@ def discover():
                 workflows = [w.workflow for w in m.workflows]
                 if set(workflows) == set(release['workflows']):
                     multirun = m
+                    # TODO #8: this shouldn't be here, because unrelated multirun can be modified
+                    multirun.run_numbers.append(run)
 
             if not multirun:
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
                                     run_class_name=run.run_class_name, closed=False, cmssw=release['cmssw'],
                                     scram_arch=release['scram_arch'], scenario=release['scenario'],
-                                    global_tag=release['global_tag'])
+                                    global_tag=release['global_tag'], run_numbers=[run])
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()

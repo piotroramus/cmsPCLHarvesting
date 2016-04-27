@@ -1,11 +1,18 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Table
 
 Base = declarative_base()
 
 
 # TODO #5: order this alphabetically by a name
+
+
+run_multirun_assoc = Table('run_multirun', Base.metadata,
+                           Column('multirun_id', Integer, ForeignKey('multirun.id')),
+                           Column('run_info_id', Integer, ForeignKey('run_info.number')))
+
 
 class RunInfo(Base):
     __tablename__ = 'run_info'
@@ -17,7 +24,7 @@ class RunInfo(Base):
     stop_time = Column(DateTime)
 
     run_blocks = relationship("RunBlock")
-    multirun = Column(Integer, ForeignKey('multirun.id'))
+    multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
 
     def __repr__(self):
         return "RunInfo(number={}, run_class_name={}, bfield={} start_time={}, end_time={})".format(
@@ -50,7 +57,7 @@ class Multirun(Base):
     global_tag = Column(String)
     closed = Column(Boolean)
 
-    run_numbers = relationship("RunInfo")
+    run_numbers = relationship("RunInfo", secondary=run_multirun_assoc, back_populates="multiruns")
     filenames = relationship("Filename")
     # TODO #6: many-to-many relationship
     workflows = relationship("Workflow", back_populates="multirun")
