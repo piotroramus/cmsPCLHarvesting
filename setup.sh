@@ -12,7 +12,7 @@ else
     export X509_USER_PROXY=$(voms-proxy-info --path)
 
 
-    # TODO: first check if user has an access to /cvmfs/cms.cern.ch - if not raise an error message
+    # TODO #10: first check if user has an access to /cvmfs/cms.cern.ch - if not raise an error message
 
     source /cvmfs/cms.cern.ch/crab3/crab.sh
 fi
