@@ -59,8 +59,6 @@ class Multirun(Base):
 
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc, back_populates="multiruns")
     filenames = relationship("Filename")
-    workflow_id = Column(Integer, ForeignKey('workflow.id'))
-    workflow = relationship("Workflow", back_populates="multiruns")
 
     def __repr__(self):
         return ("Multirun(id={}, "
@@ -75,10 +73,9 @@ class Multirun(Base):
                 "closed={}, "
                 "processed={}, "
                 "run_numbers={}, "
-                "filenames={}, "
-                "workflow={}").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
+                "filenames={} ").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
                                       self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
-                                      self.processed, self.run_numbers, self.filenames, self.workflow)
+                                      self.processed, self.run_numbers, self.filenames)
 
 
 class Filename(Base):
@@ -91,15 +88,3 @@ class Filename(Base):
 
     def __repr__(self):
         return self.filename
-
-
-class Workflow(Base):
-    __tablename__ = 'workflow'
-
-    id = Column(Integer, primary_key=True)
-    workflow = Column(String)
-
-    multiruns = relationship("Multirun", back_populates="workflow")
-
-    def __repr__(self):
-        return self.workflow

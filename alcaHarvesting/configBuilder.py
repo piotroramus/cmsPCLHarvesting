@@ -10,7 +10,7 @@ class AlCaHarvestingCfgBuilder(object):
         setup_logging()
         self.logger = logging.getLogger(__name__)
 
-    def build(self, dataset, alcapromptdataset, input_files, workflows, scenario, global_tag, output_file):
+    def build(self, dataset, alcapromptdataset, input_files, scenario, global_tag, output_file, workflows=None):
 
         if not output_file.endswith(".py"):
             output_file += ".py"

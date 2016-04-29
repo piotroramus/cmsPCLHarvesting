@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from rrapi import RRApi, RRApiError
 from logs.logger import setup_logging
 
-from model import Base, RunInfo, RunBlock, Multirun, Filename, Workflow
+from model import Base, RunInfo, RunBlock, Multirun, Filename
 from config import dbsapi_url, rrapi_url, runs_db_path, first_run_number, harvest_all_runs, days_old_runs
 from config import workspace, columns, table, template, filters, events_threshold
 from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
@@ -131,8 +131,9 @@ def discover():
             logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
             dataset_workflow = extract_workflow(dataset['dataset'])
             if dataset_workflow not in release['workflows']:
-                logger.warning("Dataset workflow {} is different than run workflows {}".format(dataset_workflow,
-                                                                                               release['workflows']))
+                logger.warning(
+                    "Dataset workflow {} is different than workflow from run release {}".format(dataset_workflow,
+                                                                                                release['workflows']))
                 continue
 
             multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
@@ -145,14 +146,10 @@ def discover():
             # TODO #4 - release should be equal up to 2 digits?
 
             if not multirun:
-                workflow = session.query(Workflow).filter(Workflow.workflow == dataset_workflow).one_or_none()
-                if not workflow:
-                    workflow = Workflow(workflow=dataset_workflow)
-                    logger.info("Creted new workflow entry: {}".format(workflow))
                 multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
                                     run_class_name=run.run_class_name, closed=False, processed=False,
                                     cmssw=release['cmssw'], scram_arch=release['scram_arch'],
-                                    scenario=release['scenario'], global_tag=release['global_tag'], workflow=workflow)
+                                    scenario=release['scenario'], global_tag=release['global_tag'])
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()

@@ -21,12 +21,13 @@ mapping = {
 
 
 # TODO: rethink name
-def alca_harvest(dataset, filenames, global_tag, scenario, workflow):
-    print ("RUN WITH \n{} \n{} \n{} \n{} \n{}".format(dataset, filenames, global_tag, scenario, workflow))
+def alca_harvest(dataset, filenames, global_tag, scenario):
+    print ("RUN WITH \n{} \n{} \n{} \n{}".format(dataset, filenames, global_tag, scenario))
     from configBuilder import AlCaHarvestingCfgBuilder
+    from dataDiscovery.discover import extract_workflow
     builder = AlCaHarvestingCfgBuilder()
     input_files = [str(input_file) for input_file in filenames]
-    builder.build(str(dataset), None, input_files, mapping[workflow.workflow], scenario, global_tag, "alcaConfig.py")
+    builder.build(str(dataset), extract_workflow(dataset), input_files, scenario, global_tag, "alcaConfig.py")
 
 
 def parse_multirun_info():
@@ -48,5 +49,5 @@ def main():
     session = Session()
 
     m = session.query(Multirun).filter(Multirun.processed == False).first()
-
-    alca_harvest(m.dataset, m.filenames, m.global_tag, m.scenario, m.workflow)
+    print "FIRST MULTIRUN: {}".format(m)
+    alca_harvest(m.dataset, m.filenames, m.global_tag, m.scenario)
