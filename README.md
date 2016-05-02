@@ -6,7 +6,7 @@ In order to be able to use the DBS API Client, before using please do the follow
 
 then enter the certificate pass phrase if needed.
 
-## For running data (new runs) discovery execute
+## Running data (new runs) discovery
 
 `python runDataDiscovery.py`
 
@@ -14,7 +14,7 @@ It will look for a newly available runs, update local database and create multir
 out of them.
 
 
-## For running AlCa Harvesting PCL step execute
+## Running AlCa Harvesting PCL step
 
 `python runAlCaHarvesting.py`
 
