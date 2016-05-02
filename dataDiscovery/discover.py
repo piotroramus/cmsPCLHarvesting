@@ -132,8 +132,8 @@ def discover():
             dataset_workflow = extract_workflow(dataset['dataset'])
             if dataset_workflow not in release['workflows']:
                 logger.warning(
-                    "Dataset workflow {} is different than workflow from run release {}".format(dataset_workflow,
-                                                                                                release['workflows']))
+                    "Dataset {} workflow {} is different than workflow from run {} release {}".format(
+                        dataset['dataset'], dataset_workflow, run.number, release['workflows']))
                 continue
 
             multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
