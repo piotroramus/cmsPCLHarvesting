@@ -24,6 +24,7 @@ mapping = {
 def alca_harvest(dataset, filenames, global_tag, scenario):
     print ("RUN WITH \n{} \n{} \n{} \n{}".format(dataset, filenames, global_tag, scenario))
     from configBuilder import AlCaHarvestingCfgBuilder
+    # TODO #13: this thing couples modules
     from dataDiscovery.discover import extract_workflow
     builder = AlCaHarvestingCfgBuilder()
     input_files = [str(input_file) for input_file in filenames]
