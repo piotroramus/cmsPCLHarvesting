@@ -3,9 +3,10 @@ import logging
 from logs.logger import setup_logging
 from Configuration.DataProcessing.GetScenario import getScenario
 
+import FWCore.ParameterSet.Config as cms
+
 
 class AlCaHarvestingCfgBuilder(object):
-
     def __init__(self):
         setup_logging()
         self.logger = logging.getLogger(__name__)
@@ -40,6 +41,10 @@ class AlCaHarvestingCfgBuilder(object):
 
         for input_file in input_files:
             process.source.fileNames.append(input_file)
+
+        # fix in order to make multiruns work
+        process.DQMStore.collateHistograms = cms.untracked.bool(True)
+        process.dqmSaver.forceRunNumber = cms.untracked.int32(999999)
 
         with open(output_file, "w") as alcacfg:
             alcacfg.write(process.dumpPython())
