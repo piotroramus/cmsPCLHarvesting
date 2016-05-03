@@ -48,6 +48,6 @@ def main():
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    m = session.query(Multirun).filter(Multirun.processed == False).first()
+    m = session.query(Multirun).filter(Multirun.processed == False, Multirun.closed == True).first()
     print "FIRST MULTIRUN: {}".format(m)
     alca_harvest(m.dataset, m.filenames, m.global_tag, m.scenario)
