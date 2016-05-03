@@ -45,4 +45,4 @@ class AlCaHarvestingCfgBuilder(object):
             alcacfg.write(process.dumpPython())
 
         cms_run = "cmsRun -j FrameworkJobReport.xml {}".format(output_file)
-        print "Now do:\n{}".format(cms_run)
+        self.logger.info("Now do:\n{}".format(cms_run))
