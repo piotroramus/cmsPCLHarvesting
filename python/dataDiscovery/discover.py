@@ -9,7 +9,7 @@ from dbs.apis.dbsClient import DbsApi
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from rrapi import RRApi, RRApiError
+from rrapi.rrapi_v3 import RRApi, RRApiError
 from logs.logger import setup_logging
 
 from model import Base, RunInfo, RunBlock, Multirun, Filename
