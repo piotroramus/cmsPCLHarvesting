@@ -1,9 +1,9 @@
-import argparse
 import logging
 import json
 import subprocess
 
 import config
+import utils.workflows as workflows
 
 from logs.logger import setup_logging
 from model import Base, Multirun
@@ -11,32 +11,12 @@ from model import Base, Multirun
 setup_logging()
 logger = logging.getLogger(__name__)
 
-# change this to https://github.com/cms-sw/cmssw/blob/CMSSW_8_1_X/Configuration/AlCa/python/autoPCL.py
-mapping = {
-    'PromptCalibProd': ['BeamSpotByRun', 'BeamSpotByLumi', 'SiStripQuality'],
-    'PromptCalibProdSiStrip': ['SiStripQuality'],
-    'PromptCalibProdSiStripGains': ['SiStripGains'],
-    'PromptCalibProdSiPixelAli': ['SiPixelAli']
-}
-
-import re
-def extract_workflow(dataset):
-    pattern = r'/(?P<primary_dataset>.*)/(?P<acquisition_era>.*?)-(?P<workflow>.*?)-(?P<version>.*)/ALCAPROMPT'
-    workflow = re.match(pattern, dataset)
-    if not workflow:
-        raise ValueError("Couldn't determine workflow out of dataset name {}".format(dataset))
-    # TODO #9: check if workflow is correct in autoPCL
-    return workflow.group('workflow')
-
 
 def build_config(dataset, filenames, global_tag, scenario, output_file="alcaConfig.py"):
-    # print ("RUN WITH \n{} \n{} \n{} \n{}".format(dataset, filenames, global_tag, scenario))
     from configBuilder import AlCaHarvestingCfgBuilder
-    # TODO #13: this thing couples modules
-    # from dataDiscovery.discover import extract_workflow
     builder = AlCaHarvestingCfgBuilder()
     input_files = [str(input_file) for input_file in filenames]
-    builder.build(str(dataset), extract_workflow(dataset), input_files, scenario, global_tag, output_file)
+    builder.build(str(dataset), workflows.extract_workflow(dataset), input_files, scenario, global_tag, output_file)
 
 
 def prepare_information():
