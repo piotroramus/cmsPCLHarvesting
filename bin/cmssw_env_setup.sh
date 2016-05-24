@@ -43,7 +43,4 @@ python $PYTHON_DIR_PATH/configPreparator.py $PARAMS_FILE
 
 cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee jobOutput.txt
 
-# TODO: check results of operation, set processed = False in db if needed
-# And closed should be set to False, since only then the multirun can be increased
-# Upload needed files
-# python
+python $PYTHON_DIR_PATH/resultsHandler.py
