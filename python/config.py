@@ -4,8 +4,11 @@ rrapi_url = "http://runregistry.web.cern.ch/runregistry/"
 # path to database containing all the harvesting information
 runs_db_path = "test.db"
 
+# where to setup environments for AlCaHarvesting
+workspace_path = "/afs/cern.ch/work/p/poramus/cmsenvs"
+
 # how far in the past should we look for new runs
-days_old_runs = 5
+days_old_runs = 7
 
 # in case we want to get all the runs (eg. for the first time)
 harvest_all_runs = False
@@ -19,7 +22,7 @@ template = 'json'
 filters = {}
 
 # how many events multirun should contain to be qualified as ready to start
-events_threshold = 30000
+events_threshold = 100000
 
 # only specified runClasses will be processed while using the particular workflow
 workflow_run_classes = {
