@@ -9,12 +9,14 @@ CMSSW_RELEASE="$2"
 SCRAM_ARCH="$3"
 MULTIRUN_ID="$4"
 PARAMS_FILE="$5"
+PYTHON_DIR_PATH="$6"
 
 PARAMS_FILE_PWD=$PWD/$PARAMS_FILE
 
 echo "Creating CMSSW environment in $WORKSPACE"
 echo "Release to be used: $CMSSW_RELEASE"
 echo "Architecture: $SCRAM_ARCH"
+
 
 # TODO: consider what to do when the environment already exists
 mkdir -p $WORKSPACE
@@ -36,6 +38,12 @@ cd $MULTIRUN_ID
 
 mv $PARAMS_FILE_PWD .
 
-python /afs/cern.ch/user/p/poramus/shared/cmsPCLHarvesting/python/configPreparator.py $PARAMS_FILE
+# TODO: workon environment? hmm... needed at earlier stage
+python $PYTHON_DIR_PATH/configPreparator.py $PARAMS_FILE
 
 cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee jobOutput.txt
+
+# TODO: check results of operation, set processed = False in db if needed
+# And closed should be set to False, since only then the multirun can be increased
+# Upload needed files
+# python

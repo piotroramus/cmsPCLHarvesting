@@ -1,6 +1,7 @@
 import logging
 import json
 import subprocess
+import os
 
 import config
 import utils.workflows as workflows
@@ -19,8 +20,7 @@ def build_config(dataset, filenames, global_tag, scenario, output_file="alcaConf
     builder.build(str(dataset), workflows.extract_workflow(dataset), input_files, scenario, global_tag, output_file)
 
 
-def prepare_information():
-
+def prepare_multirun_environment():
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
@@ -29,11 +29,13 @@ def prepare_information():
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    multiruns = session.query(Multirun).filter(Multirun.processed == False, Multirun.closed == True).all()
+    multirun = session.query(Multirun).filter(Multirun.processed == False, Multirun.closed == True).first()
 
-    #TODO: this should take only one run - which is done now, but with break.
-    # It should rather mark it somehow in database that multirun was taken
-    for multirun in multiruns:
+    if multirun:
+        # TODO: uncomment when comfortable to use
+        # multirun.processed = True
+        # session.commit()
+
         multirun_info = dict()
         multirun_info['id'] = multirun.id
         multirun_info['dataset'] = multirun.dataset
@@ -49,22 +51,21 @@ def prepare_information():
             f.write(dump)
 
         workspace = "{}/{}".format(config.workspace_path, multirun.scram_arch)
-        cmd = "/afs/cern.ch/user/p/poramus/shared/cmsPCLHarvesting/bin/cmssw_env_setup.sh {} {} {} {} {}".format(workspace,
-                                                                                                           multirun.cmssw,
-                                                                                                           multirun.scram_arch, multirun.id, filename)
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
+        python_dir_path = script_path.replace("/alcaHarvesting", "/")
+        cmd = "{} {} {} {} {} {} {}".format(shell_script_path, workspace, multirun.cmssw, multirun.scram_arch, multirun.id,
+                                         filename, python_dir_path)
         subprocess.call(cmd, shell=True)
 
-        break
 
 def prepare_config(params_file):
-
     multirun_info = None
     with open(params_file, 'r') as f:
         multirun_info = f.read()
 
     params = json.loads(multirun_info)
 
-    # TODO: workspace is now defined in two places... not really good
     workspace = "{}/{}".format(config.workspace_path, params['scram_arch'])
     config_file = "{}/{}/src/{}/alcaConfig.py".format(workspace, params['cmssw'], params['id'])
 

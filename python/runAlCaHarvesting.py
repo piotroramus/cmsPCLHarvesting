@@ -1,7 +1,7 @@
 import logging
 
 from logs.logger import setup_logging
-from alcaHarvesting.runner import prepare_information
+from alcaHarvesting.runner import prepare_multirun_environment
 
 if __name__ == '__main__':
 
@@ -10,6 +10,6 @@ if __name__ == '__main__':
 
     logger.info("Preparing AlCa Harvesting config")
 
-    prepare_information()
+    prepare_multirun_environment()
 
     logger.info("AlCa Harvesting has been finished")
