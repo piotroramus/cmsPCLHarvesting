@@ -10,6 +10,7 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     if len(sys.argv) != 2:
-        logger.error("Script usage: {} parameters_file".format(sys.argv[0]))
+        logger.error("Script usage: {} params_file_path".format(sys.argv[0]))
     else:
-        prepare_config(sys.argv[1])
+        params_file_path = sys.argv[1]
+        prepare_config(params_file_path)
