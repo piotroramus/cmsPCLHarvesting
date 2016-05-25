@@ -2,6 +2,7 @@ import datetime
 import logging
 
 import config
+import utils.workflows as workflows
 
 from dbs.apis.dbsClient import DbsApi
 
@@ -122,7 +123,7 @@ def discover():
             files, number_of_events = [], 0
 
             logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
-            dataset_workflow = extract_workflow(dataset['dataset'])
+            dataset_workflow = workflows.extract_workflow(dataset['dataset'])
             if dataset_workflow not in release['workflows']:
                 logger.warning(
                     "Dataset {} workflow {} is different than workflow from run {} release {}".format(
