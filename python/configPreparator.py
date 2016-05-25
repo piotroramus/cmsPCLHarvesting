@@ -2,7 +2,7 @@ import logging
 import sys
 
 from logs.logger import setup_logging
-from alcaHarvesting.runner import prepare_config
+from alcaHarvesting.envAssembler import prepare_config
 
 if __name__ == '__main__':
 

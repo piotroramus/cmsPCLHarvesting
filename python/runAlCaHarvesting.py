@@ -1,7 +1,7 @@
 import logging
 
 from logs.logger import setup_logging
-from alcaHarvesting.runner import prepare_multirun_environment
+from alcaHarvesting.envAssembler import prepare_multirun_environment
 
 if __name__ == '__main__':
 

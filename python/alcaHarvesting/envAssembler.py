@@ -66,7 +66,5 @@ def prepare_config(params_file):
 
     params = json.loads(multirun_info)
 
-    workspace = "{}/{}".format(config.workspace_path, params['scram_arch'])
-    config_file = "{}/{}/src/{}/alcaConfig.py".format(workspace, params['cmssw'], params['id'])
-
+    config_file = "alcaConfig.py"
     build_config(params['dataset'], params['filenames'], params['global_tag'], params['scenario'], config_file)
