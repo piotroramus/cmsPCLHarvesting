@@ -5,41 +5,21 @@ from sqlalchemy.schema import Table
 
 Base = declarative_base()
 
-# TODO #5: order this alphabetically by a name
-
-
 run_multirun_assoc = Table('run_multirun', Base.metadata,
                            Column('multirun_id', Integer, ForeignKey('multirun.id')),
                            Column('run_info_id', Integer, ForeignKey('run_info.number')))
 
 
-class RunInfo(Base):
-    __tablename__ = 'run_info'
-
-    number = Column(Integer, primary_key=True)
-    run_class_name = Column(String)
-    bfield = Column(Float)
-    start_time = Column(DateTime)
-    stop_time = Column(DateTime)
-
-    run_blocks = relationship("RunBlock")
-    multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
-
-    def __repr__(self):
-        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={}, end_time={})".format(
-            self.number, self.run_class_name, self.bfield, self.start_time, self.stop_time)
-
-
-class RunBlock(Base):
-    __tablename__ = 'run_block'
+class Filename(Base):
+    __tablename__ = 'filename'
 
     id = Column(Integer, primary_key=True)
-    block_name = Column(String)
+    filename = Column(String)
 
-    run_number = Column(Integer, ForeignKey('run_info.number'))
+    multirun = Column(Integer, ForeignKey('multirun.id'))
 
     def __repr__(self):
-        return "RunBlock(id={}, block_name={}, run_number={}".format(self.id, self.block_name, self.run_number)
+        return self.filename
 
 
 class Multirun(Base):
@@ -74,17 +54,34 @@ class Multirun(Base):
                 "processed={}, "
                 "run_numbers={}, "
                 "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
-                                      self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
-                                      self.processed, self.run_numbers, self.filenames)
+                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
+                                        self.processed, self.run_numbers, self.filenames)
 
 
-class Filename(Base):
-    __tablename__ = 'filename'
+class RunBlock(Base):
+    __tablename__ = 'run_block'
 
     id = Column(Integer, primary_key=True)
-    filename = Column(String)
+    block_name = Column(String)
 
-    multirun = Column(Integer, ForeignKey('multirun.id'))
+    run_number = Column(Integer, ForeignKey('run_info.number'))
 
     def __repr__(self):
-        return self.filename
+        return "RunBlock(id={}, block_name={}, run_number={}".format(self.id, self.block_name, self.run_number)
+
+
+class RunInfo(Base):
+    __tablename__ = 'run_info'
+
+    number = Column(Integer, primary_key=True)
+    run_class_name = Column(String)
+    bfield = Column(Float)
+    start_time = Column(DateTime)
+    stop_time = Column(DateTime)
+
+    run_blocks = relationship("RunBlock")
+    multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
+
+    def __repr__(self):
+        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={}, end_time={})".format(
+            self.number, self.run_class_name, self.bfield, self.start_time, self.stop_time)
