@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 
 import config
 import utils.workflows as workflows
@@ -14,6 +15,14 @@ from logs.logger import setup_logging
 
 from model import Base, RunInfo, RunBlock, Multirun, Filename
 from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
+
+
+def get_base_release(full_release):
+    pattern = r'(?P<release>CMSSW_\d+_\d+_)\d+'
+    base_release = re.match(pattern, full_release)
+    if not base_release:
+        raise ValueError("Couldn't determine base release out of {}".format(full_release))
+    return base_release.group('release')
 
 
 def discover():
@@ -114,6 +123,9 @@ def discover():
             logger.debug("Express config for run {} is not available".format(run.number))
             continue
 
+        base_release = get_base_release(release['cmssw'])
+        base_release_pattern = "{}%".format(base_release)
+
         logger.debug("Getting already harvested blocks for run {}".format(run.number))
         harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run.number).all()
 
@@ -140,7 +152,7 @@ def discover():
             multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
                                                       Multirun.bfield == run.bfield,
                                                       Multirun.run_class_name == run.run_class_name,
-                                                      Multirun.cmssw == release['cmssw'],
+                                                      Multirun.cmssw.like(base_release_pattern), #TODO: write tests to find out whether it really works as wanted
                                                       Multirun.scram_arch == release['scram_arch'],
                                                       Multirun.scenario == release['scenario'],
                                                       Multirun.global_tag == release['global_tag']).one_or_none()
