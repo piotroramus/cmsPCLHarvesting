@@ -181,7 +181,6 @@ def discover():
                         "Multirun {} with {} events ready to be processed".format(multirun.id,
                                                                                   multirun.number_of_events))
                     multirun.closed = True
-                    # TODO #2: inform some other service, that this multirun can be executed
                 session.commit()
 
     session.commit()
