@@ -2,7 +2,7 @@
 
 # sets CMSSW environment up
 # should be called as the following:
-# cmssw_env_setup.sh workspace cmsswRelease scramArch multirun_id multirun_params_filename path_to_python_scripts
+# cmssw_env_setup.sh workspace cmsswRelease scramArch multirun_id multirun_params_filename path_to_python_scripts dqmgui_dir dqm_upload_host
 
 WORKSPACE="$1"
 CMSSW_RELEASE="$2"
@@ -10,6 +10,8 @@ SCRAM_ARCH="$3"
 MULTIRUN_ID="$4"
 PARAMS_FILE="$5"
 PYTHON_DIR_PATH="$6"
+DQMGUI_DIR="$7"
+DQM_UPLOAD_HOST="$8"
 
 PARAMS_FILE_PWD=$PWD/$PARAMS_FILE
 
@@ -55,3 +57,17 @@ cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee jobOutput.txt
 
 # handle results of the job
 python $PYTHON_DIR_PATH/resultsHandler.py
+
+# upload DQM file
+# check if there is exactly one .root file
+root_files_count=$(ls *.root 2>/dev/null | wc -l)
+if [ $root_files_count -lt 1 ]; then
+    echo "DQM file is missing!"
+    echo "DQM file upload failed."
+elif [ $root_files_count -gt 1 ]; then
+    echo "More than one DQM file!"
+    echo "DQM file upload failed."
+else
+    source $DQMGUI_DIR/current/apps/dqmgui/128/etc/profile.d/env.sh
+    visDQMUpload $DQM_UPLOAD_HOST $(ls *.root)
+fi

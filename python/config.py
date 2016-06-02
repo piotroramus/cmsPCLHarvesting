@@ -7,6 +7,12 @@ runs_db_path = "test.db"
 # where to setup environments for AlCaHarvesting
 workspace_path = "/afs/cern.ch/work/p/poramus/cmsenvs"
 
+# location of `current` DQM GUI directory
+dqm_current = "/datadqm/testGui"
+
+# where to upload resultant DQM file
+dqm_upload_host = "http://piotri.cern.ch:8060/dqm/dev"
+
 # how far in the past should we look for new runs
 days_old_runs = 7
 

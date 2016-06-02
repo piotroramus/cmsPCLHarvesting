@@ -54,8 +54,8 @@ def prepare_multirun_environment():
         script_path = os.path.dirname(os.path.realpath(__file__))
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         python_dir_path = script_path.replace("/alcaHarvesting", "/")
-        cmd = "{} {} {} {} {} {} {}".format(shell_script_path, workspace, multirun.cmssw, multirun.scram_arch, multirun.id,
-                                         filename, python_dir_path)
+        cmd = "{} {} {} {} {} {} {} {}".format(shell_script_path, workspace, multirun.cmssw, multirun.scram_arch, multirun.id,
+                                         filename, python_dir_path, config.dqm_current, config.dqm_upload_host)
         subprocess.call(cmd, shell=True)
 
 
