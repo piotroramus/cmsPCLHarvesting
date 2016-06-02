@@ -84,7 +84,7 @@ def discover():
                 start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
                 stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
                 old_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
-                old_run.run_class_name = run[u'run_class_name']
+                old_run.run_class_name = run[u'runClassName']
                 old_run.bfield = run[u'bfield']
                 old_run.start_time = start
                 old_run.stop_time = stop
