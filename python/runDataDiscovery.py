@@ -7,7 +7,6 @@ if __name__ == '__main__':
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    # TODO #3: consider calling setup.sh here
     logger.info("Starting data discovery")
     dataDiscovery.discover.discover()
     logger.info("Data discovery has been finished")
