@@ -4,6 +4,16 @@
 
 ### Get access to DBS python client
 
+#### Provide credentials for voms-proxy-init
+
+In the `bin` directory create a file called `voms.pwd` and fill it with the following content:
+
+GRID_PASS_PHRASE=gridphrase
+
+where the `gridphrase` is a phrase for your GRID certificate
+
+#### Source setup file
+
 `source bin/setup.sh`
 
 ### Setup python virtual environment
