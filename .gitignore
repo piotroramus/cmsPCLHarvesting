@@ -63,3 +63,6 @@ target/
 
 #SQLite database files
 *.db
+
+# file with password for voms proxy
+bin/voms.pwd

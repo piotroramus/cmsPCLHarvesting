@@ -8,11 +8,24 @@ if [[ ! ${0##*/} == -* ]]; then
 else
 
     echo "Generating new proxy certificate..."
-    voms-proxy-init -rfc -voms cms
-    export X509_USER_PROXY=$(voms-proxy-info --path)
+
+    VOMS_PASS_PHRASE_FILE="voms.pwd"
+    if [ ! -f $VOMS_PASS_PHRASE_FILE ]; then
+        echo "Error: $VOMS_PASS_PHRASE_FILE file is missing!"
+        exit 1
+    else
+        source $VOMS_PASS_PHRASE_FILE
+        if [ -z ${GRID_PASS_PHRASE+x} ]; then
+            echo "Error: GRID_PASS_PHRASE not set in $VOMS_PASS_PHRASE_FILE!"
+            exit 1
+        else
+            echo $GRID_PASS_PHRASE | voms-proxy-init -rfc -voms cms -pwstdin
+            export X509_USER_PROXY=$(voms-proxy-info --path)
+
+            # TODO #10: first check if user has an access to /cvmfs/cms.cern.ch - if not raise an error message
+            source /cvmfs/cms.cern.ch/crab3/crab.sh
+        fi
+    fi
 
 
-    # TODO #10: first check if user has an access to /cvmfs/cms.cern.ch - if not raise an error message
-
-    source /cvmfs/cms.cern.ch/crab3/crab.sh
 fi
