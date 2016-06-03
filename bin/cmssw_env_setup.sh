@@ -24,9 +24,10 @@ mkdir -p $WORKSPACE/$CMSSW_RELEASE
 
 
 # get CMSSW_RELEASE location
-CMSSW_RELEASE_DIR=$(scram -a $SCRAM_ARCH list -c CMSSW $CMSSW_RELEASE |
-                    awk -v pattern="^$CMSSW_RELEASE$" '$2 ~ pattern {print $3}')
-
+CMSSW_RELEASE_DIR=$(
+                    scram -a $SCRAM_ARCH list -c CMSSW $CMSSW_RELEASE |
+                    awk -v pattern="^$CMSSW_RELEASE$" '$2 ~ pattern {print $3}'
+                    )
 
 echo "Sourcing environment from $CMSSW_RELEASE_DIR/src"
 cd $CMSSW_RELEASE_DIR/src
