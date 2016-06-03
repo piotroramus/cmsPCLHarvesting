@@ -22,8 +22,13 @@ else
             echo $GRID_PASS_PHRASE | voms-proxy-init -rfc -voms cms -pwstdin
             export X509_USER_PROXY=$(voms-proxy-info --path)
 
-            # TODO #10: first check if user has an access to /cvmfs/cms.cern.ch - if not raise an error message
-            source /cvmfs/cms.cern.ch/crab3/crab.sh
+            if [ ! -d "/cvmfs/cms.cern.ch" ]; then
+                echo "Error: User $(whoami) does not have access to /cvmfs/cms.cern.ch space"
+                echo "Please grant the access first"
+                exit 1
+            else
+                source /cvmfs/cms.cern.ch/crab3/crab.sh
+            fi
         fi
     fi
 
