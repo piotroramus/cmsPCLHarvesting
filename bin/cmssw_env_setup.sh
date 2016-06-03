@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # sets CMSSW environment up
-# should be called as the following:
-# cmssw_env_setup.sh workspace cmsswRelease scramArch multirun_id multirun_params_filename path_to_python_scripts dqmgui_dir dqm_upload_host
+# should be called as follows:
+# cmssw_env_setup.sh workspace cmsswRelease scramArch multirun_id multirun_params_filename path_to_python_scripts dqmgui_dir dqm_upload_host cmssw_releases
 
 WORKSPACE="$1"
 CMSSW_RELEASE="$2"
@@ -12,6 +12,7 @@ PARAMS_FILE="$5"
 PYTHON_DIR_PATH="$6"
 DQMGUI_DIR="$7"
 DQM_UPLOAD_HOST="$8"
+CMSSW_RELEASES_BASE="$9"
 
 PARAMS_FILE_PWD=$PWD/$PARAMS_FILE
 
@@ -20,19 +21,27 @@ echo "Release to be used: $CMSSW_RELEASE"
 echo "Architecture: $SCRAM_ARCH"
 
 
-mkdir -p $WORKSPACE
-cd $WORKSPACE
+mkdir -p $WORKSPACE/$CMSSW_RELEASE
 
-# if given CMSSW environment does not exists for the given architecture - create it
-if [ ! -d "$CMSSW_RELEASE" ]; then
-    export SCRAM_ARCH=$SCRAM_ARCH
-    # the same as cmsrel $CMSSW_RELEASE
-    scramv1 project CMSSW $CMSSW_RELEASE
+
+CMSSW_RELEASE_DIR=$CMSSW_RELEASES_BASE/$SCRAM_ARCH/cms/cmssw/$CMSSW_RELEASE
+# check whether formed directory is valid
+if [ ! -d $CMSSW_RELEASE_DIR ]; then
+    # try a patch release which has slightly different path
+    CMSSW_RELEASE_DIR=$CMSSW_RELEASES_BASE/$SCRAM_ARCH/cms/cmssw-patch/$CMSSW_RELEASE
+    if [ ! -d $CMSSW_RELEASE_DIR ]; then
+        echo "CMSSW release directory: $CMSSW_RELEASE_DIR is somehow wrong"
+        echo "Please fix this script, so the directory is the same as $CMSSW_RELEASE_BASE after doing cmsenv"
+        exit 1
+    fi
 fi
 
-
-cd $CMSSW_RELEASE/src
+echo "Sourcing environment from $CMSSW_RELEASE_DIR"
+cd $CMSSW_RELEASE_DIR
 eval `scramv1 runtime -sh`
+
+cd $WORKSPACE/$CMSSW_RELEASE
+
 
 MULTIRUN_DIR=$MULTIRUN_ID
 if [ -d "$MULTIRUN_ID" ]; then

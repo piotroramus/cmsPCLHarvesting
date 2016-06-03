@@ -13,6 +13,12 @@ dqm_current = "/datadqm/testGui"
 # where to upload resultant DQM file
 dqm_upload_host = "http://piotri.cern.ch:8060/dqm/dev"
 
+# base directory where CMSSW releases are stored
+# it can be obtained via $CMSSW_RELEASE_BASE after doing cmsenv and omitting release specific subdirectories
+# ## if the $CMSSW_RELEASE_BASE is /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_8_0_8
+# ## the variable should be set to /cvmfs/cms.cern.ch
+cmssw_releases = "/cvmfs/cms.cern.ch"
+
 # how far in the past should we look for new runs
 days_old_runs = 7
 
