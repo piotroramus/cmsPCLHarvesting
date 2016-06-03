@@ -1,20 +1,16 @@
 import datetime
 import logging
 import re
+import sqlalchemy
 
 import config
 import utils.workflows as workflows
-
-from dbs.apis.dbsClient import DbsApi
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import dbs.apis.dbsClient as dbsapi
+import logs.logger as logs
+import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 
 from rrapi.rrapi_v3 import RRApi, RRApiError
-from logs.logger import setup_logging
-
 from model import Base, RunInfo, RunBlock, Multirun, Filename
-from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
 
 
 def get_base_release(full_release):
@@ -26,16 +22,16 @@ def get_base_release(full_release):
 
 
 def discover():
-    setup_logging()
+    logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    engine = create_engine('sqlite:///{}'.format(config.runs_db_path), echo=False)
+    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config.runs_db_path), echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
-    Session = sessionmaker(bind=engine)
+    Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
     rrapi = RRApi(config.rrapi_url, debug=True)
-    dbsApi = DbsApi(url=config.dbsapi_url)
+    dbsApi = dbsapi.DbsApi(url=config.dbsapi_url)
 
     days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - config.days_old_runs).strftime(
         "%Y-%m-%d")
@@ -113,7 +109,7 @@ def discover():
                                                   RunInfo.start_time > days_old_runs_date).all()
     # TODO #1: test if the date comparison works properly
 
-    t0api = Tier0Api()
+    t0api = t0wmadatasvcApi.Tier0Api()
     logger.info("Starting creating multiruns...")
     for run in complete_runs:
 
@@ -152,7 +148,8 @@ def discover():
             multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
                                                       Multirun.bfield == run.bfield,
                                                       Multirun.run_class_name == run.run_class_name,
-                                                      Multirun.cmssw.like(base_release_pattern), #TODO: write tests to find out whether it really works as wanted
+                                                      Multirun.cmssw.like(base_release_pattern),
+                                                      # TODO: write tests to find out whether it really works as wanted
                                                       Multirun.scram_arch == release['scram_arch'],
                                                       Multirun.scenario == release['scenario'],
                                                       Multirun.global_tag == release['global_tag']).one_or_none()

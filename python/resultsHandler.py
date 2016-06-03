@@ -1,10 +1,9 @@
 import logging
-
-from logs.logger import setup_logging
+import logs.logger as logs
 
 if __name__ == '__main__':
 
-    setup_logging()
+    logs.setup_logging()
     logger = logging.getLogger(__name__)
 
     logger.info("I will somehow handle the result of the AlCaHarvesting step.")

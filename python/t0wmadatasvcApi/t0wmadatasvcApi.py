@@ -1,21 +1,18 @@
 import os
 import logging
+import requests
 
-from requests import Request, Session
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.packages.urllib3 import disable_warnings
-
-from logs.logger import setup_logging
+import logs.logger as logs
 
 
 class Tier0Api(object):
     def __init__(self):
         self.base_url = 'https://cmsweb.cern.ch/t0wmadatasvc/prod/express_config'
-        self.session = Session()
-        request = Request('GET', self.base_url)
+        self.session = requests.Session()
+        request = requests.Request('GET', self.base_url)
         self.request = self.session.prepare_request(request)
-        disable_warnings(InsecureRequestWarning)
-        setup_logging()
+        requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+        logs.setup_logging()
         self.logger = logging.getLogger(__name__)
 
     def get_run_express_config(self, run):

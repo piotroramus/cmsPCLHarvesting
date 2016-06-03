@@ -5,11 +5,11 @@ import os
 
 import config
 import utils.workflows as workflows
+import logs.logger as logs
 
-from logs.logger import setup_logging
 from model import Base, Multirun
 
-setup_logging()
+logs.setup_logging()
 logger = logging.getLogger(__name__)
 
 

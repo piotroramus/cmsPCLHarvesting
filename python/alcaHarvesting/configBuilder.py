@@ -1,14 +1,13 @@
 import logging
 
-from logs.logger import setup_logging
-from Configuration.DataProcessing.GetScenario import getScenario
-
+import logs.logger as logs
+import Configuration.DataProcessing.GetScenario as cmssw
 import FWCore.ParameterSet.Config as cms
 
 
 class AlCaHarvestingCfgBuilder(object):
     def __init__(self):
-        setup_logging()
+        logs.setup_logging()
         self.logger = logging.getLogger(__name__)
 
     def build(self, dataset, alcapromptdataset, input_files, scenario, global_tag, output_file, workflows=None):
@@ -17,7 +16,7 @@ class AlCaHarvestingCfgBuilder(object):
             output_file += ".py"
 
         try:
-            scenario = getScenario(scenario)
+            scenario = cmssw.getScenario(scenario)
         except Exception as ex:
             msg = "Error getting Scenario implementation for {}\n".format(scenario)
             msg += str(ex)

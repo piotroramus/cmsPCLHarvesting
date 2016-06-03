@@ -1,16 +1,16 @@
 import logging
 import sys
 
-from logs.logger import setup_logging
-from alcaHarvesting.envAssembler import prepare_config
+import logs.logger as logs
+import alcaHarvesting.envAssembler
 
 if __name__ == '__main__':
 
-    setup_logging()
+    logs.setup_logging()
     logger = logging.getLogger(__name__)
 
     if len(sys.argv) != 2:
         logger.error("Script usage: {} params_file_path".format(sys.argv[0]))
     else:
         params_file_path = sys.argv[1]
-        prepare_config(params_file_path)
+        alcaHarvesting.envAssembler.prepare_config(params_file_path)
