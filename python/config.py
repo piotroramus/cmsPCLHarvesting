@@ -2,7 +2,7 @@ dbsapi_url = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
 rrapi_url = "http://runregistry.web.cern.ch/runregistry/"
 
 # path to database containing all the harvesting information
-runs_db_path = "test.db"
+runs_db_path = "/afs/cern.ch/work/p/poramus/database/database.db"
 
 # where to setup environments for AlCaHarvesting
 workspace_path = "/afs/cern.ch/work/p/poramus/cmsenvs"
