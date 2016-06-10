@@ -56,6 +56,14 @@ python $PYTHON_DIR_PATH/configPreparator.py $PARAMS_FILE
 
 # run the AlCaHarvesting step
 cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee jobOutput.txt
+CMS_RUN_RESULT=$?
+
+if [[ $CMS_RUN_RESULT != 0 ]]; then
+    echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID
+    exit $CMS_RUN_RESULT
+fi
+
 
 # handle results of the job
 python $PYTHON_DIR_PATH/resultsHandler.py

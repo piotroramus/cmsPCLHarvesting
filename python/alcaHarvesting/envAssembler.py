@@ -34,12 +34,11 @@ def prepare_multirun_environment():
     if not multirun:
         logger.info("No closed and unprocessed multiruns found - no further steps will be taken")
 
-    if multirun:
+    else:
         logger.info("Multirun to be processed: {}".format(multirun))
 
-        # TODO: uncomment when comfortable to use
-        # multirun.processed = True
-        # session.commit()
+        multirun.processed = True
+        session.commit()
 
         multirun_info = dict()
         multirun_info['id'] = multirun.id
