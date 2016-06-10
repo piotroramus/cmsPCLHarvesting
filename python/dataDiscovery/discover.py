@@ -40,6 +40,7 @@ def discover():
     else:
         config.filters['startTime'] = "> {}".format(days_old_runs_date)
     recent_runs = []
+    # TODO #13: this try is not coupled well with previous if statement - logger info particularly
     try:
         logger.info("Fetching Run Registry records from last {} days".format(config.days_old_runs))
         # TODO #11: might be worth to take only runs with the runClassNames from config
