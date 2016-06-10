@@ -35,6 +35,8 @@ def prepare_multirun_environment():
         logger.info("No closed and unprocessed multiruns found - no further steps will be taken")
 
     if multirun:
+        logger.info("Multirun to be processed: {}".format(multirun))
+
         # TODO: uncomment when comfortable to use
         # multirun.processed = True
         # session.commit()
@@ -58,8 +60,8 @@ def prepare_multirun_environment():
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         python_dir_path = script_path.replace("/alcaHarvesting", "/")
         cmd = "{} {} {} {} {} {} {} {} {}".format(shell_script_path, workspace, multirun.cmssw, multirun.scram_arch,
-                                                     multirun.id, filename, python_dir_path, config.dqm_current,
-                                                     config.dqm_upload_host)
+                                                  multirun.id, filename, python_dir_path, config.dqm_current,
+                                                  config.dqm_upload_host)
         subprocess.call(cmd, shell=True)
 
 
