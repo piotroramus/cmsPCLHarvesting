@@ -14,7 +14,12 @@ where the `gridphrase` is a phrase for your GRID certificate
 
 #### Source setup file
 
-`source bin/setup.sh`
+`cd bin`
+`source setup.sh`
+`cd ..`
+
+Please note that the script should be sourced from bin directory itself.
+Otherwise credentials file will not be recognized.
 
 ### Setup python virtual environment
 
