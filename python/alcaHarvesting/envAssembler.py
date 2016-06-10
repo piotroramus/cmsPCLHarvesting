@@ -31,6 +31,9 @@ def prepare_multirun_environment():
 
     multirun = session.query(Multirun).filter(Multirun.processed == False, Multirun.closed == True).first()
 
+    if not multirun:
+        logger.info("No closed and unprocessed multiruns found - no further steps will be taken")
+
     if multirun:
         # TODO: uncomment when comfortable to use
         # multirun.processed = True
