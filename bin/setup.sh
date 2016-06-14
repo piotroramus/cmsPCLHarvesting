@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 
 
-# magic to check if the script was sourced
-if [[ ! ${0##*/} == -* ]]; then
-    echo "This script should be sourced rather than executed in different shell"
-    exit 1
-fi
-
 echo "Generating new proxy certificate..."
 
 VOMS_PASS_PHRASE_FILE="voms.pwd"
