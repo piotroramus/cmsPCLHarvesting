@@ -125,6 +125,9 @@ def discover():
 
         logger.debug("Getting already harvested blocks for run {}".format(run.number))
         harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run.number).all()
+        harvested_blocks_list = list()
+        for block_name, in harvested_blocks:
+            harvested_blocks_list.append(block_name)
 
         datasets = dbsApi.listDatasets(run_num=run.number, dataset='/*/*/ALCAPROMPT')
         for dataset in datasets:
@@ -146,51 +149,59 @@ def discover():
                         config.workflow_run_classes[dataset_workflow]))
                 continue
 
-            multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'], Multirun.closed == False,
-                                                      Multirun.bfield == run.bfield,
-                                                      Multirun.run_class_name == run.run_class_name,
-                                                      Multirun.cmssw.like(base_release_pattern),
-                                                      # TODO: write tests to find out whether it really works as wanted
-                                                      Multirun.scram_arch == release['scram_arch'],
-                                                      Multirun.scenario == release['scenario'],
-                                                      Multirun.global_tag == release['global_tag']).one_or_none()
-            # TODO #4 - release should be equal up to 2 digits?
-
-            if not multirun:
-                multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'], bfield=run.bfield,
-                                    run_class_name=run.run_class_name, closed=False, processed=False,
-                                    cmssw=release['cmssw'], scram_arch=release['scram_arch'],
-                                    scenario=release['scenario'], global_tag=release['global_tag'])
-                session.add(multirun)
-                # force generation of multirun.id which is accessed later on in this code
-                session.flush()
-                session.refresh(multirun)
-                logger.info("Created new multirun {}".format(multirun))
-
-            multirun.run_numbers.append(run)
-
-            logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
+            logger.debug("Getting not harvested blocks for dataset {}".format(dataset['dataset']))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
+            new_blocks = list()
             for block in blocks:
-                if block['block_name'] not in harvested_blocks:
-                    run_block = RunBlock(block_name=block['block_name'], run_number=run.number)
-                    session.add(run_block)
-                    block_files = dbsApi.listFiles(run_num=run.number, block_name=block['block_name'])
+                if block['block_name'] not in harvested_blocks_list:
+                    new_blocks.append(RunBlock(block_name=block['block_name'], run_number=run.number))
+
+            # so not to create multiruns when they will not have any files - a common situation
+            if new_blocks:
+                multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'],
+                                                          Multirun.closed == False,
+                                                          Multirun.bfield == run.bfield,
+                                                          Multirun.run_class_name == run.run_class_name,
+                                                          Multirun.cmssw.like(base_release_pattern),
+                                                          # TODO: write tests to find out whether it really works as wanted
+                                                          Multirun.scram_arch == release['scram_arch'],
+                                                          Multirun.scenario == release['scenario'],
+                                                          Multirun.global_tag == release['global_tag']).one_or_none()
+                # TODO #4 - release should be equal up to 2 digits?
+
+                if not multirun:
+                    multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'],
+                                        bfield=run.bfield,
+                                        run_class_name=run.run_class_name, closed=False, processed=False,
+                                        cmssw=release['cmssw'], scram_arch=release['scram_arch'],
+                                        scenario=release['scenario'], global_tag=release['global_tag'])
+                    session.add(multirun)
+                    # force generation of multirun.id which is accessed later on in this code
+                    session.flush()
+                    session.refresh(multirun)
+                    logger.info("Created new multirun {}".format(multirun))
+
+                multirun.run_numbers.append(run)
+
+                logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
+                for block in new_blocks:
+                    session.add(block)
+                    block_files = dbsApi.listFiles(run_num=run.number, block_name=block.block_name)
                     files.extend(block_files)
-                    file_summaries = dbsApi.listFileSummaries(run_num=run.number, block_name=block['block_name'])
+                    file_summaries = dbsApi.listFileSummaries(run_num=run.number, block_name=block.block_name)
                     number_of_events += file_summaries[0]['num_event']
 
-            logger.debug("Adding gathered data to multirun {}".format(multirun.id))
-            if number_of_events > 0 and files:
-                multirun.number_of_events += number_of_events
-                for f in files:
-                    multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
-                    session.add(multirun_file)
-                if multirun.number_of_events > config.events_threshold:
-                    logger.info(
-                        "Multirun {} with {} events ready to be processed".format(multirun.id,
-                                                                                  multirun.number_of_events))
-                    multirun.closed = True
-                session.commit()
+                logger.debug("Adding gathered data to multirun {}".format(multirun.id))
+                if number_of_events > 0 and files:
+                    multirun.number_of_events += number_of_events
+                    for f in files:
+                        multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
+                        session.add(multirun_file)
+                    if multirun.number_of_events > config.events_threshold:
+                        logger.info(
+                            "Multirun {} with {} events ready to be processed".format(multirun.id,
+                                                                                      multirun.number_of_events))
+                        multirun.closed = True
+                    session.commit()
 
     session.commit()
