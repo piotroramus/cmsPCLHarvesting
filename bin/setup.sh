@@ -13,6 +13,12 @@ else
         exit 1
     else
         echo $GRID_PASS_PHRASE | voms-proxy-init -rfc -voms cms -pwstdin
+        rc=$?
+        if [ $rc -eq 3 ]; then
+            echo "Error: Wrong passphrase for GRID certificate!"
+            exit $rc
+        fi
+
         export X509_USER_PROXY=$(voms-proxy-info --path)
 
         if [ ! -d "/cvmfs/cms.cern.ch" ]; then
