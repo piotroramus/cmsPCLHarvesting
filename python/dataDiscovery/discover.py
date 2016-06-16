@@ -21,6 +21,7 @@ def get_base_release(full_release):
     return base_release.group('release')
 
 
+# TODO: review logger messages after all the changes
 def discover():
     logs.setup_logging()
     logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ def discover():
 
     rrapi = RRApi(config.rrapi_url, debug=True)
     dbsApi = dbsapi.DbsApi(url=config.dbsapi_url)
+    t0api = t0wmadatasvcApi.Tier0Api()
 
     days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - config.days_old_runs).strftime(
         "%Y-%m-%d")
@@ -61,56 +63,46 @@ def discover():
     logger.info("Getting {} days old runs form local database".format(config.days_old_runs))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
-    complete_runs = [run.number for run in local_runs if run.stop_time]
-    incomplete_runs = [run.number for run in local_runs if not run.stop_time]
+    closed_runs = [run.number for run in local_runs if run.stream_completed]
+    unclosed_runs = [run.number for run in local_runs if not run.stream_completed]
 
     logger.info("Updating local database of new fetched runs")
     for run in valid_runs:
 
         logger.debug("Checking run {} fetched from Run Registry".format(run[u'number']))
 
-        if run[u'number'] in complete_runs:
+        if run[u'number'] in closed_runs:
             logger.debug("Run {} already exists in local database".format(run[u'number']))
             continue
 
-        if run[u'number'] in incomplete_runs:
-            logger.debug("Run {} already exists in local database but does not has a stop date".format(run[u'number']))
+        if run[u'number'] in unclosed_runs:
+            logger.debug("Run {} already exists in local database but the stream is not closed".format(run[u'number']))
 
-            if run[u'stopTime']:
-                logger.info("Updating incomplete run {} ".format(run[u'number']))
-                start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
-                stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
+            if t0api.run_stream_completed(run[u'number']):
+                logger.info("Stream for run {} is now completed. Now it can be included in multiruns".format(run[u'number']))
                 old_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
-                old_run.run_class_name = run[u'runClassName']
-                old_run.bfield = run[u'bfield']
-                old_run.start_time = start
-                old_run.stop_time = stop
+                old_run.stream_completed = True
             else:
-                logger.debug("Run {} still without stop time".format(run[u'number']))
+                # TODO: timeout for not closed streams (few days)
+                logger.debug("Stream for run {} still not closed".format(run[u'number']))
                 continue
 
         else:
             logger.info("New run: {}".format(run[u'number']))
             start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
-            stop = None
-            try:
-                stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
-            except TypeError:
-                # if there is not stop date we can ignore it
-                pass
+            stream_completed = t0api.run_stream_completed(run[u'number'])
             run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
-                               start_time=start, stop_time=stop)
+                               start_time=start, stream_completed=stream_completed, used_datasets=[])
             session.add(run_info)
 
         session.commit()
 
     logger.info("Getting complete runs from local database")
     # TODO #12: the second condition ignores harvest_all_runs config value
-    complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None,
+    complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
                                                   RunInfo.start_time > days_old_runs_date).all()
     # TODO #1: test if the date comparison works properly
 
-    t0api = t0wmadatasvcApi.Tier0Api()
     logger.info("Starting creating multiruns...")
     for run in complete_runs:
 
@@ -128,6 +120,10 @@ def discover():
         harvested_blocks_list = list()
         for block_name, in harvested_blocks:
             harvested_blocks_list.append(block_name)
+
+        # TODO HOW TO CHECK IF (RUN, DATASET, PROPERTIES) WAS ALREADY USED?
+        # as the run has always the same properties
+        # IDEA: keep processed datasets for run info
 
         datasets = dbsApi.listDatasets(run_num=run.number, dataset='/*/*/ALCAPROMPT')
         for dataset in datasets:
