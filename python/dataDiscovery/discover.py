@@ -3,7 +3,6 @@ import logging
 import re
 import sqlalchemy
 
-import config
 import utils.workflows as workflows
 import dbs.apis.dbsClient as dbsapi
 import logs.logger as logs
@@ -22,34 +21,35 @@ def get_base_release(full_release):
 
 
 # TODO: review logger messages after all the changes
-def discover():
+def discover(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config.runs_db_path), echo=False)
+    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config['runs_db_path']), echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
-    rrapi = RRApi(config.rrapi_url, debug=True)
-    dbsApi = dbsapi.DbsApi(url=config.dbsapi_url)
+    rrapi = RRApi(config['rrapi_url'], debug=True)
+    dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
     t0api = t0wmadatasvcApi.Tier0Api()
 
-    days_old_runs_date = datetime.date.fromordinal(datetime.date.today().toordinal() - config.days_old_runs).strftime(
+    days_old_runs_date = datetime.date.fromordinal(
+        datetime.date.today().toordinal() - config['days_old_runs']).strftime(
         "%Y-%m-%d")
-    if config.harvest_all_runs:
-        config.filters['number'] = "> {}".format(config.first_run_number)
+    if config['harvest_all_runs']:
+        config['filters']['number'] = "> {}".format(config['first_run_number'])
     else:
-        config.filters['startTime'] = "> {}".format(days_old_runs_date)
+        config['filters']['startTime'] = "> {}".format(days_old_runs_date)
     recent_runs = []
     # TODO #13: this try is not coupled well with previous if statement - logger info particularly
     try:
-        logger.info("Fetching Run Registry records from last {} days".format(config.days_old_runs))
+        logger.info("Fetching Run Registry records from last {} days".format(config['days_old_runs']))
         # TODO #11: might be worth to take only runs with the runClassNames from config
-        recent_runs = rrapi.data(workspace=config.workspace, columns=config.columns, table=config.table,
-                                 template=config.template, filter=config.filters)
+        recent_runs = rrapi.data(workspace=config['workspace'], columns=config['columns'], table=config['table'],
+                                 template=config['template'], filter=config['filters'])
     except RRApiError:
-        logger.error("Error while querying RR API for {} days old runs".format(config.days_old_runs), exc_info=True)
+        logger.error("Error while querying RR API for {} days old runs".format(config['days_old_runs']), exc_info=True)
 
     logger.info("Ignoring runs with no runClassName specified")
     runs_with_classname = [r for r in recent_runs if r[u'runClassName']]
@@ -60,7 +60,7 @@ def discover():
             logger.error("Run without a start date: {}. Ignoring.".format(run[u'number']))
     valid_runs = (r for r in runs_with_classname if r[u'startTime'])
 
-    logger.info("Getting {} days old runs form local database".format(config.days_old_runs))
+    logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
     closed_runs = [run.number for run in local_runs if run.stream_completed]
@@ -146,11 +146,11 @@ def discover():
                         dataset['dataset'], dataset_workflow, run.number, release['workflows']))
                 continue
 
-            if run.run_class_name not in config.workflow_run_classes[dataset_workflow]:
+            if run.run_class_name not in config['workflow_run_classes'][dataset_workflow]:
                 logger.debug(
                     "Ignoring dataset {} for run {} since runClassName {} for the run is not specified for this dataset workflow {}:{}".format(
                         dataset['dataset'], run.number, run.run_class_name, dataset_workflow,
-                        config.workflow_run_classes[dataset_workflow]))
+                        config['workflow_run_classes'][dataset_workflow]))
                 continue
 
             ds = session.query(Dataset).filter(Dataset.dataset == dataset['dataset']).one_or_none()
@@ -226,7 +226,7 @@ def discover():
                 for f in files:
                     multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
                     session.add(multirun_file)
-                if multirun.number_of_events > config.events_threshold:
+                if multirun.number_of_events > config['events_threshold']:
                     logger.info(
                         "Multirun {} with {} events ready to be processed".format(multirun.id,
                                                                                   multirun.number_of_events))

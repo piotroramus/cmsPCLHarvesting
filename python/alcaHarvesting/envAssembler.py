@@ -3,7 +3,6 @@ import json
 import subprocess
 import os
 
-import config
 import utils.workflows as workflows
 import logs.logger as logs
 
@@ -20,11 +19,11 @@ def build_config(dataset, filenames, global_tag, scenario, output_file="alcaConf
     builder.build(str(dataset), workflows.extract_workflow(dataset), input_files, scenario, global_tag, output_file)
 
 
-def prepare_multirun_environment():
+def prepare_multirun_environment(config):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
-    engine = create_engine('sqlite:///{}'.format(config.runs_db_path), echo=False)
+    engine = create_engine('sqlite:///{}'.format(config['runs_db_path']), echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -54,13 +53,13 @@ def prepare_multirun_environment():
         with open(filename, "w") as f:
             f.write(dump)
 
-        workspace = "{}/{}".format(config.workspace_path, multirun.scram_arch)
+        workspace = "{}/{}".format(config['workspace_path'], multirun.scram_arch)
         script_path = os.path.dirname(os.path.realpath(__file__))
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         python_dir_path = script_path.replace("/alcaHarvesting", "")
         cmd = "{} {} {} {} {} {} {} {} {}".format(shell_script_path, workspace, multirun.cmssw, multirun.scram_arch,
-                                                  multirun.id, filename, python_dir_path, config.dqm_current,
-                                                  config.dqm_upload_host)
+                                                  multirun.id, filename, python_dir_path, config['dqm_current'],
+                                                  config['dqm_upload_host'])
         subprocess.call(cmd, shell=True)
 
 
