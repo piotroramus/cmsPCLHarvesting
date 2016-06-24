@@ -29,7 +29,7 @@ def prepare_config(params_file):
     global_tag = params['global_tag']
     scenario = params['scenario']
     input_files = [str(input_file) for input_file in params['filenames']]
-    runs_range = "123456-123457" # TODO: fixed right now, should be extracted from file
+    runs_range = "123456-123457"  # TODO: fixed right now, should be extracted from file
 
     builder = AlCaHarvestingCfgBuilder()
     dataset_with_rr = dataset_with_runs_range(str(dataset), runs_range)
@@ -59,6 +59,9 @@ def prepare_multirun_environment(config):
         multirun.status = processing_status
         session.commit()
 
+        filenames = [f.filename for f in multirun.filenames]
+        runs = [run.number for run in multirun.run_numbers]
+
         multirun_info = dict()
         multirun_info['id'] = multirun.id
         multirun_info['dataset'] = multirun.dataset
@@ -66,9 +69,10 @@ def prepare_multirun_environment(config):
         multirun_info['scenario'] = multirun.scenario
         multirun_info['cmssw'] = multirun.cmssw
         multirun_info['scram_arch'] = multirun.scram_arch
-        filenames = [f.filename for f in multirun.filenames]
         multirun_info['filenames'] = filenames
+        multirun_info['runs'] = runs
         dump = json.dumps(multirun_info)
+
         multirun_props_file = "multirun_{}_properties.txt".format(multirun.id)
         with open(multirun_props_file, 'w') as f:
             f.write(dump)
