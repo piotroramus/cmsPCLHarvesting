@@ -31,7 +31,7 @@ filters: {}
 events_threshold: 100000
 
 # how many times multirun should be processed if cmsRun exits with non-zero code
-max_retires: 2
+max_retries: 2
 
 # only specified runClasses will be processed while using the particular workflow
 workflow_run_classes:
