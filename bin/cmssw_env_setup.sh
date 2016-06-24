@@ -9,6 +9,7 @@ PROPERTIES_FILE="$1"
 source $PROPERTIES_FILE
 
 MULTIRUN_PROPS_FILE_PWD=$PWD/$MULTIRUN_PROPS_FILE
+PROPERTIES_FILE_PWD=$PWD/$PROPERTIES_FILE
 
 echo "Creating $CMSSW_RELEASE environment in $WORKSPACE"
 echo "Release to be used: $CMSSW_RELEASE"
@@ -45,7 +46,7 @@ cd $MULTIRUN_DIR
 # python script, which invoked this script, created a file with multirun parameters
 # the file was created within python's script working directory so it needs to be moved
 mv $MULTIRUN_PROPS_FILE_PWD .
-mv $PROPERTIES_FILE .
+mv $PROPERTIES_FILE_PWD .
 
 # create cmsRun config for AlCaHarvesting step
 python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE
