@@ -66,7 +66,7 @@ def prepare_multirun_environment(config):
             f.write("WORKSPACE={}\n".format(workspace))
             f.write("CMSSW_RELEASE={}\n".format(multirun.cmssw))
             f.write("SCRAM_ARCH={}\n".format(multirun.scram_arch))
-            f.write("MULTIRUN_ID={}".format(multirun.id))
+            f.write("MULTIRUN_ID={}\n".format(multirun.id))
             f.write("MULTIRUN_PROPS_FILE={}\n".format(multirun_props_file))
             f.write("PYTHON_DIR_PATH={}\n".format(absolute_python_dir_path))
             f.write("DQM_GUI_DIR={}\n".format(config['dqm_current']))
