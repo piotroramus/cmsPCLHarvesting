@@ -1,12 +1,10 @@
 import argparse
 import logging
-import sys
 
 import logs.logger as logs
 import alcaHarvesting.envAssembler
 
 if __name__ == '__main__':
-
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
