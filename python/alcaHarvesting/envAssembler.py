@@ -51,17 +51,31 @@ def prepare_multirun_environment(config):
         filenames = [f.filename for f in multirun.filenames]
         multirun_info['filenames'] = filenames
         dump = json.dumps(multirun_info)
-        filename = "params_{}".format(multirun.id)
-        with open(filename, "w") as f:
+        multirun_props_file = "params_{}.txt".format(multirun.id)
+        with open(multirun_props_file, 'w') as f:
             f.write(dump)
 
         workspace = "{}/{}".format(config['workspace_path'], multirun.scram_arch)
         script_path = os.path.dirname(os.path.realpath(__file__))
-        shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         python_dir_path = script_path.replace("/alcaHarvesting", "")
-        cmd = "{} {} {} {} {} {} {} {} {}".format(shell_script_path, workspace, multirun.cmssw, multirun.scram_arch,
-                                                  multirun.id, filename, python_dir_path, config['dqm_current'],
-                                                  config['dqm_upload_host'])
+        absolute_python_dir_path = os.path.abspath(python_dir_path)
+        db_path = os.path.abspath(config['runs_db_path'])
+
+        shell_props_file = "shell_properties_{}.txt".format(multirun.id)
+        with open(shell_props_file, 'w') as f:
+            f.write("WORKSPACE={}\n".format(workspace))
+            f.write("CMSSW_RELEASE={}\n".format(multirun.cmssw))
+            f.write("SCRAM_ARCH={}\n".format(multirun.scram_arch))
+            f.write("MULTIRUN_ID={}".format(multirun.id))
+            f.write("MULTIRUN_PROPS_FILE={}\n".format(multirun_props_file))
+            f.write("PYTHON_DIR_PATH={}\n".format(absolute_python_dir_path))
+            f.write("DQM_GUI_DIR={}\n".format(config['dqm_current']))
+            f.write("DQM_UPLOAD_HOST={}\n".format(config['dqm_upload_host']))
+            f.write("DB_PATH={}\n".format(db_path))
+            f.write("MAX_RETRIES={}\n".format(config['max_retries']))
+
+        shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
+        cmd = "{} {}".format(shell_script_path, shell_props_file)
         subprocess.call(cmd, shell=True)
 
 
