@@ -71,7 +71,7 @@ class Multirun(Base):
                 "status={}, "
                 "run_numbers={}, "
                 "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
-                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.retires,
+                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.retries,
                                         self.status.status, self.run_numbers, self.filenames)
 
 
