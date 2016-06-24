@@ -43,16 +43,16 @@ class Multirun(Base):
 
     id = Column(Integer, primary_key=True)
     number_of_events = Column(Integer)
-    dataset = Column(String) # TODO: think of replacing with dataset table (already created)
+    dataset = Column(String)  # TODO: think of replacing with dataset table (already created)
     bfield = Column(Float)
     run_class_name = Column(String)
     cmssw = Column(String)
     scram_arch = Column(String)
     scenario = Column(String)
     global_tag = Column(String)
-    closed = Column(Boolean)
-    processed = Column(Boolean)
+    status_id = Column(Integer, ForeignKey('multirun_status.id'))
 
+    status = relationship("MultirunStatus")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc, back_populates="multiruns")
     filenames = relationship("Filename")
 
@@ -66,14 +66,21 @@ class Multirun(Base):
                 "scram_arch={}, "
                 "scenario={}, "
                 "global_tag={}, "
-                "closed={}, "
-                "processed={}, "
+                "status={}, "
                 "run_numbers={}, "
                 "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
-                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
-                                        self.processed, self.run_numbers, self.filenames)
+                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.status.status,
+                                        self.run_numbers, self.filenames)
 
 
+class MultirunStatus(Base):
+    __tablename__ = 'multirun_status'
+
+    id = Column(Integer, primary_key=True)
+    status = Column(String, unique=True)
+
+
+# TODO: many-to-many relationship?
 class RunBlock(Base):
     __tablename__ = 'run_block'
 
@@ -94,7 +101,7 @@ class RunInfo(Base):
     bfield = Column(Float)
     start_time = Column(DateTime)
     stream_completed = Column(Boolean)
-    used = Column(Boolean) # TODO: update __repr__ maybe even consider using printing self.__dict__
+    used = Column(Boolean)  # TODO: update __repr__ maybe even consider using printing self.__dict__
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc, back_populates="run_numbers")
     run_blocks = relationship("RunBlock")

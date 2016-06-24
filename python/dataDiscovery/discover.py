@@ -9,7 +9,7 @@ import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 
 from rrapi.rrapi_v3 import RRApi, RRApiError
-from model import Base, RunInfo, RunBlock, Multirun, Filename, Dataset
+from model import Base, RunInfo, RunBlock, Multirun, Filename, Dataset, MultirunStatus
 
 
 def get_base_release(full_release):
@@ -78,8 +78,7 @@ def discover(config):
         if run[u'number'] in unclosed_runs:
             logger.debug("Run {} already exists in local database but the stream is not closed".format(run[u'number']))
 
-            # if t0api.run_stream_completed(run[u'number']):
-            if t0api.fixed_run_stream_completed(run[u'number'], run[u'runClassName']):
+            if t0api.run_stream_completed(run[u'number']):
                 logger.info(
                     "Stream for run {} is now completed. Now it can be included in multiruns".format(run[u'number']))
                 old_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
@@ -92,8 +91,7 @@ def discover(config):
         else:
             logger.info("New run: {}".format(run[u'number']))
             start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
-            # stream_completed = t0api.run_stream_completed(run[u'number'])
-            stream_completed = t0api.fixed_run_stream_completed(run[u'number'], run[u'runClassName'])
+            stream_completed = t0api.run_stream_completed(run[u'number'])
             if stream_completed != -1:
                 run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
                                    start_time=start, stream_completed=stream_completed, used_datasets=[], used=False)
@@ -110,8 +108,8 @@ def discover(config):
                                                   RunInfo.used == False).all()
     # TODO #1: test if the date comparison works properly
 
-    # print "COMPLETED runs: {}".format(complete_runs)
 
+    ready_status = session.query(MultirunStatus).filter(MultirunStatus.status == 'ready').one()
     logger.info("Starting creating multiruns...")
     for run in complete_runs:
 
@@ -133,7 +131,6 @@ def discover(config):
             if dataset['dataset'] not in used_datasets:
                 datasets.append(dataset)
                 # TODO: change here to datasets.append(dataset['dataset']) and then everywhere below
-
 
         for dataset in datasets:
 
@@ -159,39 +156,45 @@ def discover(config):
                 session.add(ds)
 
             # TODO: search for an open multirun with these properties - if exists then abort processing
-            not_processed_multirun = session.query(Multirun).filter(Multirun.processed == False,
-                                                                    Multirun.closed == True,
-                                                                    Multirun.dataset == dataset['dataset'],
-                                                                    # TODO: switch to ds object
-                                                                    Multirun.bfield == run.bfield,
-                                                                    Multirun.run_class_name == run.run_class_name,
-                                                                    Multirun.cmssw.like(base_release_pattern),
-                                                                    # TODO: write tests to find out whether it really works as wanted
-                                                                    Multirun.scram_arch == release['scram_arch'],
-                                                                    Multirun.scenario == release['scenario'],
-                                                                    Multirun.global_tag == release[
-                                                                        'global_tag']).one_or_none()
+            # TODO: find out if it will be faster to get rid of joins - now multirun.status comparison should work
+            not_processed_multirun = session.query(Multirun) \
+                .join(MultirunStatus) \
+                .filter(Multirun.dataset == dataset['dataset'],
+                        # TODO: switch to ds object
+                        Multirun.bfield == run.bfield,
+                        Multirun.run_class_name == run.run_class_name,
+                        Multirun.cmssw.like(base_release_pattern),
+                        # TODO: write tests to find out whether it really works as wanted
+                        Multirun.scram_arch == release['scram_arch'],
+                        Multirun.scenario == release['scenario'],
+                        Multirun.global_tag == release['global_tag']) \
+                .filter(sqlalchemy.or_(MultirunStatus.status == 'ready', MultirunStatus.status == 'processing')) \
+                .one_or_none()  # TODO: test this or_
             # TODO #4 - release should be equal up to 2 digits?
 
             if not_processed_multirun:
                 continue
 
-            multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'],
-                                                      Multirun.closed == False,
-                                                      Multirun.bfield == run.bfield,
-                                                      Multirun.run_class_name == run.run_class_name,
-                                                      Multirun.cmssw.like(base_release_pattern),
-                                                      Multirun.scram_arch == release['scram_arch'],
-                                                      Multirun.scenario == release['scenario'],
-                                                      Multirun.global_tag == release['global_tag']).one_or_none()
+            # search for multi-run which the run could be merged into
+            multirun = session.query(Multirun) \
+                .join(MultirunStatus) \
+                .filter(Multirun.dataset == dataset['dataset'],
+                        Multirun.bfield == run.bfield,
+                        Multirun.run_class_name == run.run_class_name,
+                        Multirun.cmssw.like(base_release_pattern),
+                        Multirun.scram_arch == release['scram_arch'],
+                        Multirun.scenario == release['scenario'],
+                        Multirun.global_tag == release['global_tag'])\
+                .filter(MultirunStatus.status == 'need_more_data')\
+                .one_or_none()
 
             if not multirun:
-                # TODO: check if fields are still consistent with model
+                need_more_data_status = session.query(MultirunStatus).filter(MultirunStatus.status == 'need_more_data').one()
                 multirun = Multirun(number_of_events=0, dataset=dataset['dataset'],
-                                    bfield=run.bfield,
-                                    run_class_name=run.run_class_name, closed=False, processed=False,
+                                    bfield=run.bfield, run_class_name=run.run_class_name,
                                     cmssw=release['cmssw'], scram_arch=release['scram_arch'],
-                                    scenario=release['scenario'], global_tag=release['global_tag'])
+                                    scenario=release['scenario'], global_tag=release['global_tag'],
+                                    status=need_more_data_status)
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
@@ -230,6 +233,6 @@ def discover(config):
                     logger.info(
                         "Multirun {} with {} events ready to be processed".format(multirun.id,
                                                                                   multirun.number_of_events))
-                    multirun.closed = True
+                    multirun.status = ready_status
 
         session.commit()
