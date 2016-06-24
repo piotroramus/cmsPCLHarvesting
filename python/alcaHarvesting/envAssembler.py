@@ -12,22 +12,29 @@ logs.setup_logging()
 logger = logging.getLogger(__name__)
 
 
-def build_config(dataset, filenames, global_tag, scenario, output_file="alcaConfig.py"):
-    from configBuilder import AlCaHarvestingCfgBuilder
-    builder = AlCaHarvestingCfgBuilder()
-    input_files = [str(input_file) for input_file in filenames]
-    builder.build(str(dataset), workflows.extract_workflow(dataset), input_files, scenario, global_tag, output_file)
+def dataset_with_runs_range(dataset, runs_range):
+    return dataset
 
 
 def prepare_config(params_file):
+    from configBuilder import AlCaHarvestingCfgBuilder
     multirun_info = None
     with open(params_file, 'r') as f:
         multirun_info = f.read()
 
     params = json.loads(multirun_info)
 
-    config_file = "alcaConfig.py"
-    build_config(params['dataset'], params['filenames'], params['global_tag'], params['scenario'], config_file)
+    output_file = "alcaConfig.py"
+    dataset = str(params['dataset'])
+    global_tag = params['global_tag']
+    scenario = params['scenario']
+    input_files = [str(input_file) for input_file in params['filenames']]
+    runs_range = "123456-123457" # TODO: fixed right now, should be extracted from file
+
+    builder = AlCaHarvestingCfgBuilder()
+    dataset_with_rr = dataset_with_runs_range(str(dataset), runs_range)
+    builder.build(dataset_with_rr, workflows.extract_workflow(dataset), input_files, scenario, global_tag,
+                  output_file)
 
 
 def prepare_multirun_environment(config):
