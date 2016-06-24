@@ -1,3 +1,4 @@
+import argparse
 import logging
 import sys
 
@@ -9,8 +10,9 @@ if __name__ == '__main__':
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    if len(sys.argv) != 2:
-        logger.error("Script usage: {} params_file_path".format(sys.argv[0]))
-    else:
-        params_file_path = sys.argv[1]
-        alcaHarvesting.envAssembler.prepare_config(params_file_path)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("params_file", help="path to file containing multi-run parameters")
+    args = parser.parse_args()
+
+    params_file_path = args.params_file
+    alcaHarvesting.envAssembler.prepare_config(params_file_path)
