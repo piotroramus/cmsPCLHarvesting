@@ -51,7 +51,7 @@ def prepare_multirun_environment(config):
         filenames = [f.filename for f in multirun.filenames]
         multirun_info['filenames'] = filenames
         dump = json.dumps(multirun_info)
-        multirun_props_file = "params_{}.txt".format(multirun.id)
+        multirun_props_file = "multirun_{}_properties.txt".format(multirun.id)
         with open(multirun_props_file, 'w') as f:
             f.write(dump)
 
