@@ -194,7 +194,7 @@ def discover(config):
                                     bfield=run.bfield, run_class_name=run.run_class_name,
                                     cmssw=release['cmssw'], scram_arch=release['scram_arch'],
                                     scenario=release['scenario'], global_tag=release['global_tag'],
-                                    status=need_more_data_status)
+                                    retries=0, status=need_more_data_status)
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()

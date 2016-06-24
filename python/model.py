@@ -50,6 +50,7 @@ class Multirun(Base):
     scram_arch = Column(String)
     scenario = Column(String)
     global_tag = Column(String)
+    retries = Column(Integer)
     status_id = Column(Integer, ForeignKey('multirun_status.id'))
 
     status = relationship("MultirunStatus")
@@ -66,11 +67,12 @@ class Multirun(Base):
                 "scram_arch={}, "
                 "scenario={}, "
                 "global_tag={}, "
+                "retries={}, "
                 "status={}, "
                 "run_numbers={}, "
                 "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
-                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.status.status,
-                                        self.run_numbers, self.filenames)
+                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.retires,
+                                        self.status.status, self.run_numbers, self.filenames)
 
 
 class MultirunStatus(Base):
