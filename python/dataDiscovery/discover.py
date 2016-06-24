@@ -9,7 +9,7 @@ import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 
 from rrapi.rrapi_v3 import RRApi, RRApiError
-from model import Base, RunInfo, RunBlock, Multirun, Filename
+from model import Base, RunInfo, RunBlock, Multirun, Filename, Dataset, MultirunStatus
 
 
 def get_base_release(full_release):
@@ -20,6 +20,7 @@ def get_base_release(full_release):
     return base_release.group('release')
 
 
+# TODO: review logger messages after all the changes
 def discover(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ def discover(config):
 
     rrapi = RRApi(config['rrapi_url'], debug=True)
     dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
+    t0api = t0wmadatasvcApi.Tier0Api()
 
     days_old_runs_date = datetime.date.fromordinal(
         datetime.date.today().toordinal() - config['days_old_runs']).strftime(
@@ -61,56 +63,53 @@ def discover(config):
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
-    complete_runs = [run.number for run in local_runs if run.stop_time]
-    incomplete_runs = [run.number for run in local_runs if not run.stop_time]
+    closed_runs = [run.number for run in local_runs if run.stream_completed]
+    unclosed_runs = [run.number for run in local_runs if not run.stream_completed]
 
     logger.info("Updating local database of new fetched runs")
     for run in valid_runs:
 
         logger.debug("Checking run {} fetched from Run Registry".format(run[u'number']))
 
-        if run[u'number'] in complete_runs:
+        if run[u'number'] in closed_runs:
             logger.debug("Run {} already exists in local database".format(run[u'number']))
             continue
 
-        if run[u'number'] in incomplete_runs:
-            logger.debug("Run {} already exists in local database but does not has a stop date".format(run[u'number']))
+        if run[u'number'] in unclosed_runs:
+            logger.debug("Run {} already exists in local database but the stream is not closed".format(run[u'number']))
 
-            if run[u'stopTime']:
-                logger.info("Updating incomplete run {} ".format(run[u'number']))
-                start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
-                stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
+            if t0api.run_stream_completed(run[u'number']):
+                logger.info(
+                    "Stream for run {} is now completed. Now it can be included in multiruns".format(run[u'number']))
                 old_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
-                old_run.run_class_name = run[u'runClassName']
-                old_run.bfield = run[u'bfield']
-                old_run.start_time = start
-                old_run.stop_time = stop
+                old_run.stream_completed = True
             else:
-                logger.debug("Run {} still without stop time".format(run[u'number']))
+                # TODO: timeout for not closed streams (few days)
+                logger.debug("Stream for run {} still not closed".format(run[u'number']))
                 continue
 
         else:
             logger.info("New run: {}".format(run[u'number']))
             start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
-            stop = None
-            try:
-                stop = datetime.datetime.strptime(run[u'stopTime'], "%a %d-%m-%y %H:%M:%S")
-            except TypeError:
-                # if there is not stop date we can ignore it
-                pass
-            run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
-                               start_time=start, stop_time=stop)
-            session.add(run_info)
+            stream_completed = t0api.run_stream_completed(run[u'number'])
+            if stream_completed != -1:
+                run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
+                                   start_time=start, stream_completed=stream_completed, used_datasets=[], used=False)
+                session.add(run_info)
 
         session.commit()
 
     logger.info("Getting complete runs from local database")
     # TODO #12: the second condition ignores harvest_all_runs config value
-    complete_runs = session.query(RunInfo).filter(RunInfo.stop_time != None,
-                                                  RunInfo.start_time > days_old_runs_date).all()
+    # complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
+    #                                               RunInfo.start_time > days_old_runs_date).all()
+
+    complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
+                                                  RunInfo.used == False).all()
     # TODO #1: test if the date comparison works properly
 
-    t0api = t0wmadatasvcApi.Tier0Api()
+
+    ready_status = session.query(MultirunStatus).filter(MultirunStatus.status == 'ready').one()
     logger.info("Starting creating multiruns...")
     for run in complete_runs:
 
@@ -123,17 +122,19 @@ def discover(config):
         base_release = get_base_release(release['cmssw'])
         base_release_pattern = "{}%".format(base_release)
 
-        logger.debug("Getting already harvested blocks for run {}".format(run.number))
-        harvested_blocks = session.query(RunBlock.block_name).filter(RunBlock.run_number == run.number).all()
-        harvested_blocks_list = list()
-        for block_name, in harvested_blocks:
-            harvested_blocks_list.append(block_name)
+        run_datasets = dbsApi.listDatasets(run_num=run.number, dataset='/*/*/ALCAPROMPT')
 
-        datasets = dbsApi.listDatasets(run_num=run.number, dataset='/*/*/ALCAPROMPT')
+        # get datasets that are not part of any multi-run yet
+        datasets = list()
+        used_datasets = [d.dataset for d in run.used_datasets]
+        for dataset in run_datasets:
+            if dataset['dataset'] not in used_datasets:
+                datasets.append(dataset)
+                # TODO: change here to datasets.append(dataset['dataset']) and then everywhere below
+
         for dataset in datasets:
 
-            files, number_of_events = [], 0
-
+            # TODO logger msg is definitely wrong
             logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
             dataset_workflow = workflows.extract_workflow(dataset['dataset'])
             if dataset_workflow not in release['workflows']:
@@ -149,59 +150,90 @@ def discover(config):
                         config['workflow_run_classes'][dataset_workflow]))
                 continue
 
-            logger.debug("Getting not harvested blocks for dataset {}".format(dataset['dataset']))
+            ds = session.query(Dataset).filter(Dataset.dataset == dataset['dataset']).one_or_none()
+            if not ds:
+                ds = Dataset(dataset=dataset['dataset'])
+                session.add(ds)
+
+            # TODO: search for an open multirun with these properties - if exists then abort processing
+            # TODO: find out if it will be faster to get rid of joins - now multirun.status comparison should work
+            not_processed_multirun = session.query(Multirun) \
+                .join(MultirunStatus) \
+                .filter(Multirun.dataset == dataset['dataset'],
+                        # TODO: switch to ds object
+                        Multirun.bfield == run.bfield,
+                        Multirun.run_class_name == run.run_class_name,
+                        Multirun.cmssw.like(base_release_pattern),
+                        # TODO: write tests to find out whether it really works as wanted
+                        Multirun.scram_arch == release['scram_arch'],
+                        Multirun.scenario == release['scenario'],
+                        Multirun.global_tag == release['global_tag']) \
+                .filter(sqlalchemy.or_(MultirunStatus.status == 'ready', MultirunStatus.status == 'processing')) \
+                .one_or_none()  # TODO: test this or_
+            # TODO #4 - release should be equal up to 2 digits?
+
+            if not_processed_multirun:
+                continue
+
+            # search for multi-run which the run could be merged into
+            multirun = session.query(Multirun) \
+                .join(MultirunStatus) \
+                .filter(Multirun.dataset == dataset['dataset'],
+                        Multirun.bfield == run.bfield,
+                        Multirun.run_class_name == run.run_class_name,
+                        Multirun.cmssw.like(base_release_pattern),
+                        Multirun.scram_arch == release['scram_arch'],
+                        Multirun.scenario == release['scenario'],
+                        Multirun.global_tag == release['global_tag']) \
+                .filter(MultirunStatus.status == 'need_more_data') \
+                .one_or_none()
+
+            if not multirun:
+                need_more_data_status = session.query(MultirunStatus).filter(
+                    MultirunStatus.status == 'need_more_data').one()
+                multirun = Multirun(number_of_events=0, dataset=dataset['dataset'],
+                                    bfield=run.bfield, run_class_name=run.run_class_name,
+                                    cmssw=release['cmssw'], scram_arch=release['scram_arch'],
+                                    scenario=release['scenario'], global_tag=release['global_tag'],
+                                    retries=0, status=need_more_data_status)
+                session.add(multirun)
+                # force generation of multirun.id which is accessed later on in this code
+                session.flush()
+                session.refresh(multirun)
+                logger.info("Created new multirun {}".format(multirun))
+
+            multirun.run_numbers.append(run)
+
+            # add dataset to used for given run
+            run.used_datasets.append(ds)
+
+            # if this is the last dataset - mark run as used
+            if len(datasets) == 1:
+                run.used = True
+
+            files, number_of_events = [], 0
+
+            logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
-            new_blocks = list()
             for block in blocks:
-                if block['block_name'] not in harvested_blocks_list:
-                    new_blocks.append(RunBlock(block_name=block['block_name'], run_number=run.number))
+                run_block = RunBlock(block_name=block['block_name'], run_number=run.number)
+                session.add(run_block)
+                block_files = dbsApi.listFiles(run_num=run.number, block_name=run_block.block_name)
+                files.extend(block_files)
+                file_summaries = dbsApi.listFileSummaries(run_num=run.number,
+                                                          block_name=run_block.block_name)  # TODO: measure what is faster: dict or objetct access and adjust properly
+                number_of_events += file_summaries[0]['num_event']
 
-            # so not to create multiruns when they will not have any files - a common situation
-            if new_blocks:
-                multirun = session.query(Multirun).filter(Multirun.dataset == dataset['dataset'],
-                                                          Multirun.closed == False,
-                                                          Multirun.bfield == run.bfield,
-                                                          Multirun.run_class_name == run.run_class_name,
-                                                          Multirun.cmssw.like(base_release_pattern),
-                                                          # TODO: write tests to find out whether it really works as wanted
-                                                          Multirun.scram_arch == release['scram_arch'],
-                                                          Multirun.scenario == release['scenario'],
-                                                          Multirun.global_tag == release['global_tag']).one_or_none()
-                # TODO #4 - release should be equal up to 2 digits?
+            logger.debug("Adding gathered data to multirun {}".format(multirun.id))
+            if number_of_events > 0 and files:
+                multirun.number_of_events += number_of_events
+                for f in files:
+                    multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
+                    session.add(multirun_file)
+                if multirun.number_of_events > config['events_threshold']:
+                    logger.info(
+                        "Multirun {} with {} events ready to be processed".format(multirun.id,
+                                                                                  multirun.number_of_events))
+                    multirun.status = ready_status
 
-                if not multirun:
-                    multirun = Multirun(number_of_events=number_of_events, dataset=dataset['dataset'],
-                                        bfield=run.bfield,
-                                        run_class_name=run.run_class_name, closed=False, processed=False,
-                                        cmssw=release['cmssw'], scram_arch=release['scram_arch'],
-                                        scenario=release['scenario'], global_tag=release['global_tag'])
-                    session.add(multirun)
-                    # force generation of multirun.id which is accessed later on in this code
-                    session.flush()
-                    session.refresh(multirun)
-                    logger.info("Created new multirun {}".format(multirun))
-
-                multirun.run_numbers.append(run)
-
-                logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
-                for block in new_blocks:
-                    session.add(block)
-                    block_files = dbsApi.listFiles(run_num=run.number, block_name=block.block_name)
-                    files.extend(block_files)
-                    file_summaries = dbsApi.listFileSummaries(run_num=run.number, block_name=block.block_name)
-                    number_of_events += file_summaries[0]['num_event']
-
-                logger.debug("Adding gathered data to multirun {}".format(multirun.id))
-                if number_of_events > 0 and files:
-                    multirun.number_of_events += number_of_events
-                    for f in files:
-                        multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
-                        session.add(multirun_file)
-                    if multirun.number_of_events > config['events_threshold']:
-                        logger.info(
-                            "Multirun {} with {} events ready to be processed".format(multirun.id,
-                                                                                      multirun.number_of_events))
-                        multirun.closed = True
-                    session.commit()
-
-    session.commit()
+        session.commit()

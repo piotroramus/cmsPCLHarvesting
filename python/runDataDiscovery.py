@@ -4,6 +4,7 @@ import logging
 import logs.logger as logs
 import dataDiscovery.discover
 import utils.configReader as configReader
+import utils.prepopulate as prepopulate
 
 if __name__ == '__main__':
     logs.setup_logging()
@@ -19,6 +20,9 @@ if __name__ == '__main__':
 
     logger.info("Reading config file: {}".format(config_file))
     config = configReader.read(config_file)
+
+    logger.info("Prepopulating database if needed")
+    prepopulate.prepopulate(config)
 
     logger.info("Starting data discovery")
     dataDiscovery.discover.discover(config)

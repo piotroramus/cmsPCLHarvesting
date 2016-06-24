@@ -9,6 +9,22 @@ run_multirun_assoc = Table('run_multirun', Base.metadata,
                            Column('multirun_id', Integer, ForeignKey('multirun.id')),
                            Column('run_info_id', Integer, ForeignKey('run_info.number')))
 
+run_dataset_assoc = Table('run_dataset', Base.metadata,
+                          Column('run_id', Integer, ForeignKey('run_info.number')),
+                          Column('dataset_id', Integer, ForeignKey('dataset.id')))
+
+
+class Dataset(Base):
+    __tablename__ = 'dataset'
+
+    id = Column(Integer, primary_key=True)
+    dataset = Column(String)
+
+    run_numbers = relationship("RunInfo", secondary=run_dataset_assoc, back_populates="used_datasets")
+
+    def __repr__(self):
+        return self.dataset
+
 
 class Filename(Base):
     __tablename__ = 'filename'
@@ -27,16 +43,17 @@ class Multirun(Base):
 
     id = Column(Integer, primary_key=True)
     number_of_events = Column(Integer)
-    dataset = Column(String)
+    dataset = Column(String)  # TODO: think of replacing with dataset table (already created)
     bfield = Column(Float)
     run_class_name = Column(String)
     cmssw = Column(String)
     scram_arch = Column(String)
     scenario = Column(String)
     global_tag = Column(String)
-    closed = Column(Boolean)
-    processed = Column(Boolean)
+    retries = Column(Integer)
+    status_id = Column(Integer, ForeignKey('multirun_status.id'))
 
+    status = relationship("MultirunStatus")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc, back_populates="multiruns")
     filenames = relationship("Filename")
 
@@ -50,14 +67,22 @@ class Multirun(Base):
                 "scram_arch={}, "
                 "scenario={}, "
                 "global_tag={}, "
-                "closed={}, "
-                "processed={}, "
+                "retries={}, "
+                "status={}, "
                 "run_numbers={}, "
                 "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
-                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.closed,
-                                        self.processed, self.run_numbers, self.filenames)
+                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.retries,
+                                        self.status.status, self.run_numbers, self.filenames)
 
 
+class MultirunStatus(Base):
+    __tablename__ = 'multirun_status'
+
+    id = Column(Integer, primary_key=True)
+    status = Column(String, unique=True)
+
+
+# TODO: many-to-many relationship?
 class RunBlock(Base):
     __tablename__ = 'run_block'
 
@@ -77,11 +102,13 @@ class RunInfo(Base):
     run_class_name = Column(String)
     bfield = Column(Float)
     start_time = Column(DateTime)
-    stop_time = Column(DateTime)
+    stream_completed = Column(Boolean)
+    used = Column(Boolean)  # TODO: update __repr__ maybe even consider using printing self.__dict__
 
+    used_datasets = relationship("Dataset", secondary=run_dataset_assoc, back_populates="run_numbers")
     run_blocks = relationship("RunBlock")
     multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
 
     def __repr__(self):
-        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={}, end_time={})".format(
-            self.number, self.run_class_name, self.bfield, self.start_time, self.stop_time)
+        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={})".format(
+            self.number, self.run_class_name, self.bfield, self.start_time)

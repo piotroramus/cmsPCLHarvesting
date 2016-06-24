@@ -46,7 +46,16 @@ class Tier0Api(object):
 
     def run_stream_completed(self, run_number):
         cfg = self.get_run_express_config(run_number)
-        stream = cfg[u'result'][0][u'stream']
-        stream_done_url = "{}?run={}&stream={}".format(self.stream_done_url, run_number, stream)
-        result = self.process_request(stream_done_url)
-        return result[u'result'][0]
+        try:
+            stream = cfg[u'result'][0][u'stream']
+            stream_done_url = "{}?run={}&stream={}".format(self.stream_done_url, run_number, stream)
+            result = self.process_request(stream_done_url)
+            return result[u'result'][0]
+        except IndexError:
+            self.logger.debug('Cannot determine if stream is completed for run {}')
+            return -1  # cannot return None, since in simple if it will be equal to False
+
+    def fixed_run_stream_completed(self, run_number, run_class_name):
+        if run_class_name == 'Collisions16':
+            return True
+        return False

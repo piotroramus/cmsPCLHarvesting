@@ -1,21 +1,17 @@
 #!/usr/bin/env bash
 
 # sets CMSSW environment up
-# should be called as follows:
-# cmssw_env_setup.sh workspace cmsswRelease scramArch multirun_id multirun_params_filename path_to_python_scripts dqmgui_dir dqm_upload_host
+# script parameters should be placed in properties file which path should be a script argument
 
-WORKSPACE="$1"
-CMSSW_RELEASE="$2"
-SCRAM_ARCH="$3"
-MULTIRUN_ID="$4"
-PARAMS_FILE="$5"
-PYTHON_DIR_PATH="$6"
-DQMGUI_DIR="$7"
-DQM_UPLOAD_HOST="$8"
+# TODO: check for properties file existence and so on
 
-PARAMS_FILE_PWD=$PWD/$PARAMS_FILE
+PROPERTIES_FILE="$1"
+source $PROPERTIES_FILE
 
-echo "Creating CMSSW environment in $WORKSPACE"
+MULTIRUN_PROPS_FILE_PWD=$PWD/$MULTIRUN_PROPS_FILE
+PROPERTIES_FILE_PWD=$PWD/$PROPERTIES_FILE
+
+echo "Creating $CMSSW_RELEASE environment in $WORKSPACE"
 echo "Release to be used: $CMSSW_RELEASE"
 echo "Architecture: $SCRAM_ARCH"
 
@@ -49,10 +45,11 @@ cd $MULTIRUN_DIR
 
 # python script, which invoked this script, created a file with multirun parameters
 # the file was created within python's script working directory so it needs to be moved
-mv $PARAMS_FILE_PWD .
+mv $MULTIRUN_PROPS_FILE_PWD .
+mv $PROPERTIES_FILE_PWD .
 
 # create cmsRun config for AlCaHarvesting step
-python $PYTHON_DIR_PATH/configPreparator.py $PARAMS_FILE
+python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE
 
 # run the AlCaHarvesting step
 cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee jobOutput.txt
@@ -60,24 +57,27 @@ CMS_RUN_RESULT=$?
 
 if [[ $CMS_RUN_RESULT != 0 ]]; then
     echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
     exit $CMS_RUN_RESULT
 fi
 
 
 # handle results of the job
-python $PYTHON_DIR_PATH/resultsHandler.py
+python $PYTHON_DIR_PATH/resultsHandler.py $MULTIRUN_ID $DB_PATH
 
 # upload DQM file
 # check if there is exactly one .root file
 root_files_count=$(ls *.root 2>/dev/null | wc -l)
 if [ $root_files_count -lt 1 ]; then
+    # TODO: retry multirun processing?
     echo "DQM file is missing!"
     echo "DQM file upload failed."
 elif [ $root_files_count -gt 1 ]; then
     echo "More than one DQM file!"
     echo "DQM file upload failed."
 else
-    source $DQMGUI_DIR/current/apps/dqmgui/128/etc/profile.d/env.sh
+    source $DQM_GUI_DIR/current/apps/dqmgui/128/etc/profile.d/env.sh
     visDQMUpload $DQM_UPLOAD_HOST $(ls *.root)
 fi
+
+# TODO: if this job returns 0 then DataDiscovery project should be triggered ?
