@@ -19,6 +19,17 @@ def build_config(dataset, filenames, global_tag, scenario, output_file="alcaConf
     builder.build(str(dataset), workflows.extract_workflow(dataset), input_files, scenario, global_tag, output_file)
 
 
+def prepare_config(params_file):
+    multirun_info = None
+    with open(params_file, 'r') as f:
+        multirun_info = f.read()
+
+    params = json.loads(multirun_info)
+
+    config_file = "alcaConfig.py"
+    build_config(params['dataset'], params['filenames'], params['global_tag'], params['scenario'], config_file)
+
+
 def prepare_multirun_environment(config):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
@@ -77,14 +88,3 @@ def prepare_multirun_environment(config):
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         cmd = "{} {}".format(shell_script_path, shell_props_file)
         subprocess.call(cmd, shell=True)
-
-
-def prepare_config(params_file):
-    multirun_info = None
-    with open(params_file, 'r') as f:
-        multirun_info = f.read()
-
-    params = json.loads(multirun_info)
-
-    config_file = "alcaConfig.py"
-    build_config(params['dataset'], params['filenames'], params['global_tag'], params['scenario'], config_file)
