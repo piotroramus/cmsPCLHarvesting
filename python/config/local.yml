@@ -30,6 +30,9 @@ filters: {}
 # how many events multirun should contain to be qualified as ready to start
 events_threshold: 100000
 
+# how many times multirun should be processed if cmsRun exits with non-zero code
+max_retires: 2
+
 # only specified runClasses will be processed while using the particular workflow
 workflow_run_classes:
     'PromptCalibProd': ['Collisions15', 'Collisions16']
