@@ -184,12 +184,13 @@ def discover(config):
                         Multirun.cmssw.like(base_release_pattern),
                         Multirun.scram_arch == release['scram_arch'],
                         Multirun.scenario == release['scenario'],
-                        Multirun.global_tag == release['global_tag'])\
-                .filter(MultirunStatus.status == 'need_more_data')\
+                        Multirun.global_tag == release['global_tag']) \
+                .filter(MultirunStatus.status == 'need_more_data') \
                 .one_or_none()
 
             if not multirun:
-                need_more_data_status = session.query(MultirunStatus).filter(MultirunStatus.status == 'need_more_data').one()
+                need_more_data_status = session.query(MultirunStatus).filter(
+                    MultirunStatus.status == 'need_more_data').one()
                 multirun = Multirun(number_of_events=0, dataset=dataset['dataset'],
                                     bfield=run.bfield, run_class_name=run.run_class_name,
                                     cmssw=release['cmssw'], scram_arch=release['scram_arch'],

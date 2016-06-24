@@ -6,7 +6,6 @@ import model
 import logs.logger as logs
 
 if __name__ == '__main__':
-
     # TODO: it might be possible to extract similar logic from uprocessedMultirun.py
 
     logs.setup_logging()
@@ -26,9 +25,9 @@ if __name__ == '__main__':
     session = Session()
 
     multirun = session.query(model.Multirun).filter(model.Multirun.id == multirun_id).one()
-    processed_status = session\
-        .query(model.MultirunStatus)\
-        .filter(model.MultirunStatus.status == 'processed_ok')\
+    processed_status = session \
+        .query(model.MultirunStatus) \
+        .filter(model.MultirunStatus.status == 'processed_ok') \
         .one()
     multirun.status = processed_status
     session.commit()
