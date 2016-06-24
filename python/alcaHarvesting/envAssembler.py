@@ -6,7 +6,7 @@ import os
 import utils.workflows as workflows
 import logs.logger as logs
 
-from model import Base, Multirun
+from model import Base, Multirun, MultirunStatus
 
 logs.setup_logging()
 logger = logging.getLogger(__name__)
@@ -28,7 +28,8 @@ def prepare_multirun_environment(config):
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    multirun = session.query(Multirun).filter(Multirun.processed == False, Multirun.closed == True).first()
+    ready_status = session.query(MultirunStatus).filter(MultirunStatus.status == 'ready').one()
+    multirun = session.query(Multirun).filter(Multirun.status == ready_status).first()
 
     if not multirun:
         logger.info("No closed and unprocessed multiruns found - no further steps will be taken")
@@ -36,7 +37,8 @@ def prepare_multirun_environment(config):
     else:
         logger.info("Multirun to be processed: {}".format(multirun))
 
-        multirun.processed = True
+        processing_status = session.query(MultirunStatus).filter(MultirunStatus.status == 'processing').one()
+        multirun.status = processing_status
         session.commit()
 
         multirun_info = dict()
