@@ -9,7 +9,7 @@ import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 
 from rrapi.rrapi_v3 import RRApi, RRApiError
-from model import Base, RunInfo, RunBlock, Multirun, Filename, Dataset, MultirunStatus
+from model import Base, RunInfo, RunBlock, Multirun, Filename, Dataset, MultirunState
 
 
 def get_base_release(full_release):
@@ -108,8 +108,7 @@ def discover(config):
                                                   RunInfo.used == False).all()
     # TODO #1: test if the date comparison works properly
 
-
-    ready_status = session.query(MultirunStatus).filter(MultirunStatus.status == 'ready').one()
+    ready_state = session.query(MultirunState).filter(MultirunState.state == 'ready').one()
     logger.info("Starting creating multiruns...")
     for run in complete_runs:
 
@@ -156,9 +155,9 @@ def discover(config):
                 session.add(ds)
 
             # TODO: search for an open multirun with these properties - if exists then abort processing
-            # TODO: find out if it will be faster to get rid of joins - now multirun.status comparison should work
+            # TODO: find out if it will be faster to get rid of joins - now multirun.state comparison should work
             not_processed_multirun = session.query(Multirun) \
-                .join(MultirunStatus) \
+                .join(MultirunState) \
                 .filter(Multirun.dataset == dataset['dataset'],
                         # TODO: switch to ds object
                         Multirun.bfield == run.bfield,
@@ -168,7 +167,7 @@ def discover(config):
                         Multirun.scram_arch == release['scram_arch'],
                         Multirun.scenario == release['scenario'],
                         Multirun.global_tag == release['global_tag']) \
-                .filter(sqlalchemy.or_(MultirunStatus.status == 'ready', MultirunStatus.status == 'processing')) \
+                .filter(sqlalchemy.or_(MultirunState.state == 'ready', MultirunState.state == 'processing')) \
                 .one_or_none()  # TODO: test this or_
             # TODO #4 - release should be equal up to 2 digits?
 
@@ -177,7 +176,7 @@ def discover(config):
 
             # search for multi-run which the run could be merged into
             multirun = session.query(Multirun) \
-                .join(MultirunStatus) \
+                .join(MultirunState) \
                 .filter(Multirun.dataset == dataset['dataset'],
                         Multirun.bfield == run.bfield,
                         Multirun.run_class_name == run.run_class_name,
@@ -185,17 +184,17 @@ def discover(config):
                         Multirun.scram_arch == release['scram_arch'],
                         Multirun.scenario == release['scenario'],
                         Multirun.global_tag == release['global_tag']) \
-                .filter(MultirunStatus.status == 'need_more_data') \
+                .filter(MultirunState.state == 'need_more_data') \
                 .one_or_none()
 
             if not multirun:
-                need_more_data_status = session.query(MultirunStatus).filter(
-                    MultirunStatus.status == 'need_more_data').one()
+                need_more_data_state = session.query(MultirunState).filter(
+                    MultirunState.state == 'need_more_data').one()
                 multirun = Multirun(number_of_events=0, dataset=dataset['dataset'],
                                     bfield=run.bfield, run_class_name=run.run_class_name,
                                     cmssw=release['cmssw'], scram_arch=release['scram_arch'],
                                     scenario=release['scenario'], global_tag=release['global_tag'],
-                                    retries=0, status=need_more_data_status)
+                                    retries=0, state=need_more_data_state)
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
@@ -234,6 +233,6 @@ def discover(config):
                     logger.info(
                         "Multirun {} with {} events ready to be processed".format(multirun.id,
                                                                                   multirun.number_of_events))
-                    multirun.status = ready_status
+                    multirun.state = ready_state
 
         session.commit()

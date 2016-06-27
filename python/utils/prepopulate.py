@@ -15,11 +15,11 @@ def prepopulate(config):
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    # check if there are some statuses
-    sts = session.query(model.MultirunStatus).all()
+    # check if there are some states
+    sts = session.query(model.MultirunState).all()
     if not sts:
-        logger.info("Multirun status table is empty. Populating...")
-        statuses = ['need_more_data', 'ready', 'processing', 'processed_ok', 'no_payload']
+        logger.info("Multirun state table is empty. Populating...")
+        states = ['need_more_data', 'ready', 'processing', 'processed_ok', 'no_payload']
         # need_more_data - waiting for more data
         # ready - ready to be processed
         # processing - AlCa harvesting step in progress
@@ -27,8 +27,8 @@ def prepopulate(config):
         # no_payload - needs more data
         # retry - something failed
 
-        for status in statuses:
-            s = model.MultirunStatus(status=status)
+        for state in states:
+            s = model.MultirunState(state=state)
             session.add(s)
 
         session.commit()

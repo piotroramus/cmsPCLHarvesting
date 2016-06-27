@@ -51,9 +51,9 @@ class Multirun(Base):
     scenario = Column(String)
     global_tag = Column(String)
     retries = Column(Integer)
-    status_id = Column(Integer, ForeignKey('multirun_status.id'))
+    state_id = Column(Integer, ForeignKey('multirun_state.id'))
 
-    status = relationship("MultirunStatus")
+    state = relationship("MultirunState")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc, back_populates="multiruns")
     filenames = relationship("Filename")
 
@@ -68,18 +68,18 @@ class Multirun(Base):
                 "scenario={}, "
                 "global_tag={}, "
                 "retries={}, "
-                "status={}, "
+                "state={}, "
                 "run_numbers={}, "
                 "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
                                         self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.retries,
-                                        self.status.status, self.run_numbers, self.filenames)
+                                        self.state.state, self.run_numbers, self.filenames)
 
 
-class MultirunStatus(Base):
-    __tablename__ = 'multirun_status'
+class MultirunState(Base):
+    __tablename__ = 'multirun_state'
 
     id = Column(Integer, primary_key=True)
-    status = Column(String, unique=True)
+    state = Column(String, unique=True)
 
 
 # TODO: many-to-many relationship?

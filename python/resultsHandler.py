@@ -25,11 +25,11 @@ if __name__ == '__main__':
     session = Session()
 
     multirun = session.query(model.Multirun).filter(model.Multirun.id == multirun_id).one()
-    processed_status = session \
-        .query(model.MultirunStatus) \
-        .filter(model.MultirunStatus.status == 'processed_ok') \
+    processed_state = session \
+        .query(model.MultirunState) \
+        .filter(model.MultirunState.state == 'processed_ok') \
         .one()
-    multirun.status = processed_status
+    multirun.state = processed_state
     session.commit()
 
     logger.info("I will somehow handle the result of the AlCaHarvesting step.")

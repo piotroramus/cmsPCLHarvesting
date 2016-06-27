@@ -32,12 +32,12 @@ if __name__ == '__main__':
         # TODO: think what should be done
         pass
     else:
-        logger.info("Retrying multi-run - changing the status to ready")
-        ready_status = session \
-            .query(model.MultirunStatus) \
-            .filter(model.MultirunStatus.status == 'ready') \
+        logger.info("Retrying multi-run - changing the state to ready")
+        ready_state = session \
+            .query(model.MultirunState) \
+            .filter(model.MultirunState.state == 'ready') \
             .one()
-        multirun.status = ready_status
+        multirun.state = ready_state
         multirun.retries = multirun.retries + 1
 
     session.commit()
