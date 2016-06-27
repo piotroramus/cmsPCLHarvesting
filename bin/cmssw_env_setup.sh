@@ -3,8 +3,16 @@
 # sets CMSSW environment up
 # script parameters should be placed in properties file which path should be a script argument
 
-# TODO: check for properties file existence and so on
+function cmsenv() {
+    eval `scramv1 runtime -sh`
+}
 
+function eos() {
+   /afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select "$@"
+}
+
+
+# TODO: check for properties file existence and so on
 PROPERTIES_FILE="$1"
 source $PROPERTIES_FILE
 
@@ -27,7 +35,7 @@ CMSSW_RELEASE_DIR=$(
 
 echo "Sourcing environment from $CMSSW_RELEASE_DIR/src"
 cd $CMSSW_RELEASE_DIR/src
-eval `scramv1 runtime -sh`
+cmsenv
 
 cd $WORKSPACE/$CMSSW_RELEASE
 
