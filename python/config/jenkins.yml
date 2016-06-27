@@ -5,7 +5,7 @@ rrapi_url: http://runregistry.web.cern.ch/runregistry/
 runs_db_path: /afs/cern.ch/work/p/poramus/database/database.db
 
 # where to setup environments for AlCaHarvesting
-workspace_path: /afs/cern.ch/work/p/poramus/cmsenvs
+workspace_path: /afs/cern.ch/work/p/poramus/cmsenvs/jenkins
 
 # location of `current` DQM GUI directory
 dqm_current: /datadqm/testGui
