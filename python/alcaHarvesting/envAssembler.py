@@ -13,7 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 def dataset_with_runs_range(dataset, runs_range):
-    return dataset
+    import re
+    pattern = r'/(?P<primary_dataset>.*)/(?P<acquisition_era>.*?)-(?P<workflow>.*?)-(?P<version>.*)/ALCAPROMPT'
+    substitution = r'/\g<primary_dataset>/\g<acquisition_era>-\g<workflow>-\g<version>-{}/ALCAPROMPT'.format(runs_range)
+    result = re.sub(pattern, substitution, dataset)
+    return result
 
 
 def prepare_config(params_file):
@@ -29,7 +33,9 @@ def prepare_config(params_file):
     global_tag = params['global_tag']
     scenario = params['scenario']
     input_files = [str(input_file) for input_file in params['filenames']]
-    runs_range = "123456-123457"  # TODO: fixed right now, should be extracted from file
+    runs = params['runs']
+    min_run, max_run = min(runs), max(runs)
+    runs_range = "{}-{}".format(min_run, max_run)
 
     builder = AlCaHarvestingCfgBuilder()
     dataset_with_rr = dataset_with_runs_range(str(dataset), runs_range)
