@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 def dataset_with_runs_range(dataset, runs_range):
     import re
-    pattern = r'/(?P<primary_dataset>.*)/(?P<acquisition_era>.*?)-(?P<workflow>.*?)-(?P<version>.*)/ALCAPROMPT'
-    substitution = r'/\g<primary_dataset>/\g<acquisition_era>-\g<workflow>-\g<version>-{}/ALCAPROMPT'.format(runs_range)
+    pattern = r'(?P<slice>.*)/ALCAPROMPT'
+    substitution = r'\g<slice>-{}/ALCAPROMPT'.format(runs_range)
     result = re.sub(pattern, substitution, dataset)
     return result
 
