@@ -20,7 +20,6 @@ def get_base_release(full_release):
     return base_release.group('release')
 
 
-# TODO: review logger messages after all the changes
 def discover(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
@@ -34,13 +33,15 @@ def discover(config):
     dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
     t0api = t0wmadatasvcApi.Tier0Api()
 
-    days_old_runs_date = datetime.date.fromordinal(
-        datetime.date.today().toordinal() - config['days_old_runs']).strftime(
-        "%Y-%m-%d")
+    days_old_runs_date = datetime.date \
+        .fromordinal(datetime.date.today().toordinal() - config['days_old_runs']) \
+        .strftime("%Y-%m-%d")
+
     if config['harvest_all_runs']:
         config['filters']['number'] = "> {}".format(config['first_run_number'])
     else:
         config['filters']['startTime'] = "> {}".format(days_old_runs_date)
+
     recent_runs = []
     # TODO #13: this try is not coupled well with previous if statement - logger info particularly
     try:
@@ -60,32 +61,34 @@ def discover(config):
             logger.error("Run without a start date: {}. Ignoring.".format(run[u'number']))
     valid_runs = (r for r in runs_with_classname if r[u'startTime'])
 
+    # TODO: this does not go with harvest_all_runs well
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
-    closed_runs = [run.number for run in local_runs if run.stream_completed]
-    unclosed_runs = [run.number for run in local_runs if not run.stream_completed]
+    complete_stream_runs = [run.number for run in local_runs if run.stream_completed]
+    incomplete_stream_runs = [run.number for run in local_runs if not run.stream_completed]
 
-    logger.info("Updating local database of new fetched runs")
+    logger.info("Updating local database with newly fetched runs")
     for run in valid_runs:
 
         logger.debug("Checking run {} fetched from Run Registry".format(run[u'number']))
 
-        if run[u'number'] in closed_runs:
+        if run[u'number'] in complete_stream_runs:
             logger.debug("Run {} already exists in local database".format(run[u'number']))
             continue
 
-        if run[u'number'] in unclosed_runs:
-            logger.debug("Run {} already exists in local database but the stream is not closed".format(run[u'number']))
+        if run[u'number'] in incomplete_stream_runs:
+            logger.debug(
+                "Run {} already exists in local database but the stream was not completed".format(run[u'number']))
 
             if t0api.run_stream_completed(run[u'number']):
                 logger.info(
-                    "Stream for run {} is now completed. Now it can be included in multiruns".format(run[u'number']))
-                old_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
-                old_run.stream_completed = True
+                    "Stream for run {} is now completed. It can be thus included in multi-runs".format(run[u'number']))
+                run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
+                run_to_update.stream_completed = True
             else:
                 # TODO: timeout for not closed streams (few days)
-                logger.debug("Stream for run {} still not closed".format(run[u'number']))
+                logger.debug("Stream for run {} is still not completed".format(run[u'number']))
                 continue
 
         else:
@@ -99,18 +102,20 @@ def discover(config):
 
         session.commit()
 
-    logger.info("Getting complete runs from local database")
+    logger.info("Getting runs with completed stream from local database")
     # TODO #12: the second condition ignores harvest_all_runs config value
+    # TODO: consider again what to do with it
     # complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
     #                                               RunInfo.start_time > days_old_runs_date).all()
 
-    complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
-                                                  RunInfo.used == False).all()
+    unused_complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
+                                                         RunInfo.used == False).all()
     # TODO #1: test if the date comparison works properly
 
     ready_state = session.query(MultirunState).filter(MultirunState.state == 'ready').one()
-    logger.info("Starting creating multiruns...")
-    for run in complete_runs:
+
+    logger.info("Starting to assemble multiruns...")
+    for run in unused_complete_runs:
 
         logger.debug("Retrieving express config for run {}".format(run.number))
         release = t0api.get_run_info(run.number)
@@ -121,9 +126,10 @@ def discover(config):
         base_release = get_base_release(release['cmssw'])
         base_release_pattern = "{}%".format(base_release)
 
+        logger.debug("Getting list of datasets for run {} from DBS".format(run.number))
         run_datasets = dbsApi.listDatasets(run_num=run.number, dataset='/*/*/ALCAPROMPT')
 
-        # get datasets that are not part of any multi-run yet
+        logger.debug("Getting datasets that are not part of any multi-run for the given run")
         datasets = list()
         used_datasets = [d.dataset for d in run.used_datasets]
         for dataset in run_datasets:
@@ -132,8 +138,6 @@ def discover(config):
 
         for dataset in datasets:
 
-            # TODO logger msg is definitely wrong
-            logger.debug("Getting multirun for the dataset {} for run {}".format(dataset, run.number))
             dataset_workflow = workflows.extract_workflow(dataset)
             if dataset_workflow not in release['workflows']:
                 logger.warning(
@@ -150,11 +154,12 @@ def discover(config):
 
             ds = session.query(Dataset).filter(Dataset.dataset == dataset).one_or_none()
             if not ds:
+                logger.info("New dataset: {}".format(ds))
                 ds = Dataset(dataset=dataset)
                 session.add(ds)
 
-            # TODO: search for an open multirun with these properties - if exists then abort processing
             # TODO: find out if it will be faster to get rid of joins - now multirun.state comparison should work
+            logger.debug("Searching for existence of 'ready' or 'processing' multi-run with similar properties")
             not_processed_multirun = session.query(Multirun) \
                 .join(MultirunState) \
                 .filter(Multirun.dataset == dataset,
@@ -168,12 +173,13 @@ def discover(config):
                         Multirun.global_tag == release['global_tag']) \
                 .filter(sqlalchemy.or_(MultirunState.state == 'ready', MultirunState.state == 'processing')) \
                 .one_or_none()  # TODO: test this or_
-            # TODO #4 - release should be equal up to 2 digits?
 
             if not_processed_multirun:
+                logger.debug(
+                    "Multi-run {} found in {} state".format(not_processed_multirun.id, not_processed_multirun.state))
                 continue
 
-            # search for multi-run which the run could be merged into
+            logger.debug("Searching for multi-run that the run could be merged into")
             multirun = session.query(Multirun) \
                 .join(MultirunState) \
                 .filter(Multirun.dataset == dataset,
@@ -205,13 +211,14 @@ def discover(config):
             # add dataset to used for given run
             run.used_datasets.append(ds)
 
-            # if this is the last dataset - mark run as used
+            # if this is the last dataset in run - mark run as used
             if len(datasets) == 1:
+                logger.debug("All datasets for run {} are now used in multi-runs".format(run.number))
                 run.used = True
 
             files, number_of_events = [], 0
 
-            logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
+            logger.debug("Getting blocks, files and number of events for multi-run {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset)
             for block in blocks:
                 run_block = RunBlock(block_name=block['block_name'], run_number=run.number)
@@ -222,7 +229,7 @@ def discover(config):
                                                           block_name=run_block.block_name)  # TODO: measure what is faster: dict or objetct access and adjust properly
                 number_of_events += file_summaries[0]['num_event']
 
-            logger.debug("Adding gathered data to multirun {}".format(multirun.id))
+            logger.debug("Adding gathered data to multi-run {} summary".format(multirun.id))
             if number_of_events > 0 and files:
                 multirun.number_of_events += number_of_events
                 for f in files:

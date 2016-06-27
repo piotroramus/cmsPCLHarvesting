@@ -72,7 +72,7 @@ class Multirun(Base):
                 "run_numbers={}, "
                 "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
                                         self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.retries,
-                                        self.state.state, self.run_numbers, self.filenames)
+                                        self.state, self.run_numbers, self.filenames)
 
 
 class MultirunState(Base):
@@ -80,6 +80,9 @@ class MultirunState(Base):
 
     id = Column(Integer, primary_key=True)
     state = Column(String, unique=True)
+
+    def __repr__(self):
+        return self.state
 
 
 # TODO: many-to-many relationship?
