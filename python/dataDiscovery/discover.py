@@ -128,37 +128,36 @@ def discover(config):
         used_datasets = [d.dataset for d in run.used_datasets]
         for dataset in run_datasets:
             if dataset['dataset'] not in used_datasets:
-                datasets.append(dataset)
-                # TODO: change here to datasets.append(dataset['dataset']) and then everywhere below
+                datasets.append(dataset['dataset'])
 
         for dataset in datasets:
 
             # TODO logger msg is definitely wrong
-            logger.debug("Getting multirun for the dataset {} for run {}".format(dataset['dataset'], run.number))
-            dataset_workflow = workflows.extract_workflow(dataset['dataset'])
+            logger.debug("Getting multirun for the dataset {} for run {}".format(dataset, run.number))
+            dataset_workflow = workflows.extract_workflow(dataset)
             if dataset_workflow not in release['workflows']:
                 logger.warning(
                     "Dataset {} workflow {} is different than workflow from run {} release {}".format(
-                        dataset['dataset'], dataset_workflow, run.number, release['workflows']))
+                        dataset, dataset_workflow, run.number, release['workflows']))
                 continue
 
             if run.run_class_name not in config['workflow_run_classes'][dataset_workflow]:
                 logger.debug(
                     "Ignoring dataset {} for run {} since runClassName {} for the run is not specified for this dataset workflow {}:{}".format(
-                        dataset['dataset'], run.number, run.run_class_name, dataset_workflow,
+                        dataset, run.number, run.run_class_name, dataset_workflow,
                         config['workflow_run_classes'][dataset_workflow]))
                 continue
 
-            ds = session.query(Dataset).filter(Dataset.dataset == dataset['dataset']).one_or_none()
+            ds = session.query(Dataset).filter(Dataset.dataset == dataset).one_or_none()
             if not ds:
-                ds = Dataset(dataset=dataset['dataset'])
+                ds = Dataset(dataset=dataset)
                 session.add(ds)
 
             # TODO: search for an open multirun with these properties - if exists then abort processing
             # TODO: find out if it will be faster to get rid of joins - now multirun.state comparison should work
             not_processed_multirun = session.query(Multirun) \
                 .join(MultirunState) \
-                .filter(Multirun.dataset == dataset['dataset'],
+                .filter(Multirun.dataset == dataset,
                         # TODO: switch to ds object
                         Multirun.bfield == run.bfield,
                         Multirun.run_class_name == run.run_class_name,
@@ -177,7 +176,7 @@ def discover(config):
             # search for multi-run which the run could be merged into
             multirun = session.query(Multirun) \
                 .join(MultirunState) \
-                .filter(Multirun.dataset == dataset['dataset'],
+                .filter(Multirun.dataset == dataset,
                         Multirun.bfield == run.bfield,
                         Multirun.run_class_name == run.run_class_name,
                         Multirun.cmssw.like(base_release_pattern),
@@ -190,7 +189,7 @@ def discover(config):
             if not multirun:
                 need_more_data_state = session.query(MultirunState).filter(
                     MultirunState.state == 'need_more_data').one()
-                multirun = Multirun(number_of_events=0, dataset=dataset['dataset'],
+                multirun = Multirun(number_of_events=0, dataset=dataset,
                                     bfield=run.bfield, run_class_name=run.run_class_name,
                                     cmssw=release['cmssw'], scram_arch=release['scram_arch'],
                                     scenario=release['scenario'], global_tag=release['global_tag'],
@@ -213,7 +212,7 @@ def discover(config):
             files, number_of_events = [], 0
 
             logger.debug("Getting files and number of events from new blocks for multirun {}".format(multirun.id))
-            blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset['dataset'])
+            blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset)
             for block in blocks:
                 run_block = RunBlock(block_name=block['block_name'], run_number=run.number)
                 session.add(run_block)
