@@ -10,10 +10,11 @@ class AlCaHarvestingCfgBuilder(object):
         logs.setup_logging()
         self.logger = logging.getLogger(__name__)
 
-    def build(self, dataset, alcapromptdataset, input_files, scenario, global_tag, output_file, workflows=None):
+    def build(self, dataset, alcapromptdataset, input_files, scenario, global_tag, output_config_file, job_report_file,
+              workflows=None):
 
-        if not output_file.endswith(".py"):
-            output_file += ".py"
+        if not output_config_file.endswith(".py"):
+            output_config_file += ".py"
 
         try:
             scenario = cmssw.getScenario(scenario)
@@ -43,8 +44,8 @@ class AlCaHarvestingCfgBuilder(object):
         process.DQMStore.collateHistograms = cms.untracked.bool(True)
         process.dqmSaver.forceRunNumber = cms.untracked.int32(999999)
 
-        with open(output_file, "w") as alcacfg:
+        with open(output_config_file, "w") as alcacfg:
             alcacfg.write(process.dumpPython())
 
-        cms_run = "cmsRun -j FrameworkJobReport.xml {}".format(output_file)
+        cms_run = "cmsRun -j {} {}".format(job_report_file, output_config_file)
         self.logger.info("Now do:\n{}".format(cms_run))
