@@ -64,7 +64,7 @@ mv $PROPERTIES_FILE_PWD .
 python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE $ALCA_CONFIG_FILE $JOB_REPORT_FILE
 
 # run the AlCaHarvesting step
-cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee jobOutput.txt
+cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee $CMS_RUN_OUTPUT
 CMS_RUN_RESULT=$?
 
 if [[ $CMS_RUN_RESULT != 0 ]]; then

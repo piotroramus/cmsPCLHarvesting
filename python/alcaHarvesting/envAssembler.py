@@ -98,6 +98,7 @@ def prepare_multirun_environment(config):
             f.write("MULTIRUN_ID={}\n".format(multirun.id))
             f.write("ALCA_CONFIG_FILE={}\n".format(config['alca_config']))
             f.write("JOB_REPORT_FILE={}\n".format(config['job_report']))
+            f.write("CMS_RUN_OUTPUT={}\n".format(config['cms_run_output']))
             f.write("MULTIRUN_PROPS_FILE={}\n".format(multirun_props_file))
             f.write("PYTHON_DIR_PATH={}\n".format(absolute_python_dir_path))
             f.write("DQM_GUI_DIR={}\n".format(config['dqm_current']))
