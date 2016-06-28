@@ -12,8 +12,12 @@ function eos() {
 }
 
 
-# TODO: check for properties file existence and so on
 PROPERTIES_FILE="$1"
+if [ ! -f $PROPERTIES_FILE ]; then
+    echo "Shell properties file $PROPERTIES_FILE cannot be localized"
+    exit 1
+fi
+
 source $PROPERTIES_FILE
 
 MULTIRUN_PROPS_FILE_PWD=$PWD/$MULTIRUN_PROPS_FILE
