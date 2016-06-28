@@ -95,7 +95,7 @@ class RunBlock(Base):
     run_number = Column(Integer, ForeignKey('run_info.number'))
 
     def __repr__(self):
-        return "RunBlock(id={}, block_name={}, run_number={}".format(self.id, self.block_name, self.run_number)
+        return self.block_name
 
 
 class RunInfo(Base):
@@ -106,12 +106,21 @@ class RunInfo(Base):
     bfield = Column(Float)
     start_time = Column(DateTime)
     stream_completed = Column(Boolean)
-    used = Column(Boolean)  # TODO: update __repr__ maybe even consider using printing self.__dict__
+    used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc, back_populates="run_numbers")
     run_blocks = relationship("RunBlock")
     multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
 
     def __repr__(self):
-        return "RunInfo(number={}, run_class_name={}, bfield={} start_time={})".format(
-            self.number, self.run_class_name, self.bfield, self.start_time)
+        return ("RunInfo(number={}, "
+                "run_class_name={}, "
+                "bfield={}, "
+                "start_time={}, "
+                "stream_completed={}, "
+                "used={}, "
+                "used_datasets={}, "
+                "run_blocks={}, "
+                "multiruns={})").format(self.number, self.run_class_name, self.bfield, self.start_time,
+                                        self.stream_completed, self.used, self.used_datasets, self.run_blocks,
+                                        self.multiruns)
