@@ -99,8 +99,6 @@ else
     visDQMUpload $DQM_UPLOAD_HOST $(ls *.root)
 fi
 
-# TODO: some filenames are camel-case and some are not (change to multirunProperties1.txt etc.?)
-# TODO: also check if it is possible to put it in a config file - probably it is needless?
 # copy workspace files to EOS
 FILES_TO_COPY=(
     $ALCA_CONFIG_FILE
@@ -108,8 +106,8 @@ FILES_TO_COPY=(
     $CMS_RUN_OUTPUT
     promptCalibConditions.db
     DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
-    multirun_*_properties.txt
-    shell_properties_*.txt
+    multirunProperties*.txt
+    shellProperties*.txt
     )
 
 for file in ${FILES_TO_COPY[@]}; do

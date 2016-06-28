@@ -51,7 +51,7 @@ def prepare_multirun_environment(config):
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    # TODO: logging
+    logger.info("Searching for a ready to be processed multi-run...")
     ready_state = session.query(MultirunState).filter(MultirunState.state == 'ready').one()
     multirun = session.query(Multirun).filter(Multirun.state == ready_state).first()
 
@@ -79,7 +79,8 @@ def prepare_multirun_environment(config):
         multirun_info['runs'] = runs
         dump = json.dumps(multirun_info)
 
-        multirun_props_file = "multirun_{}_properties.txt".format(multirun.id)
+        multirun_props_file = "multirunProperties{}.txt".format(multirun.id)
+        logger.info("Creating {} file containing multi-run information".format(multirun_props_file))
         with open(multirun_props_file, 'w') as f:
             f.write(dump)
 
@@ -89,7 +90,8 @@ def prepare_multirun_environment(config):
         absolute_python_dir_path = os.path.abspath(python_dir_path)
         db_path = os.path.abspath(config['runs_db_path'])
 
-        shell_props_file = "shell_properties_{}.txt".format(multirun.id)
+        shell_props_file = "shellProperties{}.txt".format(multirun.id)
+        logger.info("Creating {} file containing parameters used by various scripts".format(shell_props_file))
         with open(shell_props_file, 'w') as f:
             f.write("WORKSPACE={}\n".format(workspace))
             f.write("EOS_WORKSPACE={}\n".format(config['eos_workspace_path']))
@@ -108,4 +110,5 @@ def prepare_multirun_environment(config):
 
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         cmd = "{} {}".format(shell_script_path, shell_props_file)
+        logger.info("Invoking script:\n\t {}".format(cmd))
         subprocess.call(cmd, shell=True)
