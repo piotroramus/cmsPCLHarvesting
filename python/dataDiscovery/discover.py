@@ -9,7 +9,7 @@ import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 
 from rrapi.rrapi_v3 import RRApi, RRApiError
-from model import Base, RunInfo, RunBlock, Multirun, Filename, Dataset, MultirunState
+from model import Base, RunInfo, Block, Multirun, Filename, Dataset, MultirunState
 
 
 def get_base_release(full_release):
@@ -221,7 +221,7 @@ def discover(config):
             logger.debug("Getting blocks, files and number of events for multi-run {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset)
             for block in blocks:
-                run_block = RunBlock(block_name=block['block_name'], run_number=run.number)
+                run_block = Block(block_name=block['block_name'], run_number=run.number)
                 session.add(run_block)
                 block_files = dbsApi.listFiles(run_num=run.number, block_name=run_block.block_name)
                 files.extend(block_files)

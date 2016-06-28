@@ -20,6 +20,7 @@ class Dataset(Base):
     id = Column(Integer, primary_key=True)
     dataset = Column(String)
 
+    # TODO: is this back_populates really needed? is all this really needed?
     run_numbers = relationship("RunInfo", secondary=run_dataset_assoc, back_populates="used_datasets")
 
     def __repr__(self):
@@ -86,8 +87,8 @@ class MultirunState(Base):
 
 
 # TODO: many-to-many relationship?
-class RunBlock(Base):
-    __tablename__ = 'run_block'
+class Block(Base):
+    __tablename__ = 'block'
 
     id = Column(Integer, primary_key=True)
     block_name = Column(String)
@@ -109,7 +110,7 @@ class RunInfo(Base):
     used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc, back_populates="run_numbers")
-    run_blocks = relationship("RunBlock")
+    blocks = relationship("Block") #TODO: again is this needed?
     multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
 
     def __repr__(self):
@@ -120,7 +121,7 @@ class RunInfo(Base):
                 "stream_completed={}, "
                 "used={}, "
                 "used_datasets={}, "
-                "run_blocks={}, "
+                "blocks={}, "
                 "multiruns={})").format(self.number, self.run_class_name, self.bfield, self.start_time,
-                                        self.stream_completed, self.used, self.used_datasets, self.run_blocks,
+                                        self.stream_completed, self.used, self.used_datasets, self.blocks,
                                         self.multiruns)
