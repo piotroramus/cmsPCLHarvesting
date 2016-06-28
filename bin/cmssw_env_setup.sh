@@ -67,6 +67,8 @@ python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE $ALCA_CONFIG_FI
 cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee $CMS_RUN_OUTPUT
 CMS_RUN_RESULT=$?
 
+# TODO: The problem is that cmsRun returns 0 even when it fails
+echo "cmsRun return code: $CMS_RUN_RESULT"
 if [[ $CMS_RUN_RESULT != 0 ]]; then
     echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
@@ -101,13 +103,13 @@ fi
 # TODO: also check if it is possible to put it in a config file - probably it is needless?
 # copy workspace files to EOS
 FILES_TO_COPY=(
-    alcaConfig.py
-    FrameworkJobReport.xml
-    jobOutput.txt
-    multirun_*_properties.txt
-    shell_properties_*.txt
+    $ALCA_CONFIG_FILE
+    $JOB_REPORT_FILE
+    $CMS_RUN_OUTPUT
     promptCalibConditions.db
     DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
+    multirun_*_properties.txt
+    shell_properties_*.txt
     )
 
 for file in ${FILES_TO_COPY[@]}; do
