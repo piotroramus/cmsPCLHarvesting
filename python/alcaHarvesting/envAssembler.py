@@ -20,7 +20,7 @@ def dataset_with_runs_range(dataset, runs_range):
     return result
 
 
-def prepare_config(params_file):
+def prepare_config(params_file, alca_config_file="alcaConfig.py"):
     from configBuilder import AlCaHarvestingCfgBuilder
     multirun_info = None
     with open(params_file, 'r') as f:
@@ -28,7 +28,6 @@ def prepare_config(params_file):
 
     params = json.loads(multirun_info)
 
-    output_file = "alcaConfig.py"
     dataset = str(params['dataset'])
     global_tag = params['global_tag']
     scenario = params['scenario']
@@ -40,7 +39,7 @@ def prepare_config(params_file):
     builder = AlCaHarvestingCfgBuilder()
     dataset_with_rr = dataset_with_runs_range(str(dataset), runs_range)
     builder.build(dataset_with_rr, workflows.extract_workflow(dataset), input_files, scenario, global_tag,
-                  output_file)
+                  alca_config_file)
 
 
 def prepare_multirun_environment(config):
@@ -52,11 +51,12 @@ def prepare_multirun_environment(config):
     Session = sessionmaker(bind=engine)
     session = Session()
 
+    # TODO: logging
     ready_state = session.query(MultirunState).filter(MultirunState.state == 'ready').one()
     multirun = session.query(Multirun).filter(Multirun.state == ready_state).first()
 
     if not multirun:
-        logger.info("No closed and unprocessed multiruns found - no further steps will be taken")
+        logger.info("Cannot find any multi-run ready to be processed - no further steps will be taken")
 
     else:
         logger.info("Multirun to be processed: {}".format(multirun))
@@ -96,6 +96,7 @@ def prepare_multirun_environment(config):
             f.write("CMSSW_RELEASE={}\n".format(multirun.cmssw))
             f.write("SCRAM_ARCH={}\n".format(multirun.scram_arch))
             f.write("MULTIRUN_ID={}\n".format(multirun.id))
+            f.write("ALCA_CONFIG_FILE={}\n".format(config['alca_config']))
             f.write("MULTIRUN_PROPS_FILE={}\n".format(multirun_props_file))
             f.write("PYTHON_DIR_PATH={}\n".format(absolute_python_dir_path))
             f.write("DQM_GUI_DIR={}\n".format(config['dqm_current']))

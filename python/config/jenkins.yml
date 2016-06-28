@@ -4,11 +4,20 @@ rrapi_url: http://runregistry.web.cern.ch/runregistry/
 # path to database containing all the harvesting information
 runs_db_path: /afs/cern.ch/work/p/poramus/database/database.db
 
-# where to setup environments for AlCaHarvesting
+# where to setup environments for AlCa Harvesting
 workspace_path: /afs/cern.ch/work/p/poramus/cmsenvs/jenkins
 
 # where to copy files after processing has been done
 eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/jenkins
+
+# name of file containing AlCa Harvesting config
+alca_config: alcaConfig.py
+
+# name of file containing AlCa Harvesting job report
+job_report: FrameworkJobReport.xml
+
+# name of file containing logs of cmsRun for AlCa Harvesting step
+cms_run_output: cmsRunOutput.txt
 
 # location of `current` DQM GUI directory
 dqm_current: /datadqm/testGui

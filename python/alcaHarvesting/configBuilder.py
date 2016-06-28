@@ -18,8 +18,7 @@ class AlCaHarvestingCfgBuilder(object):
         try:
             scenario = cmssw.getScenario(scenario)
         except Exception as ex:
-            msg = "Error getting Scenario implementation for {}\n".format(scenario)
-            msg += str(ex)
+            msg = "Error getting Scenario implementation for {}\n{}".format(scenario, ex)
             raise RuntimeError(msg)
 
         self.logger.info("Retrieved Scenario: {}".format(scenario))
@@ -34,8 +33,7 @@ class AlCaHarvestingCfgBuilder(object):
                 kwds['alcapromptdataset'] = alcapromptdataset
             process = scenario.alcaHarvesting(global_tag, dataset, **kwds)
         except Exception as ex:
-            msg = "Error creating AlcaHarvesting config:\n"
-            msg += str(ex)
+            msg = "Error creating AlcaHarvesting config:\n{}".format(ex)
             raise RuntimeError(msg)
 
         for input_file in input_files:

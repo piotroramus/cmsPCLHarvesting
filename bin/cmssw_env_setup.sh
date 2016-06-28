@@ -61,7 +61,7 @@ mv $MULTIRUN_PROPS_FILE_PWD .
 mv $PROPERTIES_FILE_PWD .
 
 # create cmsRun config for AlCaHarvesting step
-python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE
+python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE $ALCA_CONFIG_FILE
 
 # run the AlCaHarvesting step
 cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee jobOutput.txt
