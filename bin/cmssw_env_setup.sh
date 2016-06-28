@@ -80,12 +80,37 @@ if [ $root_files_count -lt 1 ]; then
     # TODO: retry multirun processing?
     echo "DQM file is missing!"
     echo "DQM file upload failed."
+    exit 1
 elif [ $root_files_count -gt 1 ]; then
     echo "More than one DQM file!"
     echo "DQM file upload failed."
+    exit 1
 else
     source $DQM_GUI_DIR/current/apps/dqmgui/128/etc/profile.d/env.sh
     visDQMUpload $DQM_UPLOAD_HOST $(ls *.root)
 fi
 
-# TODO: if this job returns 0 then DataDiscovery project should be triggered ?
+# TODO: some filenames are camel-case and some are not (change to multirunProperties1.txt etc.?)
+# TODO: also check if it is possible to put it in a config file - probably it is needless?
+# copy workspace files to EOS
+FILES_TO_COPY=(
+    alcaConfig.py
+    FrameworkJobReport.xml
+    jobOutput.txt
+    multirun_*_properties.txt
+    shell_properties_*.txt
+    promptCalibConditions.db
+    DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
+    )
+
+for file in ${FILES_TO_COPY[@]}; do
+    if [ ! -f $file ]; then
+        echo "Error: $file does not exists"
+        echo "Preparing for retrying the processing..."
+        #TODO: retry processing here
+        exit 1
+    fi
+done
+
+EOS_MULTIRUN_WORKSPACE=$EOS_WORKSPACE/$SCRAM_ARCH/$CMSSW_RELEASE/$MULTIRUN_DIR/
+eos cp ${FILES_TO_COPY[@]} $EOS_MULTIRUN_WORKSPACE

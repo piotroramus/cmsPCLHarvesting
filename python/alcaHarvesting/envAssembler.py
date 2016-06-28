@@ -92,6 +92,7 @@ def prepare_multirun_environment(config):
         shell_props_file = "shell_properties_{}.txt".format(multirun.id)
         with open(shell_props_file, 'w') as f:
             f.write("WORKSPACE={}\n".format(workspace))
+            f.write("EOS_WORKSPACE={}\n".format(config['eos_workspace_path']))
             f.write("CMSSW_RELEASE={}\n".format(multirun.cmssw))
             f.write("SCRAM_ARCH={}\n".format(multirun.scram_arch))
             f.write("MULTIRUN_ID={}\n".format(multirun.id))
