@@ -10,7 +10,7 @@ def prepopulate(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    engine = create_engine('sqlite:///{}'.format(config['runs_db_path']), echo=False)
+    engine = create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()

@@ -24,7 +24,7 @@ def discover(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config['runs_db_path']), echo=False)
+    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()

@@ -46,7 +46,7 @@ def prepare_multirun_environment(config):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
-    engine = create_engine('sqlite:///{}'.format(config['runs_db_path']), echo=False)
+    engine = create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -88,7 +88,7 @@ def prepare_multirun_environment(config):
         script_path = os.path.dirname(os.path.realpath(__file__))
         python_dir_path = script_path.replace("/alcaHarvesting", "")
         absolute_python_dir_path = os.path.abspath(python_dir_path)
-        db_path = os.path.abspath(config['runs_db_path'])
+        db_path = os.path.abspath(config['db_path'])
 
         shell_props_file = "shellProperties{}.txt".format(multirun.id)
         logger.info("Creating {} file containing parameters used by various scripts".format(shell_props_file))
