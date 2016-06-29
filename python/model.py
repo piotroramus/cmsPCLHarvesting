@@ -52,7 +52,7 @@ class Multirun(Base):
     state_id = Column(Integer, ForeignKey('multirun_state.id'))
 
     state = relationship("MultirunState")
-    run_numbers = relationship("RunInfo", secondary=run_multirun_assoc, back_populates="multiruns")
+    run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
     filenames = relationship("Filename")
 
     def __repr__(self):
@@ -107,8 +107,7 @@ class RunInfo(Base):
     used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc)
-    blocks = relationship("Block") #TODO: again is this needed?
-    multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
+    blocks = relationship("Block")  # TODO: again is this needed?
 
     def __repr__(self):
         return ("RunInfo(number={}, "
