@@ -14,21 +14,6 @@ run_dataset_assoc = Table('run_dataset', Base.metadata,
                           Column('dataset_id', Integer, ForeignKey('dataset.id')))
 
 
-run_block_assoc = Table('run_block', Base.metadata,
-                        Column('run_id', Integer, ForeignKey('run_info.number')),
-                        Column('block_id', Integer, ForeignKey('block.id')))
-
-
-class Block(Base):
-    __tablename__ = 'block'
-
-    id = Column(Integer, primary_key=True)
-    block_name = Column(String)
-
-    def __repr__(self):
-        return self.block_name
-
-
 class Dataset(Base):
     __tablename__ = 'dataset'
 
@@ -110,7 +95,6 @@ class RunInfo(Base):
     used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc)
-    blocks = relationship("Block", secondary=run_block_assoc)
 
     def __repr__(self):
         return ("RunInfo(number={}, "
@@ -119,6 +103,5 @@ class RunInfo(Base):
                 "start_time={}, "
                 "stream_completed={}, "
                 "used={}, "
-                "used_datasets={}, "
-                "blocks={}, ").format(self.number, self.run_class_name, self.bfield, self.start_time,
-                                      self.stream_completed, self.used, self.used_datasets, self.blocks)
+                "used_datasets={}, ").format(self.number, self.run_class_name, self.bfield, self.start_time,
+                                             self.stream_completed, self.used, self.used_datasets)
