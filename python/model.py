@@ -107,7 +107,7 @@ class RunInfo(Base):
     used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc)
-    blocks = relationship("Block")  # TODO: again is this needed?
+    blocks = relationship("Block")
 
     def __repr__(self):
         return ("RunInfo(number={}, "
@@ -117,7 +117,5 @@ class RunInfo(Base):
                 "stream_completed={}, "
                 "used={}, "
                 "used_datasets={}, "
-                "blocks={}, "
-                "multiruns={})").format(self.number, self.run_class_name, self.bfield, self.start_time,
-                                        self.stream_completed, self.used, self.used_datasets, self.blocks,
-                                        self.multiruns)
+                "blocks={}, ").format(self.number, self.run_class_name, self.bfield, self.start_time,
+                                      self.stream_completed, self.used, self.used_datasets, self.blocks)
