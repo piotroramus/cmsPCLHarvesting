@@ -20,9 +20,6 @@ class Dataset(Base):
     id = Column(Integer, primary_key=True)
     dataset = Column(String)
 
-    # TODO: is this back_populates really needed? is all this really needed?
-    run_numbers = relationship("RunInfo", secondary=run_dataset_assoc, back_populates="used_datasets")
-
     def __repr__(self):
         return self.dataset
 
@@ -109,7 +106,7 @@ class RunInfo(Base):
     stream_completed = Column(Boolean)
     used = Column(Boolean)
 
-    used_datasets = relationship("Dataset", secondary=run_dataset_assoc, back_populates="run_numbers")
+    used_datasets = relationship("Dataset", secondary=run_dataset_assoc)
     blocks = relationship("Block") #TODO: again is this needed?
     multiruns = relationship("Multirun", secondary=run_multirun_assoc, back_populates="run_numbers")
 
