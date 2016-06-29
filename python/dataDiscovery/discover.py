@@ -220,8 +220,9 @@ def discover(config):
             logger.debug("Getting blocks, files and number of events for multi-run {}".format(multirun.id))
             blocks = dbsApi.listBlocks(run_num=run.number, dataset=dataset)
             for block in blocks:
-                run_block = Block(block_name=block['block_name'], run_number=run.number)
+                run_block = Block(block_name=block['block_name'])
                 session.add(run_block)
+                run.blocks.append(run_block)
                 block_files = dbsApi.listFiles(run_num=run.number, block_name=run_block.block_name)
                 files.extend(block_files)
                 file_summaries = dbsApi.listFileSummaries(run_num=run.number,

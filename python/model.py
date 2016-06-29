@@ -14,6 +14,21 @@ run_dataset_assoc = Table('run_dataset', Base.metadata,
                           Column('dataset_id', Integer, ForeignKey('dataset.id')))
 
 
+run_block_assoc = Table('run_block', Base.metadata,
+                        Column('run_id', Integer, ForeignKey('run_info.number')),
+                        Column('block_id', Integer, ForeignKey('block.id')))
+
+
+class Block(Base):
+    __tablename__ = 'block'
+
+    id = Column(Integer, primary_key=True)
+    block_name = Column(String)
+
+    def __repr__(self):
+        return self.block_name
+
+
 class Dataset(Base):
     __tablename__ = 'dataset'
 
@@ -48,8 +63,8 @@ class Multirun(Base):
     scenario = Column(String)
     global_tag = Column(String)
     retries = Column(Integer)
-    state_id = Column(Integer, ForeignKey('multirun_state.id'))
     dataset_id = Column(Integer, ForeignKey('dataset.id'))
+    state_id = Column(Integer, ForeignKey('multirun_state.id'))
 
     dataset = relationship("Dataset")
     state = relationship("MultirunState")
@@ -84,19 +99,6 @@ class MultirunState(Base):
         return self.state
 
 
-# TODO: many-to-many relationship?
-class Block(Base):
-    __tablename__ = 'block'
-
-    id = Column(Integer, primary_key=True)
-    block_name = Column(String)
-
-    run_number = Column(Integer, ForeignKey('run_info.number'))
-
-    def __repr__(self):
-        return self.block_name
-
-
 class RunInfo(Base):
     __tablename__ = 'run_info'
 
@@ -108,7 +110,7 @@ class RunInfo(Base):
     used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc)
-    blocks = relationship("Block")
+    blocks = relationship("Block", secondary=run_block_assoc)
 
     def __repr__(self):
         return ("RunInfo(number={}, "
