@@ -152,18 +152,17 @@ def discover(config):
                         config['workflow_run_classes'][dataset_workflow]))
                 continue
 
-            ds = session.query(Dataset).filter(Dataset.dataset == dataset).one_or_none()
-            if not ds:
-                logger.info("New dataset: {}".format(ds))
-                ds = Dataset(dataset=dataset)
-                session.add(ds)
+            dataset_object = session.query(Dataset).filter(Dataset.dataset == dataset).one_or_none()
+            if not dataset_object:
+                logger.info("New dataset: {}".format(dataset_object))
+                dataset_object = Dataset(dataset=dataset)
+                session.add(dataset_object)
 
             # TODO: find out if it will be faster to get rid of joins - now multirun.state comparison should work
             logger.debug("Searching for existence of 'ready' or 'processing' multi-run with similar properties")
             not_processed_multirun = session.query(Multirun) \
                 .join(MultirunState) \
-                .filter(Multirun.dataset == dataset,
-                        # TODO: switch to ds object
+                .filter(Multirun.dataset == dataset_object,
                         Multirun.bfield == run.bfield,
                         Multirun.run_class_name == run.run_class_name,
                         Multirun.cmssw.like(base_release_pattern),
@@ -182,7 +181,7 @@ def discover(config):
             logger.debug("Searching for multi-run that the run could be merged into")
             multirun = session.query(Multirun) \
                 .join(MultirunState) \
-                .filter(Multirun.dataset == dataset,
+                .filter(Multirun.dataset == dataset_object,
                         Multirun.bfield == run.bfield,
                         Multirun.run_class_name == run.run_class_name,
                         Multirun.cmssw.like(base_release_pattern),
@@ -195,7 +194,7 @@ def discover(config):
             if not multirun:
                 need_more_data_state = session.query(MultirunState).filter(
                     MultirunState.state == 'need_more_data').one()
-                multirun = Multirun(number_of_events=0, dataset=dataset,
+                multirun = Multirun(number_of_events=0, dataset=dataset_object,
                                     bfield=run.bfield, run_class_name=run.run_class_name,
                                     cmssw=release['cmssw'], scram_arch=release['scram_arch'],
                                     scenario=release['scenario'], global_tag=release['global_tag'],
@@ -209,7 +208,7 @@ def discover(config):
             multirun.run_numbers.append(run)
 
             # add dataset to used for given run
-            run.used_datasets.append(ds)
+            run.used_datasets.append(dataset_object)
 
             # if this is the last dataset in run - mark run as used
             if len(datasets) == 1:

@@ -41,7 +41,6 @@ class Multirun(Base):
 
     id = Column(Integer, primary_key=True)
     number_of_events = Column(Integer)
-    dataset = Column(String)  # TODO: think of replacing with dataset table (already created)
     bfield = Column(Float)
     run_class_name = Column(String)
     cmssw = Column(String)
@@ -50,7 +49,9 @@ class Multirun(Base):
     global_tag = Column(String)
     retries = Column(Integer)
     state_id = Column(Integer, ForeignKey('multirun_state.id'))
+    dataset_id = Column(Integer, ForeignKey('dataset.id'))
 
+    dataset = relationship("Dataset")
     state = relationship("MultirunState")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
     filenames = relationship("Filename")
