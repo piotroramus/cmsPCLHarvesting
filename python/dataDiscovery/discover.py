@@ -168,7 +168,6 @@ def discover(config):
                 dataset_object = Dataset(dataset=dataset)
                 session.add(dataset_object)
 
-            # TODO: find out if it will be faster to get rid of joins - now multirun.state comparison should work
             logger.debug("Searching for existence of 'ready' or 'processing' multi-run with similar properties")
             not_processed_multirun = session.query(Multirun) \
                 .join(MultirunState) \

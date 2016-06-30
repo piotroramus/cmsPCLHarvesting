@@ -47,9 +47,9 @@ class Multirun(Base):
     scram_arch = Column(String)
     scenario = Column(String)
     global_tag = Column(String)
-    retries = Column(Integer)
+    retries = Column(Integer, nullable=False)
     dataset_id = Column(Integer, ForeignKey('dataset.id'))
-    state_id = Column(Integer, ForeignKey('multirun_state.id'))
+    state_id = Column(Integer, ForeignKey('multirun_state.id'), nullable=False)
 
     dataset = relationship("Dataset")
     state = relationship("MultirunState")
