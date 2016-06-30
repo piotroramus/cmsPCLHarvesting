@@ -18,7 +18,7 @@ class Dataset(Base):
     __tablename__ = 'dataset'
 
     id = Column(Integer, primary_key=True)
-    dataset = Column(String)
+    dataset = Column(String, unique=True)
 
     def __repr__(self):
         return self.dataset
@@ -28,7 +28,7 @@ class Filename(Base):
     __tablename__ = 'filename'
 
     id = Column(Integer, primary_key=True)
-    filename = Column(String)
+    filename = Column(String, unique=True)
 
     multirun = Column(Integer, ForeignKey('multirun.id'))
 

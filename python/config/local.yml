@@ -26,7 +26,7 @@ dqm_current: /datadqm/testGui
 dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
 
 # how far in the past should we look for new runs
-days_old_runs: 5
+days_old_runs: 3
 
 # in case we want to get all the runs (eg. for the first time)
 harvest_all_runs: False
