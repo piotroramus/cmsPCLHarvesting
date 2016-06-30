@@ -11,6 +11,9 @@ function eos() {
    /afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select "$@"
 }
 
+for i in {1 .. 20}; do
+    echo $i
+done
 
 PROPERTIES_FILE="$1"
 if [ ! -f $PROPERTIES_FILE ]; then
@@ -64,16 +67,16 @@ mv $PROPERTIES_FILE_PWD .
 python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE $ALCA_CONFIG_FILE $JOB_REPORT_FILE
 
 # run the AlCaHarvesting step
-cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee $CMS_RUN_OUTPUT
-CMS_RUN_RESULT=$?
+#cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee $CMS_RUN_OUTPUT
+#CMS_RUN_RESULT=$?
 
 # TODO: The problem is that cmsRun returns 0 even when it fails
-echo "cmsRun return code: $CMS_RUN_RESULT"
-if [[ $CMS_RUN_RESULT != 0 ]]; then
-    echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
-    exit $CMS_RUN_RESULT
-fi
+#echo "cmsRun return code: $CMS_RUN_RESULT"
+#if [[ $CMS_RUN_RESULT != 0 ]]; then
+#    echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
+#    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
+#    exit $CMS_RUN_RESULT
+#fi
 
 
 # handle results of the job
