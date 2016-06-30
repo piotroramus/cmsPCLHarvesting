@@ -63,14 +63,13 @@ def prepare_multirun_environment(config):
 
         processing_state = session.query(MultirunState).filter(MultirunState.state == 'processing').one()
         multirun.state = processing_state
-        session.commit()
 
         filenames = [f.filename for f in multirun.filenames]
         runs = [run.number for run in multirun.run_numbers]
 
         multirun_info = dict()
         multirun_info['id'] = multirun.id
-        multirun_info['dataset'] = multirun.dataset
+        multirun_info['dataset'] = multirun.dataset.dataset
         multirun_info['global_tag'] = multirun.global_tag
         multirun_info['scenario'] = multirun.scenario
         multirun_info['cmssw'] = multirun.cmssw
@@ -107,6 +106,9 @@ def prepare_multirun_environment(config):
             f.write("DQM_UPLOAD_HOST={}\n".format(config['dqm_upload_host']))
             f.write("DB_PATH={}\n".format(db_path))
             f.write("MAX_RETRIES={}\n".format(config['max_retries']))
+
+        # commit is down here to assure that state will be changed to 'processing' after serialisation goes well
+        session.commit()
 
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         cmd = "{} {}".format(shell_script_path, shell_props_file)
