@@ -28,6 +28,10 @@ dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
 # how far in the past should we look for new runs
 days_old_runs: 7
 
+# how many days to wait for the express stream for the run to be completed
+# if the strem is not completed after given number of days, run will not be included in any multi-run
+run_stream_timeout: 3
+
 # in case we want to get all the runs (eg. for the first time)
 harvest_all_runs: False
 first_run_number: 230000  # respects all 2015 and following runs

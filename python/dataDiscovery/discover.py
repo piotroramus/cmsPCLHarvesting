@@ -37,6 +37,10 @@ def discover(config):
         .fromordinal(datetime.date.today().toordinal() - config['days_old_runs']) \
         .strftime("%Y-%m-%d")
 
+    stream_timeout = datetime.date \
+        .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
+        .strftime("%Y-%m-%d")
+
     if config['harvest_all_runs']:
         config['filters']['number'] = "> {}".format(config['first_run_number'])
     else:
@@ -63,7 +67,8 @@ def discover(config):
 
     # TODO: this does not go with harvest_all_runs well
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
-    local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
+    local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
+                                               RunInfo.stream_timeout == False).all()
 
     complete_stream_runs = [run.number for run in local_runs if run.stream_completed]
     incomplete_stream_runs = [run.number for run in local_runs if not run.stream_completed]
@@ -87,8 +92,12 @@ def discover(config):
                 run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
                 run_to_update.stream_completed = True
             else:
-                # TODO: timeout for not closed streams (few days)
                 logger.debug("Stream for run {} is still not completed".format(run[u'number']))
+                if run[u'start_time'] < stream_timeout:  # TODO: test
+                    logger.warning("Stream for run {} is not completed for {} days now.")
+                    logger.warning("The run will not be included in any multi-run.")
+                    timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
+                    timedout_run.stream_timeout = True
                 continue
 
         else:
@@ -97,7 +106,8 @@ def discover(config):
             stream_completed = t0api.run_stream_completed(run[u'number'])
             if stream_completed != -1:
                 run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
-                                   start_time=start, stream_completed=stream_completed, used_datasets=[], used=False)
+                                   start_time=start, stream_completed=stream_completed, stream_timeout=False,
+                                   used_datasets=[], used=False)
                 session.add(run_info)
 
         session.commit()

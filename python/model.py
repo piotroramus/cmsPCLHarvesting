@@ -91,7 +91,8 @@ class RunInfo(Base):
     run_class_name = Column(String)
     bfield = Column(Float)
     start_time = Column(DateTime)
-    stream_completed = Column(Boolean)
+    stream_completed = Column(Boolean, nullable=False)
+    stream_timeout = Column(Boolean, nullable=False)
     used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc)
