@@ -32,10 +32,6 @@ days_old_runs: 7
 # if the strem is not completed after given number of days, run will not be included in any multi-run
 run_stream_timeout: 3
 
-# in case we want to get all the runs (eg. for the first time)
-harvest_all_runs: False
-first_run_number: 230000  # respects all 2015 and following runs
-
 # things to search for in the Run Registry
 workspace: GLOBAL
 columns: ['number', 'startTime', 'runClassName', 'bfield']

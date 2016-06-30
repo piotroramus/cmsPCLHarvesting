@@ -41,13 +41,9 @@ def discover(config):
         .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
         .strftime("%Y-%m-%d")
 
-    if config['harvest_all_runs']:
-        config['filters']['number'] = "> {}".format(config['first_run_number'])
-    else:
-        config['filters']['startTime'] = "> {}".format(days_old_runs_date)
+    config['filters']['startTime'] = "> {}".format(days_old_runs_date)
 
     recent_runs = []
-    # TODO #13: this try is not coupled well with previous if statement - logger info particularly
     try:
         logger.info("Fetching Run Registry records from last {} days".format(config['days_old_runs']))
         # TODO #11: might be worth to take only runs with the runClassNames from config
@@ -65,7 +61,6 @@ def discover(config):
             logger.error("Run without a start date: {}. Ignoring.".format(run[u'number']))
     valid_runs = (r for r in runs_with_classname if r[u'startTime'])
 
-    # TODO: this does not go with harvest_all_runs well
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
                                                RunInfo.stream_timeout == False).all()
@@ -113,14 +108,8 @@ def discover(config):
         session.commit()
 
     logger.info("Getting runs with completed stream from local database")
-    # TODO #12: the second condition ignores harvest_all_runs config value
-    # TODO: consider again what to do with it
-    # complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
-    #                                               RunInfo.start_time > days_old_runs_date).all()
-
     unused_complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,
                                                          RunInfo.used == False).all()
-    # TODO #1: test if the date comparison works properly
 
     ready_state = session.query(MultirunState).filter(MultirunState.state == 'ready').one()
 
