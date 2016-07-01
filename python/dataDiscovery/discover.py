@@ -90,9 +90,10 @@ def discover(config):
                 logger.debug("Stream for run {} is still not completed".format(run[u'number']))
                 if run[u'start_time'] < stream_timeout:  # TODO: test
                     logger.warning("Stream for run {} is not completed for {} days now.")
-                    logger.warning("The run will not be included in any multi-run.")
+                    logger.warning("Run will be processed with the data it has for the moment")
                     timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
                     timedout_run.stream_timeout = True
+                    timedout_run.stream_completed = True
                 continue
 
         else:
