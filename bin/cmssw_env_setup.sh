@@ -81,7 +81,8 @@ python $PYTHON_DIR_PATH/resultsHandler.py $MULTIRUN_ID $DB_PATH
 
 # upload DQM file
 # check if there is exactly one .root file
-root_files_count=$(ls DQM_*.root 2>/dev/null | wc -l)
+DQM_FILE=DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
+root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
 if [ $root_files_count -lt 1 ]; then
     echo "DQM file is missing!"
     echo "DQM file upload failed."
@@ -104,8 +105,8 @@ FILES_TO_COPY=(
     $ALCA_CONFIG_FILE
     $JOB_REPORT_FILE
     $CMS_RUN_OUTPUT
+    $DQM_FILE
     promptCalibConditions.db
-    DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
     multirunProperties*.txt
     shellProperties*.txt
     )
