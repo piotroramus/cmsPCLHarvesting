@@ -81,7 +81,7 @@ python $PYTHON_DIR_PATH/resultsHandler.py $MULTIRUN_ID $DB_PATH
 
 # upload DQM file
 # check if there is exactly one .root file
-root_files_count=$(ls *.root 2>/dev/null | wc -l)
+root_files_count=$(ls DQM_*.root 2>/dev/null | wc -l)
 if [ $root_files_count -lt 1 ]; then
     echo "DQM file is missing!"
     echo "DQM file upload failed."
