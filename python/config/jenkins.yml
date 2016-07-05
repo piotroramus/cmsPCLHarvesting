@@ -51,3 +51,4 @@ workflow_run_classes:
     'PromptCalibProdSiStrip': ['Collisions15', 'Collisions16']
     'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16']
     'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16']
+    'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16']
