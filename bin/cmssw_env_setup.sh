@@ -11,6 +11,18 @@ function eos() {
    /afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select "$@"
 }
 
+function upload_available_files() {
+    echo -e "\nUploading available output files to EOS..."
+    for file in ${FILES_TO_SAVE[@]}; do
+        if [ ! -f $file ]; then
+            echo "$file does not exists - not proceeding with upload"
+        else
+            eos cp $file $EOS_MULTIRUN_WORKSPACE
+            echo "Uploaded $file to $EOS_MULTIRUN_WORKSPACE"
+        fi
+    done
+}
+
 
 PROPERTIES_FILE="$1"
 if [ ! -f $PROPERTIES_FILE ]; then
@@ -22,6 +34,21 @@ source $PROPERTIES_FILE
 
 MULTIRUN_PROPS_FILE_PWD=$PWD/$MULTIRUN_PROPS_FILE
 PROPERTIES_FILE_PWD=$PWD/$PROPERTIES_FILE
+
+
+DQM_FILE=DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
+
+# output files to be copied to EOS
+FILES_TO_SAVE=(
+    $ALCA_CONFIG_FILE
+    $JOB_REPORT_FILE
+    $CMS_RUN_OUTPUT
+    $DQM_FILE
+    promptCalibConditions.db
+    multirunProperties*.txt
+    shellProperties*.txt
+    )
+
 
 echo "Creating $CMSSW_RELEASE environment in $WORKSPACE"
 echo "Release to be used: $CMSSW_RELEASE"
@@ -52,6 +79,8 @@ if [ -d "$MULTIRUN_ID" ]; then
     MULTIRUN_DIR="${MULTIRUN_ID}_${DATE}"
 fi
 
+EOS_MULTIRUN_WORKSPACE=$EOS_WORKSPACE/$SCRAM_ARCH/$CMSSW_RELEASE/$MULTIRUN_DIR/
+
 mkdir $MULTIRUN_DIR
 cd $MULTIRUN_DIR
 
@@ -68,9 +97,11 @@ cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee $CMS_RUN_OUTPUT
 CMS_RUN_RESULT=$?
 
 # TODO: The problem is that cmsRun returns 0 even when it fails
+# TODO edit: sometimes it returns 1 - for example when suddenly it gets permission denied
 echo "cmsRun return code: $CMS_RUN_RESULT"
 if [[ $CMS_RUN_RESULT != 0 ]]; then
     echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
+    upload_available_files
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
     exit $CMS_RUN_RESULT
 fi
@@ -81,17 +112,18 @@ python $PYTHON_DIR_PATH/resultsHandler.py $MULTIRUN_ID $DB_PATH
 
 # upload DQM file
 # check if there is exactly one .root file
-DQM_FILE=DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
 root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
 if [ $root_files_count -lt 1 ]; then
     echo "DQM file is missing!"
     echo "DQM file upload failed."
+    upload_available_files
     echo "Preparing for retrying the processing..."
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
     exit 1
 elif [ $root_files_count -gt 1 ]; then
     echo "More than one DQM file!"
     echo "DQM file upload failed."
+    upload_available_files
     echo "Preparing for retrying the processing..."
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
     exit 1
@@ -100,25 +132,16 @@ else
     visDQMUpload $DQM_UPLOAD_HOST $(ls *.root)
 fi
 
-# copy workspace files to EOS
-FILES_TO_COPY=(
-    $ALCA_CONFIG_FILE
-    $JOB_REPORT_FILE
-    $CMS_RUN_OUTPUT
-    $DQM_FILE
-    promptCalibConditions.db
-    multirunProperties*.txt
-    shellProperties*.txt
-    )
 
-for file in ${FILES_TO_COPY[@]}; do
+for file in ${FILES_TO_SAVE[@]}; do
     if [ ! -f $file ]; then
         echo "Error: $file does not exists"
+        upload_available_files
         echo "Preparing for retrying the processing..."
         python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
         exit 1
     fi
 done
 
-EOS_MULTIRUN_WORKSPACE=$EOS_WORKSPACE/$SCRAM_ARCH/$CMSSW_RELEASE/$MULTIRUN_DIR/
-eos cp ${FILES_TO_COPY[@]} $EOS_MULTIRUN_WORKSPACE
+upload_available_files
+echo "Job finished for multi-run $MULTIRUN_ID"
