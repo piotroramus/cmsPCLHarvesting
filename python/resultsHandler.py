@@ -12,7 +12,7 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("multirun_id", help="id of processed multi-run")
+    parser.add_argument("multirun_id", type=int, help="id of processed multi-run")
     parser.add_argument("db_path", help="location of database containing multi-run info")
     args = parser.parse_args()
 
