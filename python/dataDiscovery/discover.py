@@ -84,14 +84,14 @@ def discover(config):
             if t0api.run_stream_completed(run[u'number']):
                 logger.info(
                     "Stream for run {} is now completed. It can be thus included in multi-runs".format(run[u'number']))
-                run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
+                run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'number']).one()
                 run_to_update.stream_completed = True
             else:
                 logger.debug("Stream for run {} is still not completed".format(run[u'number']))
                 if run[u'startTime'] < stream_timeout:  # TODO: test
                     logger.warning("Stream for run {} is not completed for {} days now.")
                     logger.warning("Run will be processed with the data it has for the moment")
-                    timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'number'])
+                    timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'number']).one()
                     timedout_run.stream_timeout = True
                     timedout_run.stream_completed = True
                 continue
@@ -120,7 +120,7 @@ def discover(config):
         logger.debug("Retrieving express config for run {}".format(run.number))
         release = t0api.get_run_info(run.number)
         if not release:
-            logger.debug("Express config for run {} is not   available".format(run.number))
+            logger.debug("Express config for run {} is not available".format(run.number))
             continue
 
         base_release = get_base_release(release['cmssw'])
