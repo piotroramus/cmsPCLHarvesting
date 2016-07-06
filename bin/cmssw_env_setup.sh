@@ -50,6 +50,7 @@ FILES_TO_SAVE=(
     )
 
 
+echo "Multi-run ID: $MULTIRUN_ID"
 echo "Creating $CMSSW_RELEASE environment in $WORKSPACE"
 echo "Release to be used: $CMSSW_RELEASE"
 echo "Architecture: $SCRAM_ARCH"
