@@ -97,10 +97,10 @@ def discover(config):
                 continue
 
         else:
-            logger.info("New run: {}".format(run[u'number']))
-            start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
             stream_completed = t0api.run_stream_completed(run[u'number'])
             if stream_completed != -1:
+                logger.info("New run: {}".format(run[u'number']))
+                start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
                 run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
                                    start_time=start, stream_completed=stream_completed, stream_timeout=False,
                                    used_datasets=[], used=False)
