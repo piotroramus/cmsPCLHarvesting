@@ -54,8 +54,3 @@ class Tier0Api(object):
         except IndexError:
             self.logger.debug('Cannot determine if stream is completed for run {}')
             return -1  # cannot return None, since in simple if it will be equal to False
-
-    def fixed_run_stream_completed(self, run_number, run_class_name):
-        if run_class_name == 'Collisions16':
-            return True
-        return False
