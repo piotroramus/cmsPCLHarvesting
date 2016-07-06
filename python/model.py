@@ -68,10 +68,9 @@ class Multirun(Base):
                 "global_tag={}, "
                 "retries={}, "
                 "state={}, "
-                "run_numbers={}, "
-                "filenames={})").format(self.id, self.number_of_events, self.dataset, self.bfield, self.run_class_name,
-                                        self.cmssw, self.scram_arch, self.scenario, self.global_tag, self.retries,
-                                        self.state, self.run_numbers, self.filenames)
+                "run_numbers={})").format(self.id, self.number_of_events, self.dataset, self.bfield,
+                                          self.run_class_name, self.cmssw, self.scram_arch, self.scenario,
+                                          self.global_tag, self.retries, self.state, self.run_numbers)
 
 
 class MultirunState(Base):
