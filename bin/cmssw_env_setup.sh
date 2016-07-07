@@ -145,4 +145,4 @@ for file in ${FILES_TO_SAVE[@]}; do
 done
 
 upload_available_files
-echo "Job finished for multi-run $MULTIRUN_ID"
+echo -e "\nJob finished for multi-run $MULTIRUN_ID\n"
