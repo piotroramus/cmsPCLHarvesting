@@ -41,25 +41,27 @@ def discover(config):
         .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
         .strftime("%Y-%m-%d")
 
+    run_class_names = set()
+    for workflow_list in config['workflow_run_classes'].itervalues():
+        for workflow in workflow_list:
+            run_class_names.add(workflow)
+
+    config['filters']['runClassName'] = "= {}".format(' or = '.join(run_class_names))
     config['filters']['startTime'] = "> {}".format(days_old_runs_date)
 
     recent_runs = []
     try:
         logger.info("Fetching Run Registry records from last {} days".format(config['days_old_runs']))
-        # TODO #11: might be worth to take only runs with the runClassNames from config
         recent_runs = rrapi.data(workspace=config['workspace'], columns=config['columns'], table=config['table'],
                                  template=config['template'], filter=config['filters'])
     except RRApiError:
         logger.error("Error while querying RR API for {} days old runs".format(config['days_old_runs']), exc_info=True)
 
-    logger.info("Ignoring runs with no runClassName specified")
-    runs_with_classname = [r for r in recent_runs if r[u'runClassName']]
-
     logger.info("Checking if all the runs have start date")
-    for run in runs_with_classname:
+    for run in recent_runs:
         if u'startTime' not in run:
             logger.error("Run without a start date: {}. Ignoring.".format(run[u'number']))
-    valid_runs = (r for r in runs_with_classname if r[u'startTime'])
+    valid_runs = (r for r in recent_runs if r[u'startTime'])
 
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
