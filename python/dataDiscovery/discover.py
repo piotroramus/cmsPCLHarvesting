@@ -138,10 +138,11 @@ def discover(config):
 
         for dataset in datasets:
 
-            dataset_workflow = workflows.extract_workflow(dataset)
+            available_workflows = config['workflow_run_classes'].keys()
+            dataset_workflow = workflows.extract_workflow(dataset, available_workflows)
             if dataset_workflow not in release['workflows']:
                 logger.warning(
-                    "Dataset {} workflow {} is different than workflow from run {} release {}".format(
+                    "Dataset {} workflow {} is different than workflow from run {} express config: {}".format(
                         dataset, dataset_workflow, run.number, release['workflows']))
                 continue
 
