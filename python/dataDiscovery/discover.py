@@ -8,7 +8,7 @@ import dbs.apis.dbsClient as dbsapi
 import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 
-from rrapi.rrapi_v3 import RRApi, RRApiError
+from rrapi.rrapi_v4 import RhApi
 from model import Base, RunInfo, Multirun, Filename, Dataset, MultirunState
 
 
@@ -29,13 +29,12 @@ def discover(config):
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
-    rrapi = RRApi(config['rrapi_url'], debug=True)
+    rrapi = RhApi(config['rrapi_url'], debug=False)
     dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
     t0api = t0wmadatasvcApi.Tier0Api()
 
     days_old_runs_date = datetime.date \
-        .fromordinal(datetime.date.today().toordinal() - config['days_old_runs']) \
-        .strftime("%Y-%m-%d")
+        .fromordinal(datetime.date.today().toordinal() - config['days_old_runs'])
 
     stream_timeout = datetime.date \
         .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
@@ -46,22 +45,20 @@ def discover(config):
         for workflow in workflow_list:
             run_class_names.add(workflow)
 
-    config['filters']['runClassName'] = "= {}".format(' or = '.join(run_class_names))
-    config['filters']['startTime'] = "> {}".format(days_old_runs_date)
+    filters = "where r.starttime > TO_DATE('{}', 'YYYY-MM-DD')".format(days_old_runs_date)
+    filters += " and (r.run_class_name = {})".format(
+        " or r.run_class_name = ".join("'" + cn + "'" for cn in run_class_names))
+    query = "select r.runnumber, r.run_class_name, r.starttime, r.bfield from runreg_global.runs r {}".format(filters)
 
-    recent_runs = []
-    try:
-        logger.info("Fetching Run Registry records from last {} days".format(config['days_old_runs']))
-        recent_runs = rrapi.data(workspace=config['workspace'], columns=config['columns'], table=config['table'],
-                                 template=config['template'], filter=config['filters'])
-    except RRApiError:
-        logger.error("Error while querying RR API for {} days old runs".format(config['days_old_runs']), exc_info=True)
+    logger.info("Fetching Run Registry records from last {} days".format(config['days_old_runs']))
+    recent_runs = rrapi.json2(query)[u'data']
 
+    # TODO: think if this is neeeded - if there is not start date then how the query can work?
     logger.info("Checking if all the runs have start date")
     for run in recent_runs:
-        if u'startTime' not in run:
-            logger.error("Run without a start date: {}. Ignoring.".format(run[u'number']))
-    valid_runs = (r for r in recent_runs if r[u'startTime'])
+        if u'starttime' not in run:
+            logger.error("Run without a start date: {}. Ignoring.".format(run[u'runnumber']))
+    valid_runs = (r for r in recent_runs if r[u'starttime'])
 
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
@@ -73,37 +70,37 @@ def discover(config):
     logger.info("Updating local database with newly fetched runs")
     for run in valid_runs:
 
-        logger.debug("Checking run {} fetched from Run Registry".format(run[u'number']))
+        logger.debug("Checking run {} fetched from Run Registry".format(run[u'runnumber']))
 
-        if run[u'number'] in complete_stream_runs:
-            logger.debug("Run {} already exists in local database".format(run[u'number']))
+        if run[u'runnumber'] in complete_stream_runs:
+            logger.debug("Run {} already exists in local database".format(run[u'runnumber']))
             continue
 
-        if run[u'number'] in incomplete_stream_runs:
+        if run[u'runnumber'] in incomplete_stream_runs:
             logger.debug(
-                "Run {} already exists in local database but the stream was not completed".format(run[u'number']))
+                "Run {} already exists in local database but the stream was not completed".format(run[u'runnumber']))
 
-            if t0api.run_stream_completed(run[u'number']):
+            if t0api.run_stream_completed(run[u'runnumber']):
                 logger.info(
-                    "Stream for run {} is now completed. It can be thus included in multi-runs".format(run[u'number']))
-                run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'number']).one()
+                    "Stream for run {} is now completed. It can be thus included in multi-runs".format(run[u'runnumber']))
+                run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'runnumber']).one()
                 run_to_update.stream_completed = True
             else:
-                logger.debug("Stream for run {} is still not completed".format(run[u'number']))
-                if run[u'startTime'] < stream_timeout:  # TODO: test
+                logger.debug("Stream for run {} is still not completed".format(run[u'runnumber']))
+                if run[u'starttime'] < stream_timeout:  # TODO: test
                     logger.warning("Stream for run {} is not completed for {} days now.")
                     logger.warning("Run will be processed with the data it has for the moment")
-                    timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'number']).one()
+                    timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'runnumber']).one()
                     timedout_run.stream_timeout = True
                     timedout_run.stream_completed = True
                 continue
 
         else:
-            stream_completed = t0api.run_stream_completed(run[u'number'])
+            stream_completed = t0api.run_stream_completed(run[u'runnumber'])
             if stream_completed != -1:
-                logger.info("New run: {}".format(run[u'number']))
-                start = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S")
-                run_info = RunInfo(number=run[u'number'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
+                logger.info("New run: {}".format(run[u'runnumber']))
+                start = datetime.datetime.strptime(run[u'starttime'], "%Y-%m-%d %H:%M:%S")
+                run_info = RunInfo(number=run[u'runnumber'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
                                    start_time=start, stream_completed=stream_completed, stream_timeout=False,
                                    used_datasets=[], used=False)
                 session.add(run_info)
