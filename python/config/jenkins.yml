@@ -1,5 +1,5 @@
 dbsapi_url: https://cmsweb.cern.ch/dbs/prod/global/DBSReader
-rrapi_url: http://runregistry.web.cern.ch/runregistry/
+rrapi_url: http://vocms00169:2113
 
 # path to database containing all the harvesting information
 db_path: /afs/cern.ch/work/p/poramus/database/database.db
