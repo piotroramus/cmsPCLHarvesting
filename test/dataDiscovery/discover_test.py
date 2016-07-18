@@ -44,6 +44,26 @@ class DiscoverTest(unittest.TestCase):
         release = 'CMSSW_7_0_24324'
         self.assertEqual(discover.get_base_release(release), 'CMSSW_7_0_')
 
+    def test_get_run_class_names(self):
+        workflow_run_classes = {'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16'],
+                                'PromptCalibProdSiStrip': ['Collisions15', 'Collisions16'],
+                                'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16'],
+                                'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16'],
+                                'PromptCalibProd': ['Collisions15', 'Collisions16']}
+
+        expected_result = {'Collisions15', 'Collisions16'}
+        run_class_names = discover.get_run_class_names(workflow_run_classes)
+        self.assertEqual(run_class_names, expected_result)
+
+        imaginary_workflow_run_classes = {'PromptCalibProdSiStripGains': ['Collisions15', 'A'],
+                                          'PromptCalibProdSiStrip': ['ILOVE_CMS', 'Collisions16', 'B', 'C'],
+                                          'RandomWorkflow': ['Collisions15', 'A'],
+                                          'PromptCalibProd': ['E', 'Collisions16']}
+
+        expected_result = {'Collisions15', 'Collisions16', 'A', 'B', 'C', 'E', 'ILOVE_CMS'}
+        run_class_names = discover.get_run_class_names(imaginary_workflow_run_classes)
+        self.assertEqual(run_class_names, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
