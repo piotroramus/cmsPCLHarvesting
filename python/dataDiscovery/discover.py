@@ -20,6 +20,14 @@ def get_base_release(full_release):
     return base_release.group('release')
 
 
+def get_run_class_names(workflow_run_classes):
+    run_class_names = set()
+    for workflow_list in workflow_run_classes.itervalues():
+        for workflow in workflow_list:
+            run_class_names.add(workflow)
+    return run_class_names
+
+
 def setup_session(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
@@ -45,10 +53,7 @@ def discover(config):
         .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
         .strftime("%Y-%m-%d")
 
-    run_class_names = set()
-    for workflow_list in config['workflow_run_classes'].itervalues():
-        for workflow in workflow_list:
-            run_class_names.add(workflow)
+    run_class_names = get_run_class_names(config['workflow_run_classes'])
 
     recent_runs = rrapi.query(days_old_runs_date, run_class_names)
 
