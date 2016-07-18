@@ -1,7 +1,6 @@
 import datetime
 import logging
 import re
-import sqlalchemy
 
 import utils.workflows as workflows
 import dbs.apis.dbsClient as dbsapi
@@ -9,7 +8,7 @@ import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 import rrapi.rrapi_wrapper as rrApi
 
-from model import Base, RunInfo, Multirun, Filename, Dataset, MultirunState
+from model import RunInfo, Multirun, Filename, Dataset, MultirunState
 
 
 def get_base_release(full_release):
@@ -28,20 +27,9 @@ def get_run_class_names(workflow_run_classes):
     return run_class_names
 
 
-def setup_session(config):
+def discover(config, session):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
-
-    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
-    Base.metadata.create_all(engine, checkfirst=True)
-    Session = sqlalchemy.orm.sessionmaker(bind=engine)
-    session = Session()
-
-    return logger, session
-
-
-def discover(config):
-    logger, session = setup_session(config)
 
     t0api = t0wmadatasvcApi.Tier0Api()
     rrapi = rrApi.RRApiWrapper(config)
@@ -113,8 +101,9 @@ def discover(config):
         session.commit()
 
 
-def assembly_multiruns(config):
-    logger, session = setup_session(config)
+def assembly_multiruns(config, session):
+    logs.setup_logging()
+    logger = logging.getLogger(__name__)
 
     dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
     t0api = t0wmadatasvcApi.Tier0Api()
