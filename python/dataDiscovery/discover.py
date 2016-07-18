@@ -7,8 +7,8 @@ import utils.workflows as workflows
 import dbs.apis.dbsClient as dbsapi
 import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
+import rrapi.rrapi_wrapper as rrApi
 
-from rrapi.rrapi_v4 import RhApi
 from model import Base, RunInfo, Multirun, Filename, Dataset, MultirunState
 
 
@@ -35,8 +35,8 @@ def setup_session(config):
 def discover(config):
     logger, session = setup_session(config)
 
-    rrapi = RhApi(config['rrapi_url'], debug=False)
     t0api = t0wmadatasvcApi.Tier0Api()
+    rrapi = rrApi.RRApiWrapper(config)
 
     days_old_runs_date = datetime.date \
         .fromordinal(datetime.date.today().toordinal() - config['days_old_runs'])
@@ -50,13 +50,7 @@ def discover(config):
         for workflow in workflow_list:
             run_class_names.add(workflow)
 
-    filters = "where r.starttime > TO_DATE('{}', 'YYYY-MM-DD')".format(days_old_runs_date)
-    filters += " and (r.run_class_name = {})".format(
-        " or r.run_class_name = ".join("'" + cn + "'" for cn in run_class_names))
-    query = "select r.runnumber, r.run_class_name, r.starttime, r.bfield from runreg_global.runs r {}".format(filters)
-
-    logger.info("Fetching Run Registry records from last {} days".format(config['days_old_runs']))
-    recent_runs = rrapi.json2(query)[u'data']
+    recent_runs = rrapi.query(days_old_runs_date, run_class_names)
 
     # TODO: think if this is neeeded - if there is not start date then how the query can work?
     logger.info("Checking if all the runs have start date")
