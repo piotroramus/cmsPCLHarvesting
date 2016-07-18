@@ -15,7 +15,8 @@ class DiscoverTest(unittest.TestCase):
         valid_releases = [
             'CMSSW_8_0_10',
             "CMSSW_9_1_1",
-            "CMSSW_10_0_11"
+            "CMSSW_10_0_11",
+            "CMSSW_8_0_8_patch1"
         ]
 
         for release in valid_releases:
@@ -38,6 +39,8 @@ class DiscoverTest(unittest.TestCase):
             self.assertRaises(ValueError, discover.get_base_release, release)
 
         release = 'CMSSW_8_0_8'
+        self.assertEqual(discover.get_base_release(release), 'CMSSW_8_0_')
+        release = 'CMSSW_8_0_8_patch1'
         self.assertEqual(discover.get_base_release(release), 'CMSSW_8_0_')
         release = 'CMSSW_10_1_8'
         self.assertEqual(discover.get_base_release(release), 'CMSSW_10_1_')
