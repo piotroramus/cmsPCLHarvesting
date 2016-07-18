@@ -1,6 +1,7 @@
 import datetime
 import logging
 import re
+import sqlalchemy
 
 import utils.workflows as workflows
 import dbs.apis.dbsClient as dbsapi
@@ -27,40 +28,16 @@ def get_run_class_names(workflow_run_classes):
     return run_class_names
 
 
-def discover(config, session):
-    logs.setup_logging()
-    logger = logging.getLogger(__name__)
-
-    t0api = t0wmadatasvcApi.Tier0Api()
-    rrapi = rrApi.RRApiWrapper(config)
-
-    days_old_runs_date = datetime.date \
-        .fromordinal(datetime.date.today().toordinal() - config['days_old_runs'])
-
+def update_runs(logger, session, t0api, config, local_runs, recent_runs):
     stream_timeout = datetime.date \
         .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
         .strftime("%Y-%m-%d")
-
-    run_class_names = get_run_class_names(config['workflow_run_classes'])
-
-    recent_runs = rrapi.query(days_old_runs_date, run_class_names)
-
-    # TODO: think if this is neeeded - if there is not start date then how the query can work?
-    logger.info("Checking if all the runs have start date")
-    for run in recent_runs:
-        if u'starttime' not in run:
-            logger.error("Run without a start date: {}. Ignoring.".format(run[u'runnumber']))
-    valid_runs = (r for r in recent_runs if r[u'starttime'])
-
-    logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
-    local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
-                                               RunInfo.stream_timeout == False).all()
 
     complete_stream_runs = [run.number for run in local_runs if run.stream_completed]
     incomplete_stream_runs = [run.number for run in local_runs if not run.stream_completed]
 
     logger.info("Updating local database with newly fetched runs")
-    for run in valid_runs:
+    for run in recent_runs:
 
         logger.debug("Checking run {} fetched from Run Registry".format(run[u'runnumber']))
 
@@ -99,6 +76,34 @@ def discover(config, session):
                 session.add(run_info)
 
         session.commit()
+
+
+def discover(config, session):
+    logs.setup_logging()
+    logger = logging.getLogger(__name__)
+
+    t0api = t0wmadatasvcApi.Tier0Api()
+    rrapi = rrApi.RRApiWrapper(config)
+
+    days_old_runs_date = datetime.date \
+        .fromordinal(datetime.date.today().toordinal() - config['days_old_runs'])
+
+    run_class_names = get_run_class_names(config['workflow_run_classes'])
+
+    recent_runs = rrapi.query(days_old_runs_date, run_class_names)
+
+    # TODO: think if this is neeeded - if there is not start date then how the query can work?
+    logger.info("Checking if all the runs have start date")
+    for run in recent_runs:
+        if u'starttime' not in run:
+            logger.error("Run without a start date: {}. Ignoring.".format(run[u'runnumber']))
+    valid_runs = (r for r in recent_runs if r[u'starttime'])
+
+    logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
+    local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
+                                               RunInfo.stream_timeout == False).all()
+
+    update_runs(logger, session, t0api, config, local_runs, valid_runs)
 
 
 def assembly_multiruns(config, session):
