@@ -20,7 +20,7 @@ def get_base_release(full_release):
     return base_release.group('release')
 
 
-def discover(config):
+def setup_session(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
@@ -29,8 +29,13 @@ def discover(config):
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
+    return logger, session
+
+
+def discover(config):
+    logger, session = setup_session(config)
+
     rrapi = RhApi(config['rrapi_url'], debug=False)
-    dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
     t0api = t0wmadatasvcApi.Tier0Api()
 
     days_old_runs_date = datetime.date \
@@ -82,7 +87,8 @@ def discover(config):
 
             if t0api.run_stream_completed(run[u'runnumber']):
                 logger.info(
-                    "Stream for run {} is now completed. It can be thus included in multi-runs".format(run[u'runnumber']))
+                    "Stream for run {} is now completed. It can be thus included in multi-runs".format(
+                        run[u'runnumber']))
                 run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'runnumber']).one()
                 run_to_update.stream_completed = True
             else:
@@ -106,6 +112,13 @@ def discover(config):
                 session.add(run_info)
 
         session.commit()
+
+
+def assembly_multiruns(config):
+    logger, session = setup_session(config)
+
+    dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
+    t0api = t0wmadatasvcApi.Tier0Api()
 
     logger.info("Getting runs with completed stream from local database")
     unused_complete_runs = session.query(RunInfo).filter(RunInfo.stream_completed == True,

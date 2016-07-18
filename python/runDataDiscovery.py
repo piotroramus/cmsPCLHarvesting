@@ -26,4 +26,5 @@ if __name__ == '__main__':
 
     logger.info("Starting data discovery")
     dataDiscovery.discover.discover(config)
+    dataDiscovery.discover.assembly_multiruns(config)
     logger.info("Data discovery has been finished")
