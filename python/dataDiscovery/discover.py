@@ -13,7 +13,7 @@ from model import RunInfo, Multirun, Filename, Dataset, MultirunState
 
 
 def get_base_release(full_release):
-    pattern = r'(?P<release>CMSSW_\d+_\d+_)\d+'
+    pattern = r'^(?P<release>CMSSW_\d+_\d+_)\d+$'
     base_release = re.match(pattern, full_release)
     if not base_release:
         raise ValueError("Couldn't determine base release out of {}".format(full_release))
