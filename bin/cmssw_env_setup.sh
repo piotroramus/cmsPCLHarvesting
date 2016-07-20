@@ -95,10 +95,12 @@ python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE $ALCA_CONFIG_FI
 
 # run the AlCaHarvesting step
 cmsRun -j FrameworkJobReport.xml alcaConfig.py 2>&1 | tee $CMS_RUN_OUTPUT
-CMS_RUN_RESULT=$?
+CMS_RUN_RESULT=${PIPESTATUS[0]}
 
-# TODO: The problem is that cmsRun returns 0 even when it fails
-# TODO edit: sometimes it returns 1 - for example when suddenly it gets permission denied
+# I was just wondering how is it possible, that cmsRun can return something > 255
+# while it is not feasible on an unix-based OS
+# cmsRun exit codes: https://twiki.cern.ch/twiki/bin/view/CMSPublic/JobExitCodes
+
 echo "cmsRun return code: $CMS_RUN_RESULT"
 if [[ $CMS_RUN_RESULT != 0 ]]; then
     echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
