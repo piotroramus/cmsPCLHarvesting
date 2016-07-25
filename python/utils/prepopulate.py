@@ -19,13 +19,15 @@ def prepopulate(config):
     sts = session.query(model.MultirunState).all()
     if not sts:
         logger.info("Multirun state table is empty. Populating...")
-        states = ['need_more_data', 'ready', 'processing', 'processed_ok', 'no_payload']
-        # need_more_data - waiting for more data
-        # ready - ready to be processed
-        # processing - AlCa harvesting step in progress
-        # processed_ok - successfully processed
-        # no_payload - needs more data
-        # retry - something failed
+        states = [
+            'need_more_data',  # waiting for more data
+            'ready',  # ready to be processed
+            'processing',  # AlCa harvesting step in progress
+            'processed_ok',  # successfully processed
+            'dqm_upload_failed',  # upload of DQM file failed
+            'dropbox_upload_failed',  # payload upload to dropbox failed
+            'uploads_ok'  # DQM and dropbox uploads completed successfully
+        ]
 
         for state in states:
             s = model.MultirunState(state=state)
