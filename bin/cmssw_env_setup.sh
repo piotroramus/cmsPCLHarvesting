@@ -140,6 +140,6 @@ done
 upload_available_files
 
 # mark multirun as processed
-python $PYTHON_DIR_PATH/resultsHandler.py $MULTIRUN_ID $DB_PATH
+python $PYTHON_DIR_PATH/markAsProcessed.py $MULTIRUN_ID $DB_PATH
 
 echo -e "\nJob finished for multi-run $MULTIRUN_ID\n"
