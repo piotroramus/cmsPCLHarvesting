@@ -13,4 +13,4 @@ def extract_workflow(dataset, available_workflows=None):
         raise ValueError(
             "Dataset {} contains unknown workflow {}. Check config for possible workflow set!".format(dataset, result))
 
-    return workflow.group('workflow')
+    return result
