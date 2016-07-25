@@ -21,6 +21,8 @@ function upload_available_files() {
             echo "Uploaded $file to $EOS_MULTIRUN_WORKSPACE"
         fi
     done
+    echo "Updating multi-run eos path"
+    python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $DB_PATH $MULTIRUN_DIR
 }
 
 

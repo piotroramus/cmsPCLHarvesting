@@ -48,6 +48,7 @@ class Multirun(Base):
     scenario = Column(String)
     global_tag = Column(String)
     retries = Column(Integer, nullable=False)
+    eos_dir = Column(String)
     dataset_id = Column(Integer, ForeignKey('dataset.id'))
     state_id = Column(Integer, ForeignKey('multirun_state.id'), nullable=False)
 

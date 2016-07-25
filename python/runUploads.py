@@ -54,9 +54,8 @@ if __name__ == '__main__':
         dqm_filename = 'DQM_V0001_R000999999__{}__{}-{}-{}__ALCAPROMPT.root' \
             .format(primary_dataset, era_wf_ver, min_run, max_run)
 
-        # TODO: multirun id could be __different__ when multirun is repeated
         dqm_file_location = "{}/{}/{}/{}/{}" \
-            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, multirun.id, dqm_filename)
+            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, multirun.eos_dir, dqm_filename)
 
         script_path = os.path.dirname(os.path.realpath(__file__))
         shell_script_path = script_path.replace("/python", "/bin/dqm_upload.sh")
