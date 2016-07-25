@@ -110,29 +110,20 @@ if [[ $CMS_RUN_RESULT != 0 ]]; then
 fi
 
 
-# handle results of the job
-python $PYTHON_DIR_PATH/resultsHandler.py $MULTIRUN_ID $DB_PATH
-
-# upload DQM file
-# check if there is exactly one .root file
+# check if there is exactly one .root (DQM) file
 root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
 if [ $root_files_count -lt 1 ]; then
     echo "DQM file is missing!"
-    echo "DQM file upload failed."
     upload_available_files
     echo "Preparing for retrying the processing..."
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
     exit 1
 elif [ $root_files_count -gt 1 ]; then
     echo "More than one DQM file!"
-    echo "DQM file upload failed."
     upload_available_files
     echo "Preparing for retrying the processing..."
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
     exit 1
-else
-    source $DQM_GUI_DIR/current/apps/dqmgui/128/etc/profile.d/env.sh
-    visDQMUpload $DQM_UPLOAD_HOST $(ls *.root)
 fi
 
 
@@ -147,4 +138,8 @@ for file in ${FILES_TO_SAVE[@]}; do
 done
 
 upload_available_files
+
+# mark multirun as processed
+python $PYTHON_DIR_PATH/resultsHandler.py $MULTIRUN_ID $DB_PATH
+
 echo -e "\nJob finished for multi-run $MULTIRUN_ID\n"
