@@ -35,3 +35,5 @@ echo "DQM exit code: $UPLOAD_RC"
 echo "Removing temporary directory $TMP_DIR"
 cd ..
 rm -r ${TMP_DIR}
+
+exit ${UPLOAD_RC}
