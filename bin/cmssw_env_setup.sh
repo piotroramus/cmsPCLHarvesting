@@ -114,8 +114,11 @@ if [[ $CMS_RUN_RESULT != 0 ]]; then
     exit $CMS_RUN_RESULT
 fi
 
+# append multirun_id to conditions file
+mv promptCalibConditions.db $CONDITIONS_FILE
+
 # create dropbox metadata file
-python $PYTHON_DIR_PATH/createMetadata.py $MULTIRUN_ID $CONDITIONS_FILE
+python $PYTHON_DIR_PATH/createMetadata.py $CONDITIONS_FILE $METADATA_FILE
 
 # check if there is exactly one .root (DQM) file
 root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
