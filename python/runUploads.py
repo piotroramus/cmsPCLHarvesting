@@ -37,12 +37,13 @@ if __name__ == '__main__':
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
-    multiruns_processed_ok = session \
+    # TODO: other cases: dqmfailed and dropboxfailed
+    multirun = session \
         .query(model.Multirun) \
         .filter(model.MultirunState.state == 'processed_ok') \
-        .all()
+        .one()
 
-    for multirun in multiruns_processed_ok:
+    if multirun:
         logger.info("Proceeding with DQM file upload for multirun {}".format(multirun.id))
         logger.info("Determining DQM filename...")
 
@@ -54,16 +55,16 @@ if __name__ == '__main__':
         dqm_filename = 'DQM_V0001_R000999999__{}__{}-{}-{}__ALCAPROMPT.root' \
             .format(primary_dataset, era_wf_ver, min_run, max_run)
 
-        dqm_file_location = "{}/{}/{}/{}/{}" \
-            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, multirun.eos_dir, dqm_filename)
+        eos_path = "{}/{}/{}/{}" \
+            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, multirun.eos_dir)
+
+        dqm_file_location = "{}/{}".format(eos_path, dqm_filename)
 
         script_path = os.path.dirname(os.path.realpath(__file__))
-        shell_script_path = script_path.replace("/python", "/bin/dqm_upload.sh")
-        cmd = "{} {} {} {} {}".format(shell_script_path, dqm_filename, dqm_file_location, config['dqm_current'],
+        dqm_script_path = script_path.replace("/python", "/bin/dqm_upload.sh")
+        cmd = "{} {} {} {} {}".format(dqm_script_path, dqm_filename, dqm_file_location, config['dqm_current'],
                                       config['dqm_upload_host'])
         result = subprocess.call(cmd, shell=True)
-
-        # this will execute after the subprocess exists
 
         if result != 0:
             dqm_failed_state = session \
@@ -74,4 +75,20 @@ if __name__ == '__main__':
             session.commit()
             sys.exit(1)
 
-        # TODO: try to upload payload to dropbox here
+        conditions_filename = "promptCalibConditions{}.db".format(multirun.id)
+        metadata_filename = "promptCalibConditions{}.txt".format(multirun.id)
+
+        payload_script_path = script_path.replace("/python", "/bin/payload_upload.sh")
+        cmd = "{} {} {} {} {} {}".format(payload_script_path, eos_path, conditions_filename, metadata_filename,
+                                         multirun.scram_arch, multirun.cmssw)
+
+        result = subprocess.call(cmd, shell=True)
+
+        if result != 0:
+            dropbox_failed_state = session \
+                .query(model.MultirunState) \
+                .filter(model.MultirunState.state == 'dropbox_upload_failed') \
+                .one()
+            multirun.state = dropbox_failed_state
+            session.commit()
+            sys.exit(1)
