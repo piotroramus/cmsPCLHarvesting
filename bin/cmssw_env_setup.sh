@@ -39,6 +39,8 @@ PROPERTIES_FILE_PWD=$PWD/$PROPERTIES_FILE
 
 
 DQM_FILE=DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
+CONDITIONS_FILE="promptCalibConditions$MULTIRUN_ID.db"
+METADATA_FILE="promptCalibConditions$MULTIRUN_ID.txt"
 
 # output files to be copied to EOS
 FILES_TO_SAVE=(
@@ -46,7 +48,8 @@ FILES_TO_SAVE=(
     $JOB_REPORT_FILE
     $CMS_RUN_OUTPUT
     $DQM_FILE
-    promptCalibConditions.db
+    $CONDITIONS_FILE
+    $METADATA_FILE
     multirunProperties*.txt
     shellProperties*.txt
     )
@@ -111,6 +114,8 @@ if [[ $CMS_RUN_RESULT != 0 ]]; then
     exit $CMS_RUN_RESULT
 fi
 
+# create dropbox metadata file
+python $PYTHON_DIR_PATH/createMetadata.py $MULTIRUN_ID $CONDITIONS_FILE
 
 # check if there is exactly one .root (DQM) file
 root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
