@@ -1,6 +1,10 @@
 dbsapi_url: https://cmsweb.cern.ch/dbs/prod/global/DBSReader
 rrapi_url: http://vocms00169:2113
 
+# whether to use RunRegistry API in version 3 (old one, but v4 sometimes crashes)
+use_rrapi_v3: False
+rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
+
 # path to database containing all the harvesting information
 db_path: test.db
 
@@ -31,13 +35,6 @@ days_old_runs: 3
 # how many days to wait for the express stream for the run to be completed
 # if the strem is not completed after given number of days, run will not be included in any multi-run
 run_stream_timeout: 3
-
-# things to search for in the Run Registry
-workspace: GLOBAL
-columns: ['number', 'startTime', 'runClassName', 'bfield']
-table: runsummary
-template: json
-filters: {}
 
 # how many events multirun should contain to be qualified as ready to start
 events_threshold: 100000
