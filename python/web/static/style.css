@@ -4,6 +4,10 @@ table, th, td {
     table-layout: fixed;
 }
 
+th, td {
+    padding: 5px;
+}
+
 table tr:nth-child(even) {
     background-color: #DADFE0;
 }

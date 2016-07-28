@@ -2,7 +2,7 @@ dbsapi_url: https://cmsweb.cern.ch/dbs/prod/global/DBSReader
 rrapi_url: http://vocms00169:2113
 
 # whether to use RunRegistry API in version 3 (old one, but v4 sometimes crashes)
-use_rrapi_v3: False
+use_rrapi_v3: True
 rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
 
 # path to database containing all the harvesting information

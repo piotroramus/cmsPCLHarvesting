@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 
 def load_config():
-    config_file = "../config/local.yml"
+    config_file = "../config/jenkins.yml"
     fconfig = os.getenv('FLASK_CONFIG')
 
     if fconfig:
@@ -23,8 +23,7 @@ def load_config():
     config = configReader.read(config_file)
     app.config.update(config)
 
-    # sqlalechmy_db = "sqlite:///{}".format(config['db_path'])
-    sqlalechmy_db = "sqlite:///../{}".format(config['db_path'])
+    sqlalechmy_db = "sqlite:///{}".format(config['db_path'])
     app.config['SQLALCHEMY_DATABASE_URI'] = sqlalechmy_db
 
 
@@ -34,6 +33,14 @@ db = SQLAlchemy(app)
 
 def get_data():
     return db.session.query(model.Multirun).all()
+
+
+def create_eos_path(multirun):
+    path = None
+    if multirun.eos_dir:
+        path = app.config['eos_workspace_path']
+        path = "{}/{}/{}/{}/".format(path, multirun.scram_arch, multirun.cmssw, multirun.eos_dir)
+    return path
 
 
 @app.route('/')
@@ -50,6 +57,8 @@ def test():
 @app.route('/display/')
 def display():
     multiruns = get_data()
+    for multirun in multiruns:
+        multirun.eos_dir = create_eos_path(multirun)
     return render_template('multirun_table.html', multiruns=multiruns)
 
 
