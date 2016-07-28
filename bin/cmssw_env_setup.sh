@@ -118,7 +118,7 @@ fi
 mv promptCalibConditions.db $CONDITIONS_FILE
 
 # create dropbox metadata file
-python $PYTHON_DIR_PATH/createMetadata.py $CONDITIONS_FILE $METADATA_FILE
+python $PYTHON_DIR_PATH/createMetadata.py $CONDITIONS_FILE $METADATA_FILE $MULTIRUN_DIR
 
 # check if there is exactly one .root (DQM) file
 root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
