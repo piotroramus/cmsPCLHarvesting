@@ -1,0 +1,35 @@
+<table>
+    <thead>
+        <th>ID</th>
+        <th>State</th>
+        <th>Num. of events</th>
+        <th>Dataset</th>
+        <th>BField</th>
+        <th>RunClassName</th>
+        <th>CMSSW</th>
+        <th>Scram arch</th>
+        <th>Scenario</th>
+        <th>GlobalTag</th>
+        <th>Retries</th>
+        <th>EOS dir</th>
+    </thead>
+
+    <tbody>
+        {% for m in multiruns %}
+        <tr>
+            <td>{{ m.id }}</td>
+            <td>{{ m.state }}</td>
+            <td>{{ m.number_of_events }}</td>
+            <td>{{ m.dataset }}</td>
+            <td>{{ m.bfield }}</td>
+            <td>{{ m.run_class_name }}</td>
+            <td>{{ m.cmssw }}</td>
+            <td>{{ m.scram_arch }}</td>
+            <td>{{ m.scenario }}</td>
+            <td>{{ m.global_tag }}</td>
+            <td>{{ m.retries }}</td>
+            <td>{{ m.eos_dir }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
