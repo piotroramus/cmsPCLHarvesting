@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     multirun_id = args.multirun_id
     db_path = args.db_path
-    eos_dir = args.multirun_dir
+    eos_dir = args.multirun_eos_dir
 
     engine = sqlalchemy.create_engine('sqlite:///{}'.format(db_path), echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
