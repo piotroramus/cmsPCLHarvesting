@@ -29,5 +29,3 @@ if [ ! -d "/cvmfs/cms.cern.ch" ]; then
     echo "Please grant the access first"
     exit 1
 fi
-
-source /cvmfs/cms.cern.ch/crab3/crab.sh

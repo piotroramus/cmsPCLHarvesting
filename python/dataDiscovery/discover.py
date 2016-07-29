@@ -4,7 +4,7 @@ import re
 import sqlalchemy
 
 import utils.workflows as workflows
-import dbs.apis.dbsClient as dbsapi
+import dbsApi.DBSApi as dbsapi
 import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 import rrapi.rrapi_wrapper as rrApi
@@ -110,7 +110,8 @@ def assembly_multiruns(config, session):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    dbsApi = dbsapi.DbsApi(url=config['dbsapi_url'])
+    # TODO 1: dbs_api url from config
+    dbsApi = dbsapi.DBSApi()
     t0api = t0wmadatasvcApi.Tier0Api()
 
     logger.info("Getting runs with completed stream from local database")
