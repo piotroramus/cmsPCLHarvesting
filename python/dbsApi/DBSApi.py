@@ -6,7 +6,17 @@ import json
 class DBSApi(object):
     """ Tailored version of DBSApi.
         Does not require pycurl which was very problematic.
-        Based on https://github.com/cms-PdmV/wmcontrol/blob/master/modules/wma.py"""
+        Based on https://github.com/cms-PdmV/wmcontrol/blob/master/modules/wma.py
+
+        In order to authenticate, X509_USER_PROXY environment variable needs to be set.
+        It can be obtained the following way:
+
+        # get proxy certificate
+        voms-proxy-init -rfc -voms cms
+        # set variable
+        export X509_USER_PROXY=$(voms-proxy-info --path)
+
+    """
 
     def __init__(self, dbs3url='/dbs/prod/global/DBSReader/'):
         self.connection = None
