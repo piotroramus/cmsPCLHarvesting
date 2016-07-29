@@ -73,14 +73,37 @@ class DBSApi(object):
         except httplib.BadStatusLine:
             raise RuntimeError('Something is really wrong')
         if response.status != 200:
+            # TODO: logger
             print "Problems quering DBS3 RESTAPI with {}: {}".format(
                 # where does base_url come from ? FIX
                 query.replace('#', '%23'), response.read())
             return None
         return response.read()
 
+    def listDatasets(self, run_num, dataset):
+        params = {
+            'run_num': run_num,
+            'dataset': dataset
+        }
+        return self._api('datasets', params)
 
-# example usage
-cw = DBSApi()
-params = {'run_num': 277096, 'dataset': '/*/*/ALCAPROMPT'}
-print cw._api('datasets', params)
+    def listBlocks(self, run_num, dataset):
+        params = {
+            'run_num': run_num,
+            'dataset': dataset
+        }
+        return self._api('blocks', params)
+
+    def listFiles(self, run_num, block_name):
+        params = {
+            'run_num': run_num,
+            'block_name': block_name
+        }
+        return self._api('files', params)
+
+    def listFileSummaries(self, run_num, block_name):
+        params = {
+            'run_num': run_num,
+            'block_name': block_name
+        }
+        return self._api('filesummaries', params)
