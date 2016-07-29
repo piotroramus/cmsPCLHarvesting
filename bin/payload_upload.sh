@@ -35,7 +35,7 @@ echo "Copying $CONDITIONS_FILE_LOCATION from EOS"
 eos cp $CONDITIONS_FILE_LOCATION $CONDITIONS_FILENAME
 EOS_RC=$?
 
-if [ EOS_RC -ne 0 ]; then
+if [ ${EOS_RC} -ne 0 ]; then
     echo "ERROR: Trying to copy $CONDITIONS_FILE_LOCATION from eos resulted in error"
     echo "EOS command returned $EOS_RC"
     exit $EOS_RC
@@ -46,7 +46,7 @@ echo "Copying $METADATA_FILE_LOCATION from EOS"
 eos cp $METADATA_FILE_LOCATION $METADATA_FILENAME
 EOS_RC=$?
 
-if [ EOS_RC -ne 0 ]; then
+if [ ${EOS_RC} -ne 0 ]; then
     echo "ERROR: Trying to copy $METADATA_FILE_LOCATION from eos resulted in error"
     echo "EOS command returned $EOS_RC"
     exit $EOS_RC

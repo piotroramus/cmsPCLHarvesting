@@ -19,7 +19,7 @@ echo "Copying $DQM_FILE_LOCATION from EOS"
 eos cp $DQM_FILE_LOCATION $DQM_FILENAME
 EOS_RC=$?
 
-if [ EOS_RC -ne 0 ]; then
+if [ ${EOS_RC} -ne 0 ]; then
     echo "ERROR: Trying to copy $DQM_FILE_LOCATION from eos resulted in error"
     echo "EOS command returned $EOS_RC"
     exit $EOS_RC
