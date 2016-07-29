@@ -23,9 +23,3 @@ if [ $rc -eq 3 ]; then
 fi
 
 export X509_USER_PROXY=$(voms-proxy-info --path)
-
-if [ ! -d "/cvmfs/cms.cern.ch" ]; then
-    echo "Error: User $(whoami) does not have access to /cvmfs/cms.cern.ch space"
-    echo "Please grant the access first"
-    exit 1
-fi
