@@ -41,7 +41,7 @@ if __name__ == '__main__':
     multirun = session \
         .query(model.Multirun) \
         .filter(model.MultirunState.state == 'processed_ok') \
-        .one()
+        .first()
 
     if multirun:
         logger.info("Proceeding with DQM file upload for multirun {}".format(multirun.id))
