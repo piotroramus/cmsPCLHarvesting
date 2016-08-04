@@ -11,6 +11,32 @@ function eos() {
    /afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select "$@"
 }
 
+#TODO: it will be better to delete whole created workspace (with all the directories)
+# but this will be usable after determining multirun_dir from eos not from local workspace
+function clear_workspace() {
+    FULL_MULTIRUN_PATH=$WORKSPACE/$CMSSW_RELEASE/$MULTIRUN_DIR
+    echo "Removing files in $FULL_MULTIRUN_PATH"
+
+    # make sure that directory exists and contains at least shell properties file
+    # and multirun properties file (ie. check if it is the correct one),
+    # because all the files within the directory will be removed with rm *
+    cd $FULL_MULTIRUN_PATH
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Workspace directory does not exist!"
+        exit 1
+    fi
+
+    ls $PROPERTIES_FILE $MULTIRUN_PROPS_FILE 1>/dev/null
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Workspace directory does not contain properties files!"
+        echo "Do not proceeding with clearing the workspace"
+        exit 1
+    fi
+
+    echo -e "Files to be removed:\n $(ls)"
+    rm *
+}
+
 function upload_available_files() {
     echo -e "\nUploading available output files to EOS..."
     for file in ${FILES_TO_SAVE[@]}; do
@@ -18,11 +44,17 @@ function upload_available_files() {
             echo "$file does not exists - not proceeding with upload"
         else
             eos cp --preserve --checksum $file $EOS_MULTIRUN_WORKSPACE
+            RC=$?
+            if [ $RC -ne 0 ]; then
+                echo "ERROR: Uploading of $file to EOS resulted in an error"
+                exit $RC
+            fi
             echo "Uploaded $file to $EOS_MULTIRUN_WORKSPACE"
         fi
     done
     echo "Updating multi-run eos path"
     python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $DB_PATH $MULTIRUN_DIR
+    clear_workspace
 }
 
 
@@ -50,8 +82,8 @@ FILES_TO_SAVE=(
     $DQM_FILE
     $CONDITIONS_FILE
     $METADATA_FILE
-    multirunProperties*.txt
-    shellProperties*.txt
+    $PROPERTIES_FILE
+    $MULTIRUN_PROPS_FILE
     )
 
 
