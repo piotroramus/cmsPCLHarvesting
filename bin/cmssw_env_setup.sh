@@ -17,7 +17,7 @@ function upload_available_files() {
         if [ ! -f $file ]; then
             echo "$file does not exists - not proceeding with upload"
         else
-            eos cp $file $EOS_MULTIRUN_WORKSPACE
+            eos cp --preserve --checksum $file $EOS_MULTIRUN_WORKSPACE
             echo "Uploaded $file to $EOS_MULTIRUN_WORKSPACE"
         fi
     done

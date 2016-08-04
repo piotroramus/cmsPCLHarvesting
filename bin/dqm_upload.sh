@@ -16,7 +16,7 @@ mkdir ${TMP_DIR}
 cd ${TMP_DIR}
 
 echo "Copying $DQM_FILE_LOCATION from EOS"
-eos cp $DQM_FILE_LOCATION $DQM_FILENAME
+eos cp --checksum --preserve $DQM_FILE_LOCATION $DQM_FILENAME
 EOS_RC=$?
 
 if [ ${EOS_RC} -ne 0 ]; then
