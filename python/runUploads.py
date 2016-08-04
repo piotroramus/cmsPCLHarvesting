@@ -39,7 +39,8 @@ if __name__ == '__main__':
 
     # TODO: other cases: dqmfailed and dropboxfailed
     multirun = session \
-        .query(model.Multirun) \
+        .query(model.Multirun)\
+        .join(model.MultirunState) \
         .filter(model.MultirunState.state == 'processed_ok') \
         .first()
 
