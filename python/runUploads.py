@@ -38,6 +38,7 @@ if __name__ == '__main__':
     session = Session()
 
     # TODO: other cases: dqmfailed and dropboxfailed
+    # TODO: perform_payload_upload is only valid for DQM upload
     multirun = session \
         .query(model.Multirun)\
         .join(model.MultirunState) \
