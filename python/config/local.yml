@@ -49,3 +49,8 @@ workflow_run_classes:
     'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16']
     'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16']
     'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16']
+
+# only multi-runs with dataset dedicated for given workflows will be uploaded to DropBox
+workflows_to_upload:
+    - 'SiStripGainsAfterAbortGap'
+    - 'PromptCalibProdSiStripGains'

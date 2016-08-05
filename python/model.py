@@ -47,6 +47,7 @@ class Multirun(Base):
     scram_arch = Column(String)
     scenario = Column(String)
     global_tag = Column(String)
+    perform_payload_upload = Column(Boolean, nullable=False)
     retries = Column(Integer, nullable=False)
     eos_dir = Column(String)
     dataset_id = Column(Integer, ForeignKey('dataset.id'))
@@ -66,12 +67,14 @@ class Multirun(Base):
                 "cmssw={}, "
                 "scram_arch={}, "
                 "scenario={}, "
+                "perform_payload_upload={}, "
                 "global_tag={}, "
                 "retries={}, "
                 "state={}, "
                 "run_numbers={})").format(self.id, self.number_of_events, self.dataset, self.bfield,
                                           self.run_class_name, self.cmssw, self.scram_arch, self.scenario,
-                                          self.global_tag, self.retries, self.state, self.run_numbers)
+                                          self.global_tag, self.perform_payload_upload, self.retries, self.state,
+                                          self.run_numbers)
 
 
 class MultirunState(Base):
@@ -105,4 +108,4 @@ class RunInfo(Base):
                 "stream_completed={}, "
                 "used={}, "
                 "used_datasets={}").format(self.number, self.run_class_name, self.bfield, self.start_time,
-                                             self.stream_completed, self.used, self.used_datasets)
+                                           self.stream_completed, self.used, self.used_datasets)

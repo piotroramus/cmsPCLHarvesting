@@ -42,6 +42,7 @@ if __name__ == '__main__':
         .query(model.Multirun)\
         .join(model.MultirunState) \
         .filter(model.MultirunState.state == 'processed_ok') \
+        .filter(model.Multirun.perform_payload_upload == True) \
         .first()
 
     if multirun:

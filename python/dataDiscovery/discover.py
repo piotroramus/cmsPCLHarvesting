@@ -28,6 +28,14 @@ def get_run_class_names(workflow_run_classes):
     return run_class_names
 
 
+def to_be_uploaded(dataset, config):
+    for workflow in config['workflows_to_upload']:
+        pattern = r'^/.*/.*{}.*/ALCAPROMPT$'.format(workflow)
+        if re.match(pattern, dataset):
+            return True
+    return False
+
+
 def update_runs(logger, session, t0api, config, local_runs, recent_runs):
     stream_timeout = datetime.date \
         .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
@@ -198,13 +206,20 @@ def assembly_multiruns(config, session):
                 .one_or_none()
 
             if not multirun:
+                payload_upload = to_be_uploaded(dataset, config)
                 need_more_data_state = session.query(MultirunState).filter(
                     MultirunState.state == 'need_more_data').one()
-                multirun = Multirun(number_of_events=0, dataset=dataset_object,
-                                    bfield=run.bfield, run_class_name=run.run_class_name,
-                                    cmssw=release['cmssw'], scram_arch=release['scram_arch'],
-                                    scenario=release['scenario'], global_tag=release['global_tag'],
-                                    retries=0, state=need_more_data_state)
+                multirun = Multirun(number_of_events=0,
+                                    dataset=dataset_object,
+                                    bfield=run.bfield,
+                                    run_class_name=run.run_class_name,
+                                    cmssw=release['cmssw'],
+                                    scram_arch=release['scram_arch'],
+                                    scenario=release['scenario'],
+                                    global_tag=release['global_tag'],
+                                    perform_payload_upload=payload_upload,
+                                    retries=0,
+                                    state=need_more_data_state)
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()

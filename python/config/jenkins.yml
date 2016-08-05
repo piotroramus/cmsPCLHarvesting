@@ -30,7 +30,7 @@ dqm_current: /datadqm/testGui
 dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
 
 # how far in the past should we look for new runs
-days_old_runs: 7
+days_old_runs: 3
 
 # how many days to wait for the express stream for the run to be completed
 # if the strem is not completed after given number of days, run will not be included in any multi-run
@@ -49,3 +49,8 @@ workflow_run_classes:
     'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16']
     'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16']
     'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16']
+
+# only multi-runs with dataset dedicated for given workflows will be uploaded to DropBox
+workflows_to_upload:
+    - 'SiStripGainsAfterAbortGap'
+    - 'PromptCalibProdSiStripGains'
