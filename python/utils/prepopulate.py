@@ -24,6 +24,7 @@ def prepopulate(config):
             'ready',  # ready to be processed
             'processing',  # AlCa harvesting step in progress
             'processed_ok',  # successfully processed
+            'failed',  # maximum retries reached
             'dqm_upload_failed',  # upload of DQM file failed
             'dropbox_upload_failed',  # payload upload to dropbox failed
             'uploads_ok'  # DQM and dropbox uploads completed successfully

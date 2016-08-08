@@ -29,8 +29,12 @@ if __name__ == '__main__':
     logger.info("Multirun {} failed. It was retried {}/{} times.".format(multirun.id, multirun.retries, max_retries))
     if multirun.retries >= max_retries:
         logger.error("Maximum number of retries reached!")
-        # TODO: think what should be done
-        pass
+        logger.info("Changing multi-run status to failed")
+        failed_state = session \
+            .query(model.MultirunState) \
+            .filter(model.MultirunState.state == 'failed') \
+            .one()
+        multirun.state = failed_state
     else:
         logger.info("Retrying multi-run - changing the state to ready")
         ready_state = session \
