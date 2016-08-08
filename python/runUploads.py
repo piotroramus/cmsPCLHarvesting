@@ -46,7 +46,10 @@ if __name__ == '__main__':
         .filter(model.Multirun.perform_payload_upload == True) \
         .first()
 
-    if multirun:
+    if not multirun:
+        logger.info("Cannot find any multi-runs ready for the upload.")
+        logger.info("Exiting job.")
+    else:
         logger.info("Proceeding with DQM file upload for multirun {}".format(multirun.id))
         logger.info("Determining DQM filename...")
 
