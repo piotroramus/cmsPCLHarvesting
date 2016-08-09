@@ -9,7 +9,7 @@ import sys
 import model
 import logs.logger as logs
 import utils.configReader as configReader
-
+import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 
 def extract_dataset_parts(dataset):
     pattern = r'/(?P<primary_dataset>.*)/(?P<era_wf_ver>.*?)/ALCAPROMPT'
@@ -81,6 +81,21 @@ if __name__ == '__main__':
             session.commit()
             sys.exit(1)
 
+        dropbox_failed_state = session \
+            .query(model.MultirunState) \
+            .filter(model.MultirunState.state == 'dropbox_upload_failed') \
+            .one()
+
+        # check whether the payload upload should be performed
+        t0api = t0wmadatasvcApi.Tier0Api()
+        firstsaferun = t0api.firstconditionsaferun()
+        if min_run < firstsaferun:
+            logger.warn("Cannot perform payload upload for synchronization reasons.")
+            logger.warn("The run number {} included in this multi-run is smaller than firstconditionsaferun: {}".format(min_run, firstsaferun))
+            multirun.state = dropbox_failed_state
+            session.commit()
+            sys.exit(1)
+
         conditions_filename = "promptCalibConditions{}.db".format(multirun.id)
         metadata_filename = "promptCalibConditions{}.txt".format(multirun.id)
 
@@ -91,10 +106,6 @@ if __name__ == '__main__':
         result = subprocess.call(cmd, shell=True)
 
         if result != 0:
-            dropbox_failed_state = session \
-                .query(model.MultirunState) \
-                .filter(model.MultirunState.state == 'dropbox_upload_failed') \
-                .one()
             multirun.state = dropbox_failed_state
             session.commit()
             sys.exit(1)

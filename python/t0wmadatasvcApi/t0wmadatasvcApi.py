@@ -9,6 +9,7 @@ class Tier0Api(object):
     def __init__(self):
         self.express_url = 'https://cmsweb.cern.ch/t0wmadatasvc/prod/express_config'
         self.stream_done_url = "https://cmsweb.cern.ch/t0wmadatasvc/prod/run_stream_done"
+        self.fcsr_url = "https://cmsweb.cern.ch/t0wmadatasvc/prod/firstconditionsaferun"
         self.session = requests.Session()
         request = requests.Request('GET', self.express_url)  # URL will be overwritten anyway
         self.request = self.session.prepare_request(request)
@@ -54,3 +55,7 @@ class Tier0Api(object):
         except IndexError:
             self.logger.debug('Cannot determine if stream is completed for run {}')
             return -1  # cannot return None, since in simple if it will be equal to False
+
+    def firstconditionsaferun(self):
+        result = self.process_request(self.fcsr_url)
+        return result['result'][0]
