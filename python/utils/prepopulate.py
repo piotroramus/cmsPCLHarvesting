@@ -23,11 +23,12 @@ def prepopulate(config):
             'need_more_data',  # waiting for more data
             'ready',  # ready to be processed
             'processing',  # AlCa harvesting step in progress
-            'processed_ok',  # successfully processed
+            'processed_ok',  # successfully processed - ready for DQM upload
             'failed',  # maximum retries reached
+            'dqm_upload_ok',  # DQM upload was successful - ready for payload upload
             'dqm_upload_failed',  # upload of DQM file failed
             'dropbox_upload_failed',  # payload upload to dropbox failed
-            'uploads_ok'  # DQM and dropbox uploads completed successfully
+            'uploads_ok'  # DQM and payload uploads completed successfully
         ]
 
         for state in states:
