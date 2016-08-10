@@ -83,7 +83,6 @@ def prepare_multirun_environment(config):
         with open(multirun_props_file, 'w') as f:
             f.write(dump)
 
-        workspace = "{}/{}".format(config['workspace_path'], multirun.scram_arch)
         script_path = os.path.dirname(os.path.realpath(__file__))
         python_dir_path = script_path.replace("/alcaHarvesting", "")
         absolute_python_dir_path = os.path.abspath(python_dir_path)
@@ -92,7 +91,6 @@ def prepare_multirun_environment(config):
         shell_props_file = "shellProperties{}.txt".format(multirun.id)
         logger.info("Creating {} file containing parameters used by various scripts".format(shell_props_file))
         with open(shell_props_file, 'w') as f:
-            f.write("WORKSPACE={}\n".format(workspace))
             f.write("EOS_WORKSPACE={}\n".format(config['eos_workspace_path']))
             f.write("CMSSW_RELEASE={}\n".format(multirun.cmssw))
             f.write("SCRAM_ARCH={}\n".format(multirun.scram_arch))

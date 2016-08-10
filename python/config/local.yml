@@ -2,14 +2,11 @@ dbsapi_url: https://cmsweb.cern.ch/dbs/prod/global/DBSReader
 rrapi_url: http://vocms00169:2113
 
 # whether to use RunRegistry API in version 3 (old one, but v4 sometimes crashes)
-use_rrapi_v3: True
+use_rrapi_v3: False
 rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
 
 # path to database containing all the harvesting information
 db_path: test.db
-
-# where to setup environments for AlCa Harvesting
-workspace_path: /afs/cern.ch/work/p/poramus/cmsenvs/local
 
 # where to copy files after processing has been done
 eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/local

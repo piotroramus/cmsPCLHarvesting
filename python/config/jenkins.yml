@@ -8,9 +8,6 @@ rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
 # path to database containing all the harvesting information
 db_path: /afs/cern.ch/work/p/poramus/database/database.db
 
-# where to setup environments for AlCa Harvesting
-workspace_path: /afs/cern.ch/work/p/poramus/cmsenvs/jenkins
-
 # where to copy files after processing has been done
 eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/jenkins
 
