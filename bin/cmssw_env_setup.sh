@@ -11,33 +11,6 @@ function eos() {
    /afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select "$@"
 }
 
-#TODO: it will be better to delete whole created workspace (with all the directories)
-# but this will be usable after determining multirun_dir from eos not from local workspace
-# right now cannot really delete everything since other jobs might suffer
-function clear_workspace() {
-    FULL_MULTIRUN_PATH=$WORKSPACE/$CMSSW_RELEASE/$MULTIRUN_DIR
-    echo "Removing files in $FULL_MULTIRUN_PATH"
-
-    # make sure that directory exists and contains at least shell properties file
-    # and multirun properties file (ie. check if it is the correct one),
-    # because all the files within the directory will be removed with rm *
-    cd $FULL_MULTIRUN_PATH
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Workspace directory does not exist!"
-        exit 1
-    fi
-
-    ls $PROPERTIES_FILE $MULTIRUN_PROPS_FILE 1>/dev/null
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Workspace directory does not contain properties files!"
-        echo "Do not proceeding with clearing the workspace"
-        exit 1
-    fi
-
-    echo -e "Files to be removed:\n $(ls)"
-    rm *
-}
-
 function upload_available_files() {
     echo -e "\nUploading available output files to EOS..."
     for file in ${FILES_TO_SAVE[@]}; do
@@ -55,7 +28,6 @@ function upload_available_files() {
     done
     echo "Updating multi-run eos path"
     python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $DB_PATH $MULTIRUN_DIR
-#    clear_workspace
 }
 
 
@@ -88,13 +60,12 @@ FILES_TO_SAVE=(
     )
 
 
-echo "Multi-run ID: $MULTIRUN_ID"
-echo "Creating $CMSSW_RELEASE environment in $WORKSPACE"
-echo "Release to be used: $CMSSW_RELEASE"
-echo "Architecture: $SCRAM_ARCH"
+echo "Multi-run ID: ${MULTIRUN_ID}"
+echo "Performing processing in ${PWD}"
+echo "Release to be used: ${CMSSW_RELEASE}"
+echo "Architecture: ${SCRAM_ARCH}"
+echo -e "\n"
 
-# TODO: thought it might be better to process it in jenkins workspace and only after that upload to EOS.
-# this would solve the problem with deleteing workspace
 
 CURRENT_WORKSPACE=$PWD
 
