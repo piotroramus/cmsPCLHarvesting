@@ -55,7 +55,7 @@ function upload_available_files() {
     done
     echo "Updating multi-run eos path"
     python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $DB_PATH $MULTIRUN_DIR
-    clear_workspace
+#    clear_workspace
 }
 
 
@@ -96,8 +96,7 @@ echo "Architecture: $SCRAM_ARCH"
 # TODO: thought it might be better to process it in jenkins workspace and only after that upload to EOS.
 # this would solve the problem with deleteing workspace
 
-mkdir -p $WORKSPACE/$CMSSW_RELEASE
-
+CURRENT_WORKSPACE=$PWD
 
 # get CMSSW_RELEASE location
 CMSSW_RELEASE_DIR=$(
@@ -109,7 +108,7 @@ echo "Sourcing environment from $CMSSW_RELEASE_DIR/src"
 cd $CMSSW_RELEASE_DIR/src
 cmsenv
 
-cd $WORKSPACE/$CMSSW_RELEASE
+cd $CURRENT_WORKSPACE
 
 # create multi-run directory name - if it was repeated append _attemptno to directory name
 if [ $ATTEMPT -ne 0 ]; then
