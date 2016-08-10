@@ -48,4 +48,4 @@ class AlCaHarvestingCfgBuilder(object):
             alcacfg.write(process.dumpPython())
 
         cms_run = "cmsRun -j {} {}".format(job_report_file, output_config_file)
-        self.logger.info("Now do:\n{}".format(cms_run))
+        self.logger.info("Command that now should be invoked:\n{}".format(cms_run))
