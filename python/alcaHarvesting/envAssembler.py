@@ -106,6 +106,7 @@ def prepare_multirun_environment(config):
             f.write("DQM_UPLOAD_HOST={}\n".format(config['dqm_upload_host']))
             f.write("DB_PATH={}\n".format(db_path))
             f.write("MAX_RETRIES={}\n".format(config['max_retries']))
+            f.write("ATTEMPT={}\n".format(multirun.retries))
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well
         session.commit()

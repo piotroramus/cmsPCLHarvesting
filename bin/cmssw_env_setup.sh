@@ -13,6 +13,7 @@ function eos() {
 
 #TODO: it will be better to delete whole created workspace (with all the directories)
 # but this will be usable after determining multirun_dir from eos not from local workspace
+# right now cannot really delete everything since other jobs might suffer
 function clear_workspace() {
     FULL_MULTIRUN_PATH=$WORKSPACE/$CMSSW_RELEASE/$MULTIRUN_DIR
     echo "Removing files in $FULL_MULTIRUN_PATH"
@@ -92,6 +93,8 @@ echo "Creating $CMSSW_RELEASE environment in $WORKSPACE"
 echo "Release to be used: $CMSSW_RELEASE"
 echo "Architecture: $SCRAM_ARCH"
 
+# TODO: thought it might be better to process it in jenkins workspace and only after that upload to EOS.
+# this would solve the problem with deleteing workspace
 
 mkdir -p $WORKSPACE/$CMSSW_RELEASE
 
@@ -108,13 +111,11 @@ cmsenv
 
 cd $WORKSPACE/$CMSSW_RELEASE
 
-
-MULTIRUN_DIR=$MULTIRUN_ID
-if [ -d "$MULTIRUN_ID" ]; then
-    # Create new folder for multirun, named multirunId_YYYY-mm-dd_HHMM
-    # For example 34_2016-05-24_1703
-    DATE=`date +%Y-%m-%d_%H%M`
-    MULTIRUN_DIR="${MULTIRUN_ID}_${DATE}"
+# create multi-run directory name - if it was repeated append _attemptno to directory name
+if [ $ATTEMPT -ne 0 ]; then
+    MULTIRUN_DIR="${MULTIRUN_ID}_${ATTEMPT}"
+else
+    MULTIRUN_DIR="${MULTIRUN_ID}"
 fi
 
 EOS_MULTIRUN_WORKSPACE=$EOS_WORKSPACE/$SCRAM_ARCH/$CMSSW_RELEASE/$MULTIRUN_DIR/
