@@ -44,10 +44,10 @@ if __name__ == '__main__':
     multirun = session \
         .query(model.Multirun) \
         .join(model.MultirunState) \
+        .filter(model.Multirun.perform_payload_upload == True) \
         .filter(sqlalchemy.or_(
         model.MultirunState.state == 'dqm_upload_ok',
         model.MultirunState.state == 'dropbox_upload_failed')) \
-        .filter(model.Multirun.perform_payload_upload == True) \
         .first()
 
     if not multirun:
