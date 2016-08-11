@@ -1,7 +1,7 @@
 rrapi_url: http://vocms00169:2113
 
 # DBS Api url served without the prefix https://cmsweb.cern.ch
-dbsapi_url: /dbs/prod/global/DBSReader
+dbsapi_url: /dbs/prod/global/DBSReader/
 
 # whether to use RunRegistry API in version 3 (old one, but v4 sometimes crashes)
 use_rrapi_v3: False
