@@ -118,8 +118,7 @@ def assembly_multiruns(config, session):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    # TODO 1: dbs_api url from config
-    dbsApi = dbsapi.DBSApi()
+    dbsApi = dbsapi.DBSApi(config['dbsapi_url'])
     t0api = t0wmadatasvcApi.Tier0Api()
 
     logger.info("Getting runs with completed stream from local database")
