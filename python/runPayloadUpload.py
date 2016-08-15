@@ -64,15 +64,15 @@ if __name__ == '__main__':
             .one()
 
         # check whether the payload upload should be performed
-        t0api = t0wmadatasvcApi.Tier0Api()
-        firstsaferun = t0api.firstconditionsaferun()
-        if min_run < firstsaferun:
-            logger.warn("Cannot perform payload upload for synchronization reasons.")
-            logger.warn("The run number {} included in this multi-run is smaller than firstconditionsaferun: {}"
-                        .format(min_run, firstsaferun))
-            multirun.state = dropbox_failed_state
-            session.commit()
-            sys.exit(1)
+        # t0api = t0wmadatasvcApi.Tier0Api()
+        # firstsaferun = t0api.firstconditionsaferun()
+        # if min_run < firstsaferun:
+        #     logger.warn("Cannot perform payload upload for synchronization reasons.")
+        #     logger.warn("The run number {} included in this multi-run is smaller than firstconditionsaferun: {}"
+        #                 .format(min_run, firstsaferun))
+        #     multirun.state = dropbox_failed_state
+        #     session.commit()
+        #     sys.exit(1)
 
         conditions_filename = "promptCalibConditions{}.db".format(multirun.id)
         metadata_filename = "promptCalibConditions{}.txt".format(multirun.id)
