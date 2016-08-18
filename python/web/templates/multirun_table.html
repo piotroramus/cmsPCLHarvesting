@@ -3,6 +3,7 @@
     <thead>
         <th>ID</th>
         <th>State</th>
+        <th>Run numbers</th>
         <th>Num. of events</th>
         <th>Perform payload upload</th>
         <th>Dataset</th>
@@ -21,6 +22,11 @@
         <tr>
             <td>{{ m.id }}</td>
             <td>{{ m.state }}</td>
+            <td>
+                {% for run in m.run_numbers %}
+                    {{ run.number }}
+                {% endfor %}
+            </td>
             <td>{{ m.number_of_events }}</td>
             <td>{{ m.perform_payload_upload }}</td>
             <td>{{ m.dataset }}</td>
