@@ -31,4 +31,8 @@ if __name__ == '__main__':
         .one()
     multirun.state = need_more_data_state
 
+    # TODO: make it consistent with max_retries
+    logger.info("Increasing number of retries")
+    multirun.retries = multirun.retries + 1
+
     session.commit()
