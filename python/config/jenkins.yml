@@ -51,5 +51,5 @@ workflow_run_classes:
 
 # only multi-runs with dataset dedicated for given workflows will be uploaded to DropBox
 workflows_to_upload:
-    - 'SiStripGainsAfterAbortGap'
+    - 'PromptCalibProdSiStripGainsAfterAbortGap'
     - 'PromptCalibProdSiStripGains'
