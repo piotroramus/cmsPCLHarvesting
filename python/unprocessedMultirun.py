@@ -32,7 +32,7 @@ if __name__ == '__main__':
         logger.info("Changing multi-run status to failed")
         failed_state = session \
             .query(model.MultirunState) \
-            .filter(model.MultirunState.state == 'failed') \
+            .filter(model.MultirunState.state == 'processing_failed') \
             .one()
         multirun.state = failed_state
     else:
