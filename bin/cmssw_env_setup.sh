@@ -150,6 +150,17 @@ for file in ${FILES_TO_SAVE[@]}; do
     fi
 done
 
+echo "Checking if the payload has been produced..."
+PAYLOAD_ROWS=$(sqlite3 $CONDITIONS_FILE "select count(*) from TAG")
+
+if [ $PAYLOAD_ROWS -eq 0 ]; then
+    echo "No payload has been produced."
+    echo "Multi-run now will go to need_more_data state"
+    python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $DB_PATH
+else
+    echo "Payload has been produced"
+fi
+
 upload_available_files
 
 # mark multirun as processed
