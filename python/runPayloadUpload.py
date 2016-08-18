@@ -41,14 +41,21 @@ if __name__ == '__main__':
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
+    # first try to proceed with multi-runs that had not been uploaded before
     multirun = session \
         .query(model.Multirun) \
         .join(model.MultirunState) \
         .filter(model.Multirun.perform_payload_upload == True) \
-        .filter(sqlalchemy.or_(
-        model.MultirunState.state == 'dqm_upload_ok',
-        model.MultirunState.state == 'dropbox_upload_failed')) \
+        .filter(model.MultirunState.state == 'dqm_upload_ok') \
         .first()
+
+    if not multirun:
+        multirun = session \
+            .query(model.Multirun) \
+            .join(model.MultirunState) \
+            .filter(model.Multirun.perform_payload_upload == True) \
+            .filter(model.MultirunState.state == 'dropbox_upload_failed') \
+            .first()
 
     if not multirun:
         logger.info("Cannot find any multi-runs ready for the payload upload.")
