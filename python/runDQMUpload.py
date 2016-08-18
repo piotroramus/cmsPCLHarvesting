@@ -40,13 +40,19 @@ if __name__ == '__main__':
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
+    # first try to proceed with multi-runs that had not been uploaded before
     multirun = session \
         .query(model.Multirun) \
         .join(model.MultirunState) \
-        .filter(sqlalchemy.or_(
-        model.MultirunState.state == 'processed_ok',
-        model.MultirunState.state == 'dqm_upload_failed')) \
+        .filter(model.MultirunState.state == 'processed_ok') \
         .first()
+
+    if not multirun:
+        multirun = session \
+            .query(model.Multirun) \
+            .join(model.MultirunState) \
+            .filter(model.MultirunState.state == 'dqm_upload_failed') \
+            .first()
 
     if not multirun:
         logger.info("Cannot find any processed multi-runs ready for the DQM upload.")
