@@ -73,8 +73,12 @@ if __name__ == '__main__':
         conditions_filename = "promptCalibConditions{}.db".format(multirun.id)
         metadata_filename = "promptCalibConditions{}.txt".format(multirun.id)
 
+        eos_dir = multirun.id
+        if multirun.retries > 0:
+            eos_dir = "{}_{}".format(multirun.id, multirun.retries)
+
         eos_path = "{}/{}/{}/{}" \
-            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, multirun.eos_dir)
+            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, eos_dir)
         script_path = os.path.dirname(os.path.realpath(__file__))
         payload_script_path = script_path.replace("/python", "/bin/payload_upload.sh")
         cmd = "{} {} {} {} {} {}".format(payload_script_path, eos_path, conditions_filename, metadata_filename,
