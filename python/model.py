@@ -24,6 +24,15 @@ class Dataset(Base):
         return self.dataset
 
 
+class EosDir(Base):
+    __tablename__ = 'eos_dir'
+
+    id = Column(Integer, primary_key=True)
+    eos_dir = Column(String, unique=True)
+
+    multirun_id = Column(Integer, ForeignKey='multirun.id')
+
+
 class Filename(Base):
     __tablename__ = 'filename'
 
@@ -49,14 +58,15 @@ class Multirun(Base):
     global_tag = Column(String)
     perform_payload_upload = Column(Boolean, nullable=False)
     retries = Column(Integer, nullable=False)
-    eos_dir = Column(String)
+    dropbox_log = Column(String)
     dataset_id = Column(Integer, ForeignKey('dataset.id'))
     state_id = Column(Integer, ForeignKey('multirun_state.id'), nullable=False)
 
     dataset = relationship("Dataset")
-    state = relationship("MultirunState")
-    run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
+    eos_dirs = relationship("EosDir")
     filenames = relationship("Filename")
+    run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
+    state = relationship("MultirunState")
 
     def __repr__(self):
         return ("Multirun(id={}, "

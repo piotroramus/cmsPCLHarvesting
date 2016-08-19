@@ -39,6 +39,8 @@ class Tier0Api(object):
             result['scenario'] = cfg[u'result'][0][u'scenario']
             result['global_tag'] = cfg[u'result'][0][u'global_tag']
             workflows = cfg[u'result'][0][u'alca_skim']
+            # TODO: where will be problem with this probably only when there is no express stream entry
+            # add check for getting the stream express, but it is important to have in mind that there can be no stream express
             if workflows:
                 wfls = workflows.split(',')
                 # TODO: this is somehow inconsistent with config workflows

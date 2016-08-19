@@ -25,6 +25,8 @@ if __name__ == '__main__':
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
-    multirun = session.query(model.Multirun).filter(model.Multirun.id == multirun_id).one()
-    multirun.eos_dir = eos_dir
+    eos_dir_obj = model.EosDir()
+    eos_dir_obj.eos_dir = eos_dir
+    eos_dir_obj.multirun_id = multirun_id
+
     session.commit()

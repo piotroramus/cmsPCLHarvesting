@@ -36,11 +36,13 @@ def get_data():
 
 
 def create_eos_path(multirun):
-    path = None
-    if multirun.eos_dir:
+    paths = []
+    for dir in multirun.eos_dirs:
+        # TODO: can be optimized a little bit
         path = app.config['eos_workspace_path']
-        path = "{}/{}/{}/{}/".format(path, multirun.scram_arch, multirun.cmssw, multirun.eos_dir)
-    return path
+        path = "{}/{}/{}/{}/".format(path, multirun.scram_arch, multirun.cmssw, dir)
+        paths.append(path)
+    return paths
 
 
 @app.route('/')
