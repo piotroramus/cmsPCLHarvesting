@@ -24,7 +24,7 @@ if __name__ == '__main__':
     session = Session()
 
     multirun = session.query(model.Multirun).filter(model.Multirun.id == multirun_id).one()
-    logger.info("Switching multirun {} state to need_more_data")
+    logger.info("Switching multirun {} state to need_more_data".format(multirun_id))
     need_more_data_state = session \
         .query(model.MultirunState) \
         .filter(model.MultirunState.state == 'need_more_data') \
