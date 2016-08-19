@@ -30,7 +30,7 @@ class EosDir(Base):
     id = Column(Integer, primary_key=True)
     eos_dir = Column(String, unique=True)
 
-    multirun_id = Column(Integer, ForeignKey='multirun.id')
+    multirun_id = Column(Integer, ForeignKey('multirun.id'))
 
 
 class Filename(Base):
