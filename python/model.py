@@ -32,6 +32,9 @@ class EosDir(Base):
 
     multirun_id = Column(Integer, ForeignKey('multirun.id'))
 
+    def __repr__(self):
+        return self.eos_dir
+
 
 class Filename(Base):
     __tablename__ = 'filename'
