@@ -157,6 +157,8 @@ if [ $PAYLOAD_ROWS -eq 0 ]; then
     echo "No payload has been produced."
     echo "Multi-run now will go to need_more_data state"
     python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $DB_PATH
+    upload_available_files
+    exit 0
 else
     echo "Payload has been produced"
 fi
