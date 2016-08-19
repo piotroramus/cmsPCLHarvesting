@@ -28,5 +28,6 @@ if __name__ == '__main__':
     eos_dir_obj = model.EosDir()
     eos_dir_obj.eos_dir = eos_dir
     eos_dir_obj.multirun_id = multirun_id
+    session.add(eos_dir_obj)
 
     session.commit()
