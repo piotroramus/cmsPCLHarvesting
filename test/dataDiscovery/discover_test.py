@@ -1,13 +1,13 @@
+import datetime
 import os
 import sqlalchemy
 import sys
 import time
 import unittest
 
-from sqlalchemy.ext.declarative import declarative_base
-
 sys.path.insert(0, os.path.abspath('../../python'))
 
+import model
 from dataDiscovery import discover
 from t0wmadatasvcApi.t0wmadatasvcApi import Tier0Api
 
@@ -111,24 +111,63 @@ class DiscoverTest(unittest.TestCase):
         run_class_names = discover.get_run_class_names(imaginary_workflow_run_classes)
         self.assertEqual(run_class_names, expected_result)
 
-    def test_update_runs(self):
 
+class UpdateRunsTest(unittest.TestCase):
+    def setUp(self):
         date = time.strftime("%d-%m-%Y_%H.%M.%S")
-        engine = sqlalchemy.create_engine('sqlite:///test-{}.db'.format(date), echo=False)
-        Base = declarative_base()
-        Base.metadata.create_all(engine, checkfirst=True)
+        self.database_file = "test-{}.db".format(date)
+        connection_string = "sqlite:///{}".format(self.database_file)
+        engine = sqlalchemy.create_engine(connection_string, echo=False)
+        model.Base.metadata.create_all(engine, checkfirst=True)
         Session = sqlalchemy.orm.sessionmaker(bind=engine)
-        session = Session()
+        self.session = Session()
+        self.logger = LoggerMock('INFO')
 
-        logger = LoggerMock('INFO')
-        t0api_stream_completed = T0ApiStreamAlwaysCompleted()
-        t0api_stream_not_completed = T0ApiStreamNeverCompleted()
+        self.t0api_stream_completed = T0ApiStreamAlwaysCompleted()
+        self.t0api_stream_not_completed = T0ApiStreamNeverCompleted()
+
+        self.__init_db()
+
+    def __init_db(self):
+        ri = model.RunInfo()
+        ri.stream_completed = True
+        ri.stream_timeout = False
+        self.session.add(ri)
+        self.session.commit()
+
+    def tearDown(self):
+        os.remove(self.database_file)
+        # pass
+
+    def test_no_new_runs(self):
+        # fixed_current_time = datetime()
+        run1 = model.RunInfo()
+        run1.number = 1
+
+        run2 = model.RunInfo()
+        run2.number = 2
+
+        run3 = model.RunInfo()
+        run3.number = 3
+
+        recent_run1 = {
+            u'runnumber': 1,
+            u'starttime': u'2016-08-11 10:35:56'
+        }
+        recent_run2 = {
+            u'runnumber': 2,
+            u'starttime': u'2016-08-11 12:35:56'
+        }
+        recent_run3 = {
+            u'runnumber': 2,
+            u'starttime': u'2016-08-11 14:35:56'
+        }
 
         config = {"run_stream_timeout": 5}
-        local_runs = []
-        recent_runs = []
+        local_runs = [run1, run2, run3]
+        recent_runs = [recent_run1, recent_run2, recent_run3]
 
-        discover.update_runs(logger, session, t0api_stream_completed, config, local_runs, recent_runs)
+        # discover.update_runs(self.logger, self.session, self.t0api_stream_completed, config, local_runs, recent_runs)
 
         # TODO: finish when RRApi server is working since real data is needed
 
