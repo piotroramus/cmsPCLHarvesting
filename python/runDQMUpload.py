@@ -81,7 +81,7 @@ if __name__ == '__main__':
         script_path = os.path.dirname(os.path.realpath(__file__))
         dqm_script_path = script_path.replace("/python", "/bin/dqm_upload.sh")
         cmd = "{} {} {} {} {}".format(dqm_script_path, dqm_filename, dqm_file_location, config['dqm_current'],
-                                      config['dqm_upload_host'])
+                                      config['dqm_upload_host'], multirun.id)
         result = subprocess.call(cmd, shell=True)
 
         if result != 0:
