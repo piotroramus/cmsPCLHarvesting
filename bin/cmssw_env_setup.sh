@@ -156,7 +156,7 @@ PAYLOAD_ROWS=$(sqlite3 $CONDITIONS_FILE "select count(*) from TAG")
 if [ $PAYLOAD_ROWS -eq 0 ]; then
     echo "No payload has been produced."
     echo "Multi-run now will go to need_more_data state"
-    python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $DB_PATH
+    python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
     upload_available_files
     exit 0
 else

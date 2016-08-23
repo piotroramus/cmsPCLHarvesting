@@ -13,7 +13,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("multirun_id", type=int, help="id of processed multi-run")
     parser.add_argument("db_path", help="location of database containing multi-run info")
-    parser.add_argument("max_retries", type=int, help="number of times which multi-run should be repeated in case of failures")
+    parser.add_argument("max_retries", type=int, help="number of times which multi-run can be repeated")
     args = parser.parse_args()
 
     multirun_id = args.multirun_id
