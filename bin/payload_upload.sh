@@ -13,7 +13,11 @@ CONDITIONS_FILENAME="$2"
 METADATA_FILENAME="$3"
 SCRAM_ARCH="$4"
 CMSSW_RELEASE="$5"
+MULTIRUN_ID="$6"
 
+echo -e "\nStarting to perform the Dropbox upload"
+echo "Multi-run ID: ${MULTIRUN_ID}"
+echo -e "\n"
 
 # check for existence of ~/.netrc file
 if [ ! -f ~/.netrc ]; then
