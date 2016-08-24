@@ -120,5 +120,5 @@ class RunInfo(Base):
                 "start_time={}, "
                 "stream_completed={}, "
                 "used={}, "
-                "used_datasets={}").format(self.number, self.run_class_name, self.bfield, self.start_time,
+                "used_datasets={})").format(self.number, self.run_class_name, self.bfield, self.start_time,
                                            self.stream_completed, self.used, self.used_datasets)
