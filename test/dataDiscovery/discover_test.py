@@ -139,6 +139,15 @@ class UpdateRunsTest(unittest.TestCase):
         os.remove(self.database_file)
         # pass
 
+    def get_local_runs(self):
+        pass
+
+    def get_recent_runs(self):
+        pass
+
+    def test_run_becoming_completed(self):
+        pass
+
     def test_no_new_runs(self):
         # fixed_current_time = datetime()
         run1 = model.RunInfo()
