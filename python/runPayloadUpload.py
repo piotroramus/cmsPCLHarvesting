@@ -81,7 +81,7 @@ if __name__ == '__main__':
             .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, eos_dir)
         script_path = os.path.dirname(os.path.realpath(__file__))
         payload_script_path = script_path.replace("/python", "/bin/payload_upload.sh")
-        cmd = "{} {} {} {} {} {}".format(payload_script_path, eos_path, conditions_filename, metadata_filename,
+        cmd = "{} {} {} {} {} {} {}".format(payload_script_path, eos_path, conditions_filename, metadata_filename,
                                          multirun.scram_arch, multirun.cmssw, multirun.id)
 
         result = subprocess.call(cmd, shell=True)
