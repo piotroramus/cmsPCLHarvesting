@@ -105,16 +105,12 @@ def discover(config, session):
     for run in recent_runs:
         if u'starttime' not in run:
             logger.error("Run without a start date: {}. Ignoring.".format(run[u'runnumber']))
-    valid_runs = [r for r in recent_runs if r[u'starttime']]
+    valid_runs = (r for r in recent_runs if r[u'starttime'])
 
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
                                                RunInfo.stream_timeout == False).all()
-    print "LOCAL RUNS"
-    print local_runs
-    print "VALID RUNS"
-    print valid_runs
-    print valid_runs[0]['starttime']
+
     update_runs(logger, session, t0api, config, local_runs, valid_runs)
 
 
