@@ -1,5 +1,7 @@
 # CMS PCL MultiRun Harvesting
 
+# NOTE: THIS IS NOT VALID ANYMORE, NEEDS TO BE UPDATED!
+
 ## Running data (new runs) discovery
 
 ### Get access to DBS python client
