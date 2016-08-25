@@ -1,0 +1,44 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<table>
+    <thead>
+        <th>ID</th>
+        <th>State</th>
+        <th>Run numbers</th>
+        <th>Num. of events</th>
+        <th>Perform payload upload</th>
+        <th>Retries</th>
+        <th>Dataset</th>
+        <th>BField</th>
+        <th>RunClassName</th>
+        <th>CMSSW</th>
+        <th>Scram arch</th>
+        <th>Scenario</th>
+        <th>GlobalTag</th>
+        <th>EOS paths</th>
+    </thead>
+
+    <tbody>
+        {% for m in multiruns %}
+        <tr>
+            <td>{{ m.id }}</td>
+            <td>{{ m.state }}</td>
+            <td>
+                {% for run in m.run_numbers %}
+                    {{ run.number }}
+                {% endfor %}
+            </td>
+            <td>{{ m.number_of_events }}</td>
+            <td>{{ m.perform_payload_upload }}</td>
+            <td>{{ m.retries }}</td>
+            <td>{{ m.dataset }}</td>
+            <td>{{ m.bfield }}</td>
+            <td>{{ m.run_class_name }}</td>
+            <td>{{ m.cmssw }}</td>
+            <td>{{ m.scram_arch }}</td>
+            <td>{{ m.scenario }}</td>
+            <td>{{ m.global_tag }}</td>
+            <td>{{ m.eos_dir }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

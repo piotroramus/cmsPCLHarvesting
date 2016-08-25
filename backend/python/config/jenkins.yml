@@ -1,0 +1,55 @@
+rrapi_url: http://vocms00169:2113
+
+# DBS Api url served without the prefix https://cmsweb.cern.ch
+dbsapi_url: /dbs/prod/global/DBSReader/
+
+# whether to use RunRegistry API in version 3 (old one, but v4 sometimes crashes)
+use_rrapi_v3: False
+rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
+
+# path to database containing all the harvesting information
+db_path: /afs/cern.ch/work/p/poramus/database/database.db
+
+# where to copy files after processing has been done
+eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/jenkins
+
+# name of file containing AlCa Harvesting config
+alca_config: alcaConfig.py
+
+# name of file containing AlCa Harvesting job report
+job_report: FrameworkJobReport.xml
+
+# name of file containing logs of cmsRun for AlCa Harvesting step
+cms_run_output: cmsRunOutput.txt
+
+# location of `current` DQM GUI directory
+dqm_current: /datadqm/testGui
+
+# where to upload resultant DQM file
+dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
+
+# how far in the past should we look for new runs
+days_old_runs: 3
+
+# how many days to wait for the express stream for the run to be completed
+# if the strem is not completed after given number of days, run will not be included in any multi-run
+run_stream_timeout: 3
+
+# how many events multirun should contain to be qualified as ready to start
+events_threshold: 100000
+
+# how many times multirun should be processed if cmsRun exits with non-zero code
+max_retries: 2
+
+# only specified runClasses will be processed while using the particular workflow
+workflow_run_classes:
+    'PromptCalibProd': ['Collisions15', 'Collisions16']
+    'PromptCalibProdSiStrip': ['Collisions15', 'Collisions16']
+    'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16']
+    'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16']
+    'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16']
+
+# only multi-runs with dataset dedicated for given workflows will be uploaded to DropBox
+workflows_to_upload:
+    - 'PromptCalibProdSiStripGainsAfterAbortGap'
+    - 'PromptCalibProdSiStripGains'
