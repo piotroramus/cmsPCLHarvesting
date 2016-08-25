@@ -14,6 +14,7 @@ from os.path import join
 
 from .models import User
 
+from backend.python import model
 from flask_httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
@@ -24,12 +25,12 @@ auth = HTTPBasicAuth()
 @app.route('/')
 @app.route('/index')
 def index():
-    gitInfo = run_in_shell('/usr/bin/git describe --all --long', shell = True)
+    gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
     return render_template('index.html', lastUpdate=datetime.utcnow(), gitInfo=gitInfo)
 
 @app.route('/heartbeat')
 def heartbeat():
-    gitInfo = run_in_shell('/usr/bin/git describe --all --long', shell = True)
+    gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
     return jsonify( {'lastUpdate' : datetime.utcnow(), 'gitInfo' : gitInfo } )
 
 # a simple "echo" method
@@ -79,3 +80,31 @@ def run_in_shell(*popenargs, **kwargs):
     if returnCode:
         raise subprocess.CalledProcessError(returnCode, cmd)
     return stdout
+
+def get_data():
+    return db.session.query(model.Multirun).all()
+
+
+def create_eos_path(multirun):
+    paths = []
+    for dir in multirun.eos_dirs:
+        # TODO: can be optimized a little bit
+        # path = app.config['eos_workspace_path']
+        path = "$ROOT"
+        path = "{}/{}/{}/{}/".format(path, multirun.scram_arch, multirun.cmssw, dir.eos_dir)
+        paths.append(path)
+    return paths
+
+#
+@app.route('/test/')
+def test():
+    print get_data()
+    return "response"
+#
+#
+@app.route('/display/')
+def display():
+    multiruns = get_data()
+    for multirun in multiruns:
+        multirun.eos_dir = create_eos_path(multirun)
+    return render_template('multirun_table.html', multiruns=multiruns)
