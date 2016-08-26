@@ -68,5 +68,5 @@ target/
 bin/voms.pwd
 
 # keeper specific directories
-logs/
+/logs/
 venv/
