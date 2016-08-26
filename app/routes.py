@@ -89,8 +89,7 @@ def create_eos_path(multirun):
     paths = []
     for dir in multirun.eos_dirs:
         # TODO: can be optimized a little bit
-        # path = app.config['eos_workspace_path']
-        path = "$ROOT"
+        path = app.config['EOS_ROOT']
         path = "{}/{}/{}/{}/".format(path, multirun.scram_arch, multirun.cmssw, dir.eos_dir)
         paths.append(path)
     return paths

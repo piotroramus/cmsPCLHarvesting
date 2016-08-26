@@ -29,6 +29,9 @@ class Config():
     LOGGING_DIR = os.path.join(BASE_DIR, 'logs/myService/')
     LOGGING_FILE = os.path.join(LOGGING_DIR, 'log')
 
+    # EOS ROOT
+    EOS_ROOT = "/eos/cms/store/group/alca_global/multiruns/results/jenkins"
+
     # get some DB connections from the secrets file (as they may contain credentials):
     # SQLALCHEMY_DATABASE_URI = getConnections( 'userDB' )
     SQLALCHEMY_DATABASE_URI = "sqlite:////afs/cern.ch/work/p/poramus/database/database.db"
