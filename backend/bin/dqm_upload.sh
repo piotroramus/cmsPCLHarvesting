@@ -7,9 +7,8 @@ function eos() {
 
 DQM_FILENAME="$1"
 DQM_FILE_LOCATION="$2"
-DQM_GUI_DIR="$3"
 DQM_UPLOAD_HOST="$4"
-MULTIRUN_ID="$5"
+MULTIRUN_ID="$5" #TODO: fix this after it finally works
 
 echo -e "\n Starting to perfrom DQM upload"
 echo "Multi-run ID: ${MULTIRUN_ID}"
@@ -31,8 +30,7 @@ if [ ${EOS_RC} -ne 0 ]; then
 fi
 
 echo "Uploading $DQM_FILENAME to DQM"
-source $DQM_GUI_DIR/current/apps/dqmgui/128/etc/profile.d/env.sh
-visDQMUpload $DQM_UPLOAD_HOST $DQM_FILENAME
+python ../visDQMUpload $DQM_UPLOAD_HOST $DQM_FILENAME
 UPLOAD_RC=$?
 
 echo "DQM exit code: $UPLOAD_RC"
