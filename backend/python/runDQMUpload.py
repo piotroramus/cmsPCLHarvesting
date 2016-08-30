@@ -28,11 +28,9 @@ if __name__ == '__main__':
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
     args = parser.parse_args()
 
-    config_file = "config/local.yml"
+    config_file = None
     if args.config:
         config_file = args.config
-
-    logger.info("Reading config file: {}".format(config_file))
     config = configReader.read(config_file)
 
     engine = sqlalchemy.create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
@@ -81,7 +79,7 @@ if __name__ == '__main__':
         script_path = os.path.dirname(os.path.realpath(__file__))
         dqm_script_path = script_path.replace("/python", "/bin/dqm_upload.sh")
         cmd = "{} {} {} {} {} {}".format(dqm_script_path, dqm_filename, dqm_file_location, config['dqm_current'],
-                                      config['dqm_upload_host'], multirun.id)
+                                         config['dqm_upload_host'], multirun.id)
         result = subprocess.call(cmd, shell=True)
 
         if result != 0:

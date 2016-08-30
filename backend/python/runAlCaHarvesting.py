@@ -13,11 +13,9 @@ if __name__ == '__main__':
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
     args = parser.parse_args()
 
-    config_file = "config/local.yml"
+    config_file = None
     if args.config:
         config_file = args.config
-
-    logger.info("Reading config file: {}".format(config_file))
     config = configReader.read(config_file)
 
     logger.info("Preparing AlCa Harvesting config")
