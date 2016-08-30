@@ -11,7 +11,6 @@ DQM_UPLOAD_HOST="$4"
 MULTIRUN_ID="$5" #TODO: fix this after it finally works
 PYTHON_DIR="$6"
 
-echo "PYTHON DIR: $PYTHON_DIR"
 
 echo -e "\n Starting to perfrom DQM upload"
 echo "Multi-run ID: ${MULTIRUN_ID}"
