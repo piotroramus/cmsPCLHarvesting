@@ -3,15 +3,15 @@
 
 echo "Generating new proxy certificate..."
 
-VOMS_PASS_PHRASE_FILE="voms.pwd"
-if [ ! -f $VOMS_PASS_PHRASE_FILE ]; then
-    echo "Error: $VOMS_PASS_PHRASE_FILE file is missing!"
+CREDENTIALS_FILE="$HOME/.credentials"
+if [ ! -f $CREDENTIALS_FILE ]; then
+    echo "Error: $CREDENTIALS_FILE file is missing!"
     exit 1
 fi
 
-source $VOMS_PASS_PHRASE_FILE
+source $CREDENTIALS_FILE
 if [ -z ${GRID_PASS_PHRASE+x} ]; then
-    echo "Error: GRID_PASS_PHRASE not set in $VOMS_PASS_PHRASE_FILE!"
+    echo "Error: GRID_PASS_PHRASE not set in $CREDENTIALS_FILE!"
     exit 1
 fi
 
