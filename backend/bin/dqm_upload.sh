@@ -7,9 +7,9 @@ function eos() {
 
 DQM_FILENAME="$1"
 DQM_FILE_LOCATION="$2"
-DQM_UPLOAD_HOST="$4"
-MULTIRUN_ID="$5" #TODO: fix this after it finally works
-PYTHON_DIR="$6"
+DQM_UPLOAD_HOST="$3"
+MULTIRUN_ID="$4"
+PYTHON_DIR="$5"
 
 
 echo -e "\n Starting to perfrom DQM upload"

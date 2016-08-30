@@ -22,9 +22,6 @@ job_report: FrameworkJobReport.xml
 # name of file containing logs of cmsRun for AlCa Harvesting step
 cms_run_output: cmsRunOutput.txt
 
-# location of `current` DQM GUI directory
-dqm_current: /datadqm/testGui
-
 # where to upload resultant DQM file
 dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
 

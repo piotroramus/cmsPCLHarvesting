@@ -100,7 +100,6 @@ def prepare_multirun_environment(config):
             f.write("CMS_RUN_OUTPUT={}\n".format(config['cms_run_output']))
             f.write("MULTIRUN_PROPS_FILE={}\n".format(multirun_props_file))
             f.write("PYTHON_DIR_PATH={}\n".format(absolute_python_dir_path))
-            f.write("DQM_GUI_DIR={}\n".format(config['dqm_current']))
             f.write("DQM_UPLOAD_HOST={}\n".format(config['dqm_upload_host']))
             f.write("DB_PATH={}\n".format(db_path))
             f.write("MAX_RETRIES={}\n".format(config['max_retries']))
