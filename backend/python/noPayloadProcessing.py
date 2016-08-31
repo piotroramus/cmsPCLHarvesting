@@ -25,26 +25,16 @@ if __name__ == '__main__':
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
-    session.commit()
-
     multirun = session.query(model.Multirun).filter(model.Multirun.id == multirun_id).one()
-    if multirun.retries >= max_retries:
-        logger.error("Maximum number of retries reached!")
-        logger.info("Changing multi-run status to failed")
-        failed_state = session \
-            .query(model.MultirunState) \
-            .filter(model.MultirunState.state == 'processing_failed') \
-            .one()
-        multirun.state = failed_state
-    else:
-        logger.info("Switching multirun {} state to need_more_data".format(multirun_id))
-        need_more_data_state = session \
-            .query(model.MultirunState) \
-            .filter(model.MultirunState.state == 'need_more_data') \
-            .one()
-        multirun.state = need_more_data_state
+    logger.info("Switching multirun {} state to need_more_data".format(multirun_id))
+    need_more_data_state = session \
+        .query(model.MultirunState) \
+        .filter(model.MultirunState.state == 'need_more_data') \
+        .one()
+    multirun.state = need_more_data_state
 
-        logger.info("Increasing number of retries")
-        multirun.retries = multirun.retries + 1
+    # TODO: might be good to distinguish between 'increasing payload retries' and 'failure retries'
+    logger.info("Increasing number of retries")
+    multirun.retries = multirun.retries + 1
 
     session.commit()
