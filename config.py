@@ -34,7 +34,7 @@ class Config():
 
     # get some DB connections from the secrets file (as they may contain credentials):
     # SQLALCHEMY_DATABASE_URI = getConnections( 'userDB' )
-    SQLALCHEMY_DATABASE_URI = "sqlite:////afs/cern.ch/work/p/poramus/database/database.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:////pclmh/data/database.db"
     LOG_DB  = getConnections( 'logDB' )
     DEST_DB = getConnections( 'destDB' ).replace('oracle://','').replace(':', '/')     # 'cms_orcoff_prep/<pwd>@CMS_CONDITIONS_002'
     # RUN_INFO_DB = getConnections( 'runInfoDB' ) # 'oracle://cms_orcon_adg/CMS_CONDITIONS'
