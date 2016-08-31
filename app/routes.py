@@ -3,7 +3,7 @@ import subprocess
 
 from app import db
 from app import app
-from flask import g, jsonify, abort, request, make_response, render_template
+from flask import g, jsonify, abort, request, make_response, render_template, redirect, url_for
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
@@ -25,8 +25,9 @@ auth = HTTPBasicAuth()
 @app.route('/')
 @app.route('/index')
 def index():
-    gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
-    return render_template('index.html', lastUpdate=datetime.utcnow(), gitInfo=gitInfo)
+    # gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
+    # return render_template('index.html', lastUpdate=datetime.utcnow(), gitInfo=gitInfo)
+    return redirect(url_for('display'))
 
 @app.route('/heartbeat')
 def heartbeat():

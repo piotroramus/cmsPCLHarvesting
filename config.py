@@ -39,11 +39,11 @@ class Config():
     DEST_DB = getConnections( 'destDB' ).replace('oracle://','').replace(':', '/')     # 'cms_orcoff_prep/<pwd>@CMS_CONDITIONS_002'
     # RUN_INFO_DB = getConnections( 'runInfoDB' ) # 'oracle://cms_orcon_adg/CMS_CONDITIONS'
 
-    SQLALCHEMY_BINDS = {
-        'log'  : LOG_DB,
-        'user' : SQLALCHEMY_DATABASE_URI,
+    # SQLALCHEMY_BINDS = {
+    #     'log'  : LOG_DB,
+    #     'user' : SQLALCHEMY_DATABASE_URI,
     #     'runInfo'  : RUN_INFO_DB,
-    }
+    # }
 
     @staticmethod
     def init_app(app):
