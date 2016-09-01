@@ -34,7 +34,9 @@ if [ ${EOS_RC} -ne 0 ]; then
     exit ${EOS_RC}
 fi
 
-echo "Uploading $DQM_FILENAME to DQM"
+echo -e \n"Uploading $DQM_FILENAME to DQM"
+echo -e "Target GUI: ${DQM_UPLOAD_HOST} \n"
+
 python ${PYTHON_DIR}/visDQMUpload.py $DQM_UPLOAD_HOST $DQM_FILENAME
 UPLOAD_RC=$?
 
