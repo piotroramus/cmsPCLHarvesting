@@ -2,7 +2,6 @@
 
 import os
 import sys
-import subprocess
 
 from app import app
 from keeperService import secretsDir
@@ -13,10 +12,6 @@ from keeperService import secretsDir
 from app import service
 
 if __name__ == "__main__":
-
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    kinit_path = "{}/kinit.sh".format(script_dir)
-    subprocess.Popen([kinit_path])
 
     service._init()
 
