@@ -5,6 +5,8 @@ import os
 
 import utils.workflows as workflows
 import logs.logger as logs
+import utils.configReader as configReader
+import utils.dbConnection as dbConnection
 
 from model import Base, Multirun, MultirunState
 
@@ -42,11 +44,14 @@ def prepare_config(params_file, alca_config_file="alcaConfig.py", job_report_fil
                   alca_config_file, job_report_file)
 
 
-def prepare_multirun_environment(config):
+def prepare_multirun_environment(config_file):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
-    engine = create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
+    config = configReader.read(config_file)
+
+    connection_string = dbConnection.oracle_connection_string(config)
+    engine = sqlalchemy.create_engine(connection_string, echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -101,9 +106,10 @@ def prepare_multirun_environment(config):
             f.write("MULTIRUN_PROPS_FILE={}\n".format(multirun_props_file))
             f.write("PYTHON_DIR_PATH={}\n".format(absolute_python_dir_path))
             f.write("DQM_UPLOAD_HOST={}\n".format(config['dqm_upload_host']))
-            f.write("DB_PATH={}\n".format(db_path))
+            f.write("DB_PATH={}\n".format(db_path)) # TODO: delete
             f.write("MAX_RETRIES={}\n".format(config['max_retries']))
             f.write("ATTEMPT={}\n".format(multirun.retries))
+            f.write("CONFIG_FILE={}\n".format(config_file))
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well
         session.commit()

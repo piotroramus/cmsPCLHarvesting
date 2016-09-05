@@ -6,6 +6,7 @@ import model
 import logs.logger as logs
 import dataDiscovery.discover
 import utils.configReader as configReader
+import utils.dbConnection as dbConnection
 import utils.prepopulate as prepopulate
 
 
@@ -25,7 +26,8 @@ if __name__ == '__main__':
     logger.info("Prepopulating database if needed")
     prepopulate.prepopulate(config)
 
-    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
+    connection_string = dbConnection.oracle_connection_string(config)
+    engine = sqlalchemy.create_engine(connection_string, echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()

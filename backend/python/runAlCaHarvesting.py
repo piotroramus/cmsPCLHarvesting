@@ -3,7 +3,6 @@ import logging
 
 import logs.logger as logs
 import alcaHarvesting.envAssembler
-import utils.configReader as configReader
 
 if __name__ == '__main__':
     logs.setup_logging()
@@ -16,8 +15,7 @@ if __name__ == '__main__':
     config_file = None
     if args.config:
         config_file = args.config
-    config = configReader.read(config_file)
 
     logger.info("Preparing AlCa Harvesting config")
-    alcaHarvesting.envAssembler.prepare_multirun_environment(config)
+    alcaHarvesting.envAssembler.prepare_multirun_environment(config_file)
     logger.info("AlCa Harvesting has been finished")

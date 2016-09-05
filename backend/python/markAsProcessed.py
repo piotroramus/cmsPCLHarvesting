@@ -4,6 +4,8 @@ import sqlalchemy
 
 import model
 import logs.logger as logs
+import utils.configReader as configReader
+import utils.dbConnection as dbConnection
 
 if __name__ == '__main__':
 
@@ -12,13 +14,16 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("multirun_id", type=int, help="id of processed multi-run")
-    parser.add_argument("db_path", help="location of database containing multi-run info")
+    parser.add_argument("config_file", help="path to configuration file")
     args = parser.parse_args()
 
     multirun_id = args.multirun_id
-    db_path = args.db_path
+    config_file = args.config_file
 
-    engine = sqlalchemy.create_engine('sqlite:///{}'.format(db_path), echo=False)
+    config = configReader.read(config_file)
+
+    connection_string = dbConnection.oracle_connection_string(config)
+    engine = sqlalchemy.create_engine(connection_string, echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()

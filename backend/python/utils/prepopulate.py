@@ -2,6 +2,8 @@ import logging
 
 import model
 import logs.logger as logs
+import utils.dbConnection as dbConnection
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -10,7 +12,8 @@ def prepopulate(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    engine = create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
+    connection_string = dbConnection.oracle_connection_string(config)
+    engine = sqlalchemy.create_engine(connection_string, echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()

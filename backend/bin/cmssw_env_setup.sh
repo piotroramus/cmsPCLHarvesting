@@ -27,7 +27,7 @@ function upload_available_files() {
         fi
     done
     echo "Updating multi-run eos path"
-    python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $DB_PATH $MULTIRUN_DIR
+    python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $MULTIRUN_DIR $CONFIG_FILE
 }
 
 
@@ -47,6 +47,7 @@ DQM_FILE=DQM_V0001_R*__StreamExpress__*__ALCAPROMPT.root
 CONDITIONS_FILE="promptCalibConditions$MULTIRUN_ID.db"
 METADATA_FILE="promptCalibConditions$MULTIRUN_ID.txt"
 
+# TODO: copy $CONFIG_FILE?
 # output files to be copied to EOS
 FILES_TO_SAVE=(
     $ALCA_CONFIG_FILE
@@ -113,7 +114,7 @@ echo "cmsRun return code: $CMS_RUN_RESULT"
 if [[ $CMS_RUN_RESULT != 0 ]]; then
     echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
     upload_available_files
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_RETRIES $CONFIG_FILE
     exit $CMS_RUN_RESULT
 fi
 
@@ -129,13 +130,13 @@ if [ $root_files_count -lt 1 ]; then
     echo "DQM file is missing!"
     upload_available_files
     echo "Preparing for retrying the processing..."
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_RETRIES $CONFIG_FILE
     exit 1
 elif [ $root_files_count -gt 1 ]; then
     echo "More than one DQM file!"
     upload_available_files
     echo "Preparing for retrying the processing..."
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_RETRIES $CONFIG_FILE
     exit 1
 fi
 
@@ -145,7 +146,7 @@ for file in ${FILES_TO_SAVE[@]}; do
         echo "Error: $file does not exists"
         upload_available_files
         echo "Preparing for retrying the processing..."
-        python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
+        python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_RETRIES $CONFIG_FILE
         exit 1
     fi
 done
@@ -156,7 +157,7 @@ PAYLOAD_ROWS=$(sqlite3 $CONDITIONS_FILE "select count(*) from TAG")
 if [ $PAYLOAD_ROWS -eq 0 ]; then
     echo "No payload has been produced."
     echo "Multi-run now will go to need_more_data state"
-    python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $DB_PATH $MAX_RETRIES
+    python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $MAX_RETRIES $CONFIG_FILE
     upload_available_files
     exit 0
 else
@@ -166,6 +167,6 @@ fi
 upload_available_files
 
 # mark multirun as processed
-python $PYTHON_DIR_PATH/markAsProcessed.py $MULTIRUN_ID $DB_PATH
+python $PYTHON_DIR_PATH/markAsProcessed.py $MULTIRUN_ID $CONFIG_FILE
 
 echo -e "\nJob finished for multi-run $MULTIRUN_ID\n"

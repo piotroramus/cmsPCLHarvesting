@@ -13,6 +13,12 @@ db_path: /pclmh/data/database.db
 # where to copy files after processing has been done
 eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/jenkins
 
+# location of file containing TNS for Oracle
+tns_file: /pclmh/tnsnames.ora
+
+# path to file containing Oracle DB credentials
+oracle_secret: /pclmh/.oracle
+
 # name of file containing AlCa Harvesting config
 alca_config: alcaConfig.py
 

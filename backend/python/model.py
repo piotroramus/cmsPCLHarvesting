@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
@@ -17,8 +17,8 @@ run_dataset_assoc = Table('run_dataset', Base.metadata,
 class Dataset(Base):
     __tablename__ = 'dataset'
 
-    id = Column(Integer, primary_key=True)
-    dataset = Column(String, unique=True)
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    dataset = Column(String(128), unique=True)
 
     def __repr__(self):
         return self.dataset
@@ -27,8 +27,8 @@ class Dataset(Base):
 class EosDir(Base):
     __tablename__ = 'eos_dir'
 
-    id = Column(Integer, primary_key=True)
-    eos_dir = Column(String, unique=True)
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    eos_dir = Column(String(128), unique=True)
 
     multirun_id = Column(Integer, ForeignKey('multirun.id'))
 
@@ -39,8 +39,8 @@ class EosDir(Base):
 class Filename(Base):
     __tablename__ = 'filename'
 
-    id = Column(Integer, primary_key=True)
-    filename = Column(String, unique=True)
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    filename = Column(String(256), unique=True)
 
     multirun = Column(Integer, ForeignKey('multirun.id'))
 
@@ -51,17 +51,17 @@ class Filename(Base):
 class Multirun(Base):
     __tablename__ = 'multirun'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence('id'), primary_key=True)
     number_of_events = Column(Integer)
     bfield = Column(Float)
-    run_class_name = Column(String)
-    cmssw = Column(String)
-    scram_arch = Column(String)
-    scenario = Column(String)
-    global_tag = Column(String)
+    run_class_name = Column(String(64))
+    cmssw = Column(String(32))
+    scram_arch = Column(String(32))
+    scenario = Column(String(64))
+    global_tag = Column(String(128))
     perform_payload_upload = Column(Boolean, nullable=False)
     retries = Column(Integer, nullable=False)
-    dropbox_log = Column(String)
+    dropbox_log = Column(String(256))
     dataset_id = Column(Integer, ForeignKey('dataset.id'))
     state_id = Column(Integer, ForeignKey('multirun_state.id'), nullable=False)
 
@@ -93,8 +93,8 @@ class Multirun(Base):
 class MultirunState(Base):
     __tablename__ = 'multirun_state'
 
-    id = Column(Integer, primary_key=True)
-    state = Column(String, unique=True)
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    state = Column(String(32), unique=True)
 
     def __repr__(self):
         return self.state
@@ -104,7 +104,7 @@ class RunInfo(Base):
     __tablename__ = 'run_info'
 
     number = Column(Integer, primary_key=True)
-    run_class_name = Column(String)
+    run_class_name = Column(String(32))
     bfield = Column(Float)
     start_time = Column(DateTime)
     stream_completed = Column(Boolean, nullable=False)

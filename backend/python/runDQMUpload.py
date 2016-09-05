@@ -9,6 +9,8 @@ import sys
 import model
 import logs.logger as logs
 import utils.configReader as configReader
+import utils.dbConnection as dbConnection
+
 
 """ Tries to upload DQM file to DQM GUI.
     Can be triggered only after the AlCa Harvesting step has finished successfully or the previous DQM upload failed."""
@@ -33,7 +35,8 @@ if __name__ == '__main__':
         config_file = args.config
     config = configReader.read(config_file)
 
-    engine = sqlalchemy.create_engine('sqlite:///{}'.format(config['db_path']), echo=False)
+    connection_string = dbConnection.oracle_connection_string(config)
+    engine = sqlalchemy.create_engine(connection_string, echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
