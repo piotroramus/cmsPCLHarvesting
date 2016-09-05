@@ -13,7 +13,7 @@ def prepopulate(config):
     logger = logging.getLogger(__name__)
 
     connection_string = dbConnection.oracle_connection_string(config)
-    engine = sqlalchemy.create_engine(connection_string, echo=False)
+    engine = create_engine(connection_string, echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()

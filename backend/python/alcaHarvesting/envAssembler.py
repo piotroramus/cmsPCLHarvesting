@@ -51,7 +51,7 @@ def prepare_multirun_environment(config_file):
     config = configReader.read(config_file)
 
     connection_string = dbConnection.oracle_connection_string(config)
-    engine = sqlalchemy.create_engine(connection_string, echo=False)
+    engine = create_engine(connection_string, echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()
