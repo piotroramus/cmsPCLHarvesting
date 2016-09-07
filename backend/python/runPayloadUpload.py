@@ -11,7 +11,6 @@ import logs.logger as logs
 import utils.configReader as configReader
 import utils.dbConnection as dbConnection
 
-
 """ Tries to upload payload to Dropbox.
     Can be triggered only after the DQM GUI upload has finished successfully or the previous payload upload failed."""
 
@@ -81,8 +80,9 @@ if __name__ == '__main__':
             .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, multirun_dir)
         script_path = os.path.dirname(os.path.realpath(__file__))
         payload_script_path = script_path.replace("/python", "/bin/payload_upload.sh")
-        cmd = "{} {} {} {} {} {} {}".format(payload_script_path, eos_path, conditions_filename, metadata_filename,
-                                         multirun.scram_arch, multirun.cmssw, multirun.id)
+        log_file = "dropbox_upload_log.txt"
+        cmd = "{} {} {} {} {} {} {} {}".format(payload_script_path, eos_path, conditions_filename, metadata_filename,
+                                               multirun.scram_arch, multirun.cmssw, multirun.id, log_file)
 
         result = subprocess.call(cmd, shell=True)
 
@@ -90,6 +90,18 @@ if __name__ == '__main__':
             multirun.state = dropbox_failed_state
             session.commit()
             sys.exit(1)
+
+        logger.info("Collecting log URL from the log file...")
+        log = None
+        with open(log_file, 'r') as f:
+            for line in f:
+                if re.search('file log at', line):
+                    log = line
+
+        match = re.match(r'.*(?P<url>http.*)', log)
+        log_url = match.group('url')
+
+        multirun.dropbox_log = log_url
 
         uploads_ok_state = session \
             .query(model.MultirunState) \

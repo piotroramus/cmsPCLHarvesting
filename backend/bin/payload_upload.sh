@@ -14,6 +14,8 @@ METADATA_FILENAME="$3"
 SCRAM_ARCH="$4"
 CMSSW_RELEASE="$5"
 MULTIRUN_ID="$6"
+LOG_FILE="$7"
+
 
 echo -e "\nStarting to perform the Dropbox upload"
 echo "Multi-run ID: ${MULTIRUN_ID}"
@@ -74,8 +76,8 @@ popd
 
 
 echo "Uploading $CONDITIONS_FILENAME to Dropbox"
-uploadConditions.py $CONDITIONS_FILENAME
-UPLOAD_RC=$?
+uploadConditions.py ${CONDITIONS_FILENAME} 2>&1 | tee ${LOG_FILE}
+UPLOAD_RC=${PIPESTATUS[0]}
 
 echo "Upload exit code: $UPLOAD_RC"
 
