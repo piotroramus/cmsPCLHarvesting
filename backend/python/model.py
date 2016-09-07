@@ -67,6 +67,7 @@ class Multirun(Base):
     state_id = Column(Integer, ForeignKey('multirun_state.id'), nullable=False)
 
     dataset = relationship("Dataset")
+    eos_dirs = relationship("EosDir")
     filenames = relationship("Filename")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
     state = relationship("MultirunState")
