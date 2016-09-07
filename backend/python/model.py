@@ -24,6 +24,18 @@ class Dataset(Base):
         return self.dataset
 
 
+class EosDir(Base):
+    __tablename__ = 'eos_dir'
+
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    eos_dir = Column(String(128), unique=True)
+
+    multirun_id = Column(Integer, ForeignKey('multirun.id'))
+
+    def __repr__(self):
+        return self.eos_dir
+
+
 class Filename(Base):
     __tablename__ = 'filename'
 
