@@ -65,7 +65,7 @@ target/
 *.db
 
 # file with password for voms proxy
-bin/voms.pwd
+backend/bin/voms.pwd
 
 # keeper specific directories
 /logs/
