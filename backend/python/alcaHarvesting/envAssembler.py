@@ -93,6 +93,10 @@ def prepare_multirun_environment(config_file):
         absolute_python_dir_path = os.path.abspath(python_dir_path)
         db_path = os.path.abspath(config['db_path'])
 
+        multirun_dir = multirun.id
+        if multirun.failure_retries > 0 or multirun.no_payload_retries:
+            multirun_dir = "{}_{}p_{}f".format(multirun.id, multirun.no_payload_retries, multirun.failure_retries)
+
         shell_props_file = "shellProperties{}.txt".format(multirun.id)
         logger.info("Creating {} file containing parameters used by various scripts".format(shell_props_file))
         with open(shell_props_file, 'w') as f:
@@ -100,15 +104,16 @@ def prepare_multirun_environment(config_file):
             f.write("CMSSW_RELEASE={}\n".format(multirun.cmssw))
             f.write("SCRAM_ARCH={}\n".format(multirun.scram_arch))
             f.write("MULTIRUN_ID={}\n".format(multirun.id))
+            f.write("MULTIRUN_DIR={}\n".format(multirun_dir))
             f.write("ALCA_CONFIG_FILE={}\n".format(config['alca_config']))
             f.write("JOB_REPORT_FILE={}\n".format(config['job_report']))
             f.write("CMS_RUN_OUTPUT={}\n".format(config['cms_run_output']))
             f.write("MULTIRUN_PROPS_FILE={}\n".format(multirun_props_file))
             f.write("PYTHON_DIR_PATH={}\n".format(absolute_python_dir_path))
             f.write("DQM_UPLOAD_HOST={}\n".format(config['dqm_upload_host']))
-            f.write("DB_PATH={}\n".format(db_path)) # TODO: delete
-            f.write("MAX_RETRIES={}\n".format(config['max_retries']))
-            f.write("ATTEMPT={}\n".format(multirun.retries))
+            f.write("MAX_FAILURE_RETRIES={}\n".format(config['max_failure_retries']))
+            f.write("FAILURE_RETRIES={}\n".format(multirun.failure_retries))
+            f.write("NO_PAYLOAD_RETRIES={}\n".format(multirun.no_payload_retries))
             f.write("CONFIG_FILE={}\n".format(config_file))
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well

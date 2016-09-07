@@ -14,12 +14,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("multirun_id", type=int, help="id of processed multi-run")
-    parser.add_argument("max_retries", type=int, help="number of times which multi-run can be repeated")
     parser.add_argument("config_file", help="path to configuration file")
     args = parser.parse_args()
 
     multirun_id = args.multirun_id
-    max_retries = args.max_retries
     config_file = args.config_file
 
     config = configReader.read(config_file)
@@ -38,8 +36,7 @@ if __name__ == '__main__':
         .one()
     multirun.state = need_more_data_state
 
-    # TODO: might be good to distinguish between 'increasing payload retries' and 'failure retries'
-    logger.info("Increasing number of retries")
-    multirun.retries = multirun.retries + 1
+    logger.info("Increasing number of no-payload-retries")
+    multirun.no_payload_retries = multirun.no_payload_retries_retries + 1
 
     session.commit()

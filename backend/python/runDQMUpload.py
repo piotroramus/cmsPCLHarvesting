@@ -70,12 +70,12 @@ if __name__ == '__main__':
         dqm_filename = 'DQM_V0001_R000999999__{}__{}-{}-{}__ALCAPROMPT.root' \
             .format(primary_dataset, era_wf_ver, min_run, max_run)
 
-        eos_dir = multirun.id
-        if multirun.retries > 0:
-            eos_dir = "{}_{}".format(multirun.id, multirun.retries)
+        multirun_dir = multirun.id
+        if multirun.failure_retries > 0 or multirun.no_payload_retries:
+            multirun_dir = "{}_{}p_{}f".format(multirun.id, multirun.no_payload_retries, multirun.failure_retries)
 
         eos_path = "{}/{}/{}/{}" \
-            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, eos_dir)
+            .format(config['eos_workspace_path'], multirun.scram_arch, multirun.cmssw, multirun_dir)
 
         dqm_file_location = "{}/{}".format(eos_path, dqm_filename)
 

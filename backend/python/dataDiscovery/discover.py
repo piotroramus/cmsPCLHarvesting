@@ -217,7 +217,8 @@ def assembly_multiruns(config, session):
                                     scenario=release['scenario'],
                                     global_tag=release['global_tag'],
                                     perform_payload_upload=payload_upload,
-                                    retries=0,
+                                    no_payload_retries=0,
+                                    failure_retries=0,
                                     state=need_more_data_state)
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code

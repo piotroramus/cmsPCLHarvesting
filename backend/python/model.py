@@ -24,18 +24,6 @@ class Dataset(Base):
         return self.dataset
 
 
-class EosDir(Base):
-    __tablename__ = 'eos_dir'
-
-    id = Column(Integer, Sequence('id'), primary_key=True)
-    eos_dir = Column(String(128), unique=True)
-
-    multirun_id = Column(Integer, ForeignKey('multirun.id'))
-
-    def __repr__(self):
-        return self.eos_dir
-
-
 class Filename(Base):
     __tablename__ = 'filename'
 
@@ -60,13 +48,13 @@ class Multirun(Base):
     scenario = Column(String(64))
     global_tag = Column(String(128))
     perform_payload_upload = Column(Boolean, nullable=False)
-    retries = Column(Integer, nullable=False)
+    no_payload_retries = Column(Integer, nullable=False)
+    failure_retries = Column(Integer, nullable=False)
     dropbox_log = Column(String(256))
     dataset_id = Column(Integer, ForeignKey('dataset.id'))
     state_id = Column(Integer, ForeignKey('multirun_state.id'), nullable=False)
 
     dataset = relationship("Dataset")
-    eos_dirs = relationship("EosDir")
     filenames = relationship("Filename")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
     state = relationship("MultirunState")
@@ -82,12 +70,13 @@ class Multirun(Base):
                 "scenario={}, "
                 "perform_payload_upload={}, "
                 "global_tag={}, "
-                "retries={}, "
+                "no_payload_retries={}, "
+                "failure_retries={}, "
                 "state={}, "
                 "run_numbers={})").format(self.id, self.number_of_events, self.dataset, self.bfield,
                                           self.run_class_name, self.cmssw, self.scram_arch, self.scenario,
-                                          self.global_tag, self.perform_payload_upload, self.retries, self.state,
-                                          self.run_numbers)
+                                          self.global_tag, self.perform_payload_upload, self.no_payload_retries,
+                                          self.failure_retries, self.state, self.run_numbers)
 
 
 class MultirunState(Base):
@@ -121,4 +110,4 @@ class RunInfo(Base):
                 "stream_completed={}, "
                 "used={}, "
                 "used_datasets={})").format(self.number, self.run_class_name, self.bfield, self.start_time,
-                                           self.stream_completed, self.used, self.used_datasets)
+                                            self.stream_completed, self.used, self.used_datasets)

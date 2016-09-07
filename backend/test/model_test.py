@@ -40,7 +40,8 @@ class ModelTest(unittest.TestCase):
         scram_arch = 'slc6_amd64_gcc530'
         scenario = 'ppEra_Run2_2016'
         global_tag = '80X_dataRun2_Express_v10'
-        retries = 0
+        failure_retries = 0
+        no_payload_retries = 0
         run_numbers = []
         dataset = '/A/B/C'
         state = 'processed_ok'
@@ -54,7 +55,8 @@ class ModelTest(unittest.TestCase):
         multirun.scram_arch = scram_arch
         multirun.scenario = scenario
         multirun.global_tag = global_tag
-        multirun.retries = retries
+        multirun.no_payload_retries = no_payload_retries
+        multirun.failure_retries = failure_retries
         multirun.run_numbers = run_numbers
         multirun.dataset = dataset
         multirun.state = state
@@ -72,7 +74,7 @@ class ModelTest(unittest.TestCase):
                              "retries={}, "
                              "state={}, "
                              "run_numbers={})").format(id, number_of_events, dataset, bfield, run_class_name, cmssw,
-                                                       scram_arch, scenario, global_tag, retries, state, run_numbers)
+                                                       scram_arch, scenario, global_tag, no_payload_retries, state, run_numbers)
 
         self.assertEqual(multirun_repr, multirun_expected)
 
