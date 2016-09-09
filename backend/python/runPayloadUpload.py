@@ -101,6 +101,7 @@ if __name__ == '__main__':
         match = re.match(r'.*(?P<url>http.*)', log)
         log_url = match.group('url')
 
+        logger.info("Setting Dropbox Log URL to {}".format(log_url))
         multirun.dropbox_log = log_url
 
         uploads_ok_state = session \
