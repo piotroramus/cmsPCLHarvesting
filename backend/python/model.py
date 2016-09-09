@@ -69,6 +69,7 @@ class Multirun(Base):
     dataset = relationship("Dataset")
     eos_dirs = relationship("EosDir")
     filenames = relationship("Filename")
+    processing_times = relationship("ProcessingTime")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
     state = relationship("MultirunState")
 
@@ -100,6 +101,19 @@ class MultirunState(Base):
 
     def __repr__(self):
         return self.state
+
+
+class ProcessingTime(Base):
+    __tablename__ = 'processing_time'
+
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    start_time = Column(DateTime)
+    end_time = Column(DateTime)
+
+    multirun_id = Column(Integer, ForeignKey('multirun.id'))
+
+    def __repr__(self):
+        return "[{} - {}]".format(self.start_time, self.end_time)
 
 
 class RunInfo(Base):

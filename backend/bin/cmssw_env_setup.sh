@@ -94,9 +94,15 @@ mv $PROPERTIES_FILE_PWD .
 # create cmsRun config for AlCaHarvesting step
 python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE $ALCA_CONFIG_FILE $JOB_REPORT_FILE
 
+# update multi-run processing start time
+python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE start
+
 # run the AlCaHarvesting step
 cmsRun -j $JOB_REPORT_FILE $ALCA_CONFIG_FILE 2>&1 | tee $CMS_RUN_OUTPUT
 CMS_RUN_RESULT=${PIPESTATUS[0]}
+
+# update multi-run processing end time
+python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE end
 
 # I was just wondering how is it possible, that cmsRun can return something > 255
 # while it is not feasible on an unix-based OS
