@@ -1,0 +1,19 @@
+[2016-09-09 10:15:56,818] INFO: Checking promptCalibConditions134713...
+[2016-09-09 10:15:56,824] INFO: cms-conddb-prod.cern.ch: Signing in user poramus ...
+[2016-09-09 10:15:57,042] INFO: cms-conddb-dev.cern.ch: Signing in user poramus ...
+[2016-09-09 10:15:57,379] INFO: cms-conddb-dev.cern.ch: promptCalibConditions134713: Uploading file (dae802279a54a15afb76a6f64e42945086969fc9, size 312331) to the online backend...
+[2016-09-09 10:15:57,510] ERROR: Error from uploading: {
+  "error": "ERR: fileHash dae802279a54a15afb76a6f64e42945086969fc9 already in state Uploaded \n", 
+  "upload": "ERROR"
+}
+[2016-09-09 10:15:57,511] ERROR: found tag promptCalibConditions134713 failed to upload. reason: 
+ ... 	{
+  "error": "ERR: fileHash dae802279a54a15afb76a6f64e42945086969fc9 already in state Uploaded \n", 
+  "upload": "ERROR"
+} 
+[2016-09-09 10:15:57,513] ERROR: tags FAILed  to upload   : [u'promptCalibConditions134713'] 
+[2016-09-09 10:15:57,513] INFO: file log at: https://cms-conddb-dev.cern.ch/logs/dropBox/getFileLog?fileHash=dae802279a54a15afb76a6f64e42945086969fc9
+[2016-09-09 10:15:57,515] INFO: cms-conddb-prod.cern.ch: Signing in user poramus ...
+[2016-09-09 10:15:57,696] INFO: cms-conddb-prod.cern.ch: Signing out...
+{'status': 1, 'files': {'promptCalibConditions134713.db': False}}
+upload ended with code: 1

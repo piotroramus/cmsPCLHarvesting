@@ -86,11 +86,6 @@ if __name__ == '__main__':
 
         result = subprocess.call(cmd, shell=True)
 
-        if result != 0:
-            multirun.state = dropbox_failed_state
-            session.commit()
-            sys.exit(1)
-
         logger.info("Collecting log URL from the log file...")
         log = None
         with open(log_file, 'r') as f:
@@ -103,6 +98,11 @@ if __name__ == '__main__':
 
         logger.info("Setting Dropbox Log URL to {}".format(log_url))
         multirun.dropbox_log = log_url
+
+        if result != 0:
+            multirun.state = dropbox_failed_state
+            session.commit()
+            sys.exit(1)
 
         uploads_ok_state = session \
             .query(model.MultirunState) \
