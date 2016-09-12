@@ -4,7 +4,7 @@ rrapi_url: http://vocms00169:2113
 dbsapi_url: /dbs/prod/global/DBSReader/
 
 # whether to use RunRegistry API in version 3 (old one, but v4 sometimes crashes)
-use_rrapi_v3: False
+use_rrapi_v3: True
 rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
 
 # which database to use
@@ -37,7 +37,7 @@ cms_run_output: cmsRunOutput.txt
 dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
 
 # how far in the past should we look for new runs
-days_old_runs: 3
+days_old_runs: 7
 
 # how many days to wait for the express stream for the run to be completed
 # if the strem is not completed after given number of days, run will not be included in any multi-run

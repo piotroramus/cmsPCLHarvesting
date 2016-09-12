@@ -36,7 +36,20 @@ def to_be_uploaded(dataset, config):
     return False
 
 
+def previous_runs_completed(run_number, incomplete_runs):
+    for run in incomplete_runs:
+        if run < run_number:
+            return False
+    return True
+
+
 def update_runs(logger, session, t0api, config, local_runs, recent_runs):
+    # stream_completed for run will be True only if according to Tier0API
+    # given run has stream completed AND all the previous runs are completed too
+    #
+    # this is because sometimes short runs with lower numbers are completed before the earlier longer ones
+    # in consequence multi-runs could consist of non-contiguous runs which should not be allowed
+
     stream_timeout = datetime.date \
         .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
         .strftime("%Y-%m-%d")
@@ -57,7 +70,8 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
             logger.debug(
                 "Run {} already exists in local database but the stream was not completed".format(run[u'runnumber']))
 
-            if t0api.run_stream_completed(run[u'runnumber']):
+            if t0api.run_stream_completed(run[u'runnumber']) and \
+                    previous_runs_completed(run[u'runumber'], incomplete_stream_runs):
                 logger.info(
                     "Stream for run {} is now completed. It can be thus included in multi-runs".format(
                         run[u'runnumber']))
@@ -66,7 +80,8 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
             else:
                 logger.debug("Stream for run {} is still not completed".format(run[u'runnumber']))
                 if run[u'starttime'] < stream_timeout:  # TODO: test
-                    logger.warning("Stream for run {} is not completed for {} days now.".format(run[u'runnumber'], config['run_stream_timeout']))
+                    logger.warning("Stream for run {} is not completed for {} days now.".
+                                   format(run[u'runnumber'], config['run_stream_timeout']))
                     logger.warning("Run will be processed with the data it has for the moment")
                     timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'runnumber']).one()
                     timedout_run.stream_timeout = True
@@ -77,6 +92,8 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
             stream_completed = t0api.run_stream_completed(run[u'runnumber'])
             if stream_completed != -1:
                 logger.info("New run: {}".format(run[u'runnumber']))
+                if stream_completed and not previous_runs_completed(run[u'runnumber'], incomplete_stream_runs):
+                    stream_completed = False
                 start = datetime.datetime.strptime(run[u'starttime'], "%Y-%m-%d %H:%M:%S")
                 run_info = RunInfo(number=run[u'runnumber'], run_class_name=run[u'runClassName'], bfield=run[u'bfield'],
                                    start_time=start, stream_completed=stream_completed, stream_timeout=False,
