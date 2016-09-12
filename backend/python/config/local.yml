@@ -7,17 +7,22 @@ dbsapi_url: /dbs/prod/global/DBSReader/
 use_rrapi_v3: False
 rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
 
-# path to database containing all the harvesting information
-db_path: test.db
+# which database to use
+# oracle - should be default choice
+# sqlite - useful for development/debugging
+db_vendor: sqlite
 
-# where to copy files after processing has been done
-eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/local
+# path to sqlite DB file (when of using one)
+sqlite_db_path: test.db
 
 # location of file containing TNS for Oracle
 tns_file: /pclmh/tnsnames.ora
 
 # path to file containing Oracle DB credentials
 oracle_secret: /pclmh/.oracle
+
+# where to copy files after processing has been done
+eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/local
 
 # name of file containing AlCa Harvesting config
 alca_config: alcaConfig.py
@@ -36,7 +41,7 @@ days_old_runs: 3
 
 # how many days to wait for the express stream for the run to be completed
 # if the strem is not completed after given number of days, run will not be included in any multi-run
-run_stream_timeout: 3
+run_stream_timeout: 2
 
 # how many events multirun should contain to be qualified as ready to start
 events_threshold: 100000
