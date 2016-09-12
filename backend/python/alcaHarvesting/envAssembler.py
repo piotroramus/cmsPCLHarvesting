@@ -50,7 +50,7 @@ def prepare_multirun_environment(config_file):
 
     config = configReader.read(config_file)
 
-    connection_string = dbConnection.oracle_connection_string(config)
+    connection_string = dbConnection.get_connection_string(config)
     engine = create_engine(connection_string, echo=False)
     Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)

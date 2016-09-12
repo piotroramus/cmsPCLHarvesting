@@ -12,7 +12,7 @@ def prepopulate(config):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    connection_string = dbConnection.oracle_connection_string(config)
+    connection_string = dbConnection.get_connection_string(config)
     engine = create_engine(connection_string, echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sessionmaker(bind=engine)

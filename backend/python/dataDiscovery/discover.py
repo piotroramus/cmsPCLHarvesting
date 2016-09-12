@@ -66,7 +66,7 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
             else:
                 logger.debug("Stream for run {} is still not completed".format(run[u'runnumber']))
                 if run[u'starttime'] < stream_timeout:  # TODO: test
-                    logger.warning("Stream for run {} is not completed for {} days now.")
+                    logger.warning("Stream for run {} is not completed for {} days now.".format(run[u'runnumber'], config['run_stream_timeout']))
                     logger.warning("Run will be processed with the data it has for the moment")
                     timedout_run = session.query(RunInfo).filter(RunInfo.number == run[u'runnumber']).one()
                     timedout_run.stream_timeout = True

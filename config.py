@@ -40,8 +40,8 @@ class Config():
     config = dict()
     config['tns_file'] = '/pclmh/tnsnames.ora'
     config['oracle_secret'] = '/pclmh/.oracle'
-    SQLALCHEMY_DATABASE_URI = dbConnection.oracle_connection_string(config)
-    # SQLALCHEMY_DATABASE_URI = "sqlite:////pclmh/data/database.db"
+    SQLALCHEMY_DATABASE_URI = dbConnection.get_connection_string(config)
+
     LOG_DB  = getConnections( 'logDB' )
     DEST_DB = getConnections( 'destDB' ).replace('oracle://','').replace(':', '/')     # 'cms_orcoff_prep/<pwd>@CMS_CONDITIONS_002'
     # RUN_INFO_DB = getConnections( 'runInfoDB' ) # 'oracle://cms_orcon_adg/CMS_CONDITIONS'

@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     config = configReader.read(config_file)
 
-    connection_string = dbConnection.oracle_connection_string(config)
+    connection_string = dbConnection.get_connection_string(config)
     engine = sqlalchemy.create_engine(connection_string, echo=False)
     model.Base.metadata.create_all(engine, checkfirst=True)
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
