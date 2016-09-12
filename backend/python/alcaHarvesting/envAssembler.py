@@ -91,7 +91,6 @@ def prepare_multirun_environment(config_file):
         script_path = os.path.dirname(os.path.realpath(__file__))
         python_dir_path = script_path.replace("/alcaHarvesting", "")
         absolute_python_dir_path = os.path.abspath(python_dir_path)
-        db_path = os.path.abspath(config['db_path'])
 
         multirun_dir = multirun.id
         if multirun.failure_retries > 0 or multirun.no_payload_retries:
