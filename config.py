@@ -1,6 +1,7 @@
 import os
 
 from keeperService import getConnections, getEncryptionString
+from backend.python.utils import dbConnection
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -11,6 +12,7 @@ class Config():
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_RECORD_QUERIES = True
+    SQLALCHEMY_POOL_RECYCLE = 7200 #2 hours
 
     MAIL_SERVER = 'smtp.cern.ch'
     MAIL_PORT = 587
@@ -34,7 +36,12 @@ class Config():
 
     # get some DB connections from the secrets file (as they may contain credentials):
     # SQLALCHEMY_DATABASE_URI = getConnections( 'userDB' )
-    SQLALCHEMY_DATABASE_URI = "sqlite:////pclmh/data/database.db"
+
+    config = dict()
+    config['tns_file'] = '/pclmh/tnsnames.ora'
+    config['oracle_secret'] = '/pclmh/.oracle'
+    SQLALCHEMY_DATABASE_URI = dbConnection.oracle_connection_string(config)
+    # SQLALCHEMY_DATABASE_URI = "sqlite:////pclmh/data/database.db"
     LOG_DB  = getConnections( 'logDB' )
     DEST_DB = getConnections( 'destDB' ).replace('oracle://','').replace(':', '/')     # 'cms_orcoff_prep/<pwd>@CMS_CONDITIONS_002'
     # RUN_INFO_DB = getConnections( 'runInfoDB' ) # 'oracle://cms_orcon_adg/CMS_CONDITIONS'
