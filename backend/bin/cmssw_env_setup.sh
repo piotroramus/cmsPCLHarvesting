@@ -20,7 +20,7 @@ function upload_available_files() {
             eos cp --preserve --checksum $file $EOS_MULTIRUN_WORKSPACE
             RC=$?
             if [ $RC -ne 0 ]; then
-                echo "ERROR: Uploading of $file to EOS resulted in an error"
+                echo "ERROR: Uploading of $file to EOS resulted in an error ${RC}"
                 exit $RC
             fi
             echo "Uploaded $file to $EOS_MULTIRUN_WORKSPACE"
