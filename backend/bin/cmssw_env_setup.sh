@@ -111,8 +111,8 @@ python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE end
 echo "cmsRun return code: $CMS_RUN_RESULT"
 if [[ $CMS_RUN_RESULT != 0 ]]; then
     echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
-    upload_available_files
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+    upload_available_files
     exit $CMS_RUN_RESULT
 fi
 
@@ -126,15 +126,15 @@ python $PYTHON_DIR_PATH/createMetadata.py $JOB_REPORT_FILE $METADATA_FILE $MULTI
 root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
 if [ $root_files_count -lt 1 ]; then
     echo "DQM file is missing!"
-    upload_available_files
     echo "Preparing for retrying the processing..."
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+    upload_available_files
     exit 1
 elif [ $root_files_count -gt 1 ]; then
     echo "More than one DQM file!"
-    upload_available_files
     echo "Preparing for retrying the processing..."
     python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+    upload_available_files
     exit 1
 fi
 
@@ -142,9 +142,9 @@ fi
 for file in ${FILES_TO_SAVE[@]}; do
     if [ ! -f $file ]; then
         echo "Error: $file does not exists"
-        upload_available_files
         echo "Preparing for retrying the processing..."
         python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+        upload_available_files
         exit 1
     fi
 done
@@ -162,9 +162,9 @@ else
     echo "Payload has been produced"
 fi
 
-upload_available_files
-
 # mark multirun as processed
 python $PYTHON_DIR_PATH/markAsProcessed.py $MULTIRUN_ID $CONFIG_FILE
+
+upload_available_files
 
 echo -e "\nJob finished for multi-run $MULTIRUN_ID\n"
