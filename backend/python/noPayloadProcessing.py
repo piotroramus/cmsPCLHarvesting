@@ -37,6 +37,6 @@ if __name__ == '__main__':
     multirun.state = need_more_data_state
 
     logger.info("Increasing number of no-payload-retries")
-    multirun.no_payload_retries = multirun.no_payload_retries_retries + 1
+    multirun.no_payload_retries = multirun.no_payload_retries + 1
 
     session.commit()
