@@ -62,7 +62,7 @@ function upload() {
 
 
     echo "Uploading $CONDITIONS_FILENAME to Dropbox"
-#    uploadConditions.py ${CONDITIONS_FILENAME} 2>&1 | tee ${LOG_FILE}
+    uploadConditions.py ${CONDITIONS_FILENAME} 2>&1 | tee ${LOG_FILE}
     UPLOAD_RC=${PIPESTATUS[0]}
 
     echo "Upload exit code: $UPLOAD_RC"
