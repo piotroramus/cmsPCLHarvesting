@@ -26,9 +26,11 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('netrc', help='path to .netrc file containing dropbox credentials')
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
     args = parser.parse_args()
 
+    netrc = args.netrc
     config_file = None
     if args.config:
         config_file = args.config
@@ -81,7 +83,7 @@ if __name__ == '__main__':
         script_path = os.path.dirname(os.path.realpath(__file__))
         payload_script_path = script_path.replace("/python", "/bin/payload_upload.sh")
         log_file = "{}/dropbox_upload_log.txt".format(os.getcwd())
-        cmd = "{} {} {} {} {} {} {} {}".format(payload_script_path, eos_path, conditions_filename, metadata_filename,
+        cmd = "{} {} {} {} {} {} {} {} {}".format(netrc, payload_script_path, eos_path, conditions_filename, metadata_filename,
                                                multirun.scram_arch, multirun.cmssw, multirun.id, log_file)
 
         result = subprocess.call(cmd, shell=True)
