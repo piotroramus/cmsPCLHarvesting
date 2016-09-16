@@ -62,7 +62,7 @@ function upload() {
 
 
     echo "Uploading $CONDITIONS_FILENAME to Dropbox"
-    uploadConditions.py ${CONDITIONS_FILENAME} 2>&1 | tee ${LOG_FILE}
+#    uploadConditions.py ${CONDITIONS_FILENAME} 2>&1 | tee ${LOG_FILE}
     UPLOAD_RC=${PIPESTATUS[0]}
 
     echo "Upload exit code: $UPLOAD_RC"
@@ -84,7 +84,7 @@ MULTIRUN_ID="$7"
 LOG_FILE="$8"
 
 
-NETRC_BACKUP=.netrcbackup
+NETRC_BACKUP=${HOME}/.netrcbackup
 ORIG_NETRC=${HOME}/.netrc
 
 if [ -f ${ORIG_NETRC} ]; then
@@ -102,7 +102,7 @@ if [ -f ${ORIG_NETRC} ]; then
 
     exit ${UPLOAD_RESULT}
 else
-	echo ".netrc file does not exists"
+	echo ".netrc file does not exists, for the time of upload a temporary one will be provided"
 	cp ${NETRC_FILE} ${ORIG_NETRC}
 
     upload

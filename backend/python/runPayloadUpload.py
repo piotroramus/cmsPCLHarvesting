@@ -89,17 +89,21 @@ if __name__ == '__main__':
         result = subprocess.call(cmd, shell=True)
 
         logger.info("Collecting log URL from the log file...")
-        log = None
-        with open(log_file, 'r') as f:
-            for line in f:
-                if re.search('file log at', line):
-                    log = line
 
-        match = re.match(r'.*(?P<url>http.*)', log)
-        log_url = match.group('url')
+        if not os.path.isfile(log_file):
+            logger.error("Log file does not exists!")
+        else:
+            log = None
+            with open(log_file, 'r') as f:
+                for line in f:
+                    if re.search('file log at', line):
+                        log = line
 
-        logger.info("Setting Dropbox Log URL to {}".format(log_url))
-        multirun.dropbox_log = log_url
+            match = re.match(r'.*(?P<url>http.*)', log)
+            log_url = match.group('url')
+
+            logger.info("Setting Dropbox Log URL to {}".format(log_url))
+            multirun.dropbox_log = log_url
 
         if result != 0:
             multirun.state = dropbox_failed_state
