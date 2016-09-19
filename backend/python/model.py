@@ -73,6 +73,31 @@ class Multirun(Base):
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
     state = relationship("MultirunState")
 
+    def to_json(self):
+        return {
+            'id': self.id,
+            'number_of_events': self.number_of_events,
+            'bfield': self.bfield,
+            'run_class_name': self.run_class_name,
+            'cmssw': self.cmssw,
+            'scram_arch': self.scram_arch,
+            'scenario': self.scenario,
+            'global_tag': self.global_tag,
+            'perform_payload_upload': self.perform_payload_upload,
+            'no_payload_retries': self.no_payload_retries,
+            'failure_retries': self.failure_retries,
+            'dropbox_log': self.dropbox_log,
+            'dataset': self.dataset.dataset,
+            'eos_dirs': self.__eos_dirs_json(),
+            'state': self.state.state,
+        }
+
+    def __eos_dirs_json(self):
+        dirs = list()
+        for eos_dir in self.eos_dirs:
+            dirs.append(eos_dir.eos_dir)
+        return dirs
+
     def __repr__(self):
         return ("Multirun(id={}, "
                 "number_of_events={}, "
