@@ -108,3 +108,13 @@ def display():
     for multirun in multiruns:
         multirun.eos_dir = create_eos_path(multirun)
     return render_template('multirun_table.html', multiruns=multiruns)
+
+@app.route('/m/')
+def multirun_new():
+    return app.send_static_file('templates/index.html')
+
+@app.route('/get_multiruns/')
+def get_multiruns():
+    data = get_data()
+    j = [m.to_json() for m in data]
+    return jsonify(json_list=j)
