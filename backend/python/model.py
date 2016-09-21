@@ -89,14 +89,25 @@ class Multirun(Base):
             'dropbox_log': self.dropbox_log,
             'dataset': self.dataset.dataset,
             'eos_dirs': self.__eos_dirs_json(),
+            'processing_times': self.__processing_times_json(),
+            'runs': self.__runs__json(),
             'state': self.state.state,
         }
 
     def __eos_dirs_json(self):
-        dirs = list()
-        for eos_dir in self.eos_dirs:
-            dirs.append(eos_dir.eos_dir)
-        return dirs
+        return [ed.eos_dir for ed in self.eos_dirs]
+
+    def __processing_times_json(self):
+        times = list()
+        for t in self.processing_times:
+            single_entry = list()
+            single_entry.append(t.start_time)
+            single_entry.append(t.end_time)
+            times.append(single_entry)
+        return times
+
+    def __runs__json(self):
+        return [r.to_json() for r in self.run_numbers]
 
     def __repr__(self):
         return ("Multirun(id={}, "
@@ -153,6 +164,11 @@ class RunInfo(Base):
     used = Column(Boolean)
 
     used_datasets = relationship("Dataset", secondary=run_dataset_assoc)
+
+    def to_json(self):
+        return {
+            'number': self.number,
+        }
 
     def __repr__(self):
         return ("RunInfo(number={}, "
