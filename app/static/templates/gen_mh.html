@@ -1,0 +1,90 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multirun Harvesting Overview</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/sandstone/bootstrap.min.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+    <link href="/static/css/gen_mh.css" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="/static/js/gen_mh.js"></script>
+
+</head>
+<body>
+
+
+<div class="opaque">
+    <div class="container" ng-app="multirunApp" ng-controller="mainController" ng-init="getData()">
+
+
+        <div class="header">
+            <div class="alert alert-info">
+                <p>Search Query: {{ searchMultirun }}</p>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon"><i class="fa fa-search"></i></div>
+
+                        <input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">
+
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="maincontent">
+            <div class="sidebar">
+                <h2>Display columns</h2>
+                <div>
+                    <ul class="unstyled">
+                        <li ng-repeat="(id, col) in columns">
+                            <label class="checkbox">
+                                <input type="checkbox" ng-model="col['show']">
+                                <span class="done-{{column.checked}}">{{col['name']}}</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="multiruntab">
+                <table class="table table-bordered table-striped">
+
+                    <thead>
+                    <tr>
+
+                        <td ng-repeat="(id, col) in columns" ng-show="col['show']">
+                            <a href="#" ng-click="sortBy(id)">
+                                {{ col['name'] }}
+                                <span ng-show="sortPredicate == id && !sortReverse" class="fa fa-caret-down"></span>
+                                <span ng-show="sortPredicate == id && sortReverse" class="fa fa-caret-up"></span>
+                            </a>
+                        </td>
+
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr ng-repeat="m in multiruns | orderBy:sortPredicate:sortReverse | filter:searchMultirun">
+                        <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']">{{ m[id] }}</td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+</body>
+</html>

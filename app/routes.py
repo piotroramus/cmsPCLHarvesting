@@ -111,7 +111,11 @@ def display():
 
 @app.route('/m/')
 def multirun_new():
-    return app.send_static_file('templates/index.html')
+    return app.send_static_file('templates/main.html')
+
+@app.route('/g/')
+def gen_mh():
+    return app.send_static_file('templates/gen_mh.html')
 
 @app.route('/get_multiruns/')
 def get_multiruns():

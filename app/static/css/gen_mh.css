@@ -1,0 +1,16 @@
+.maincontent {
+    display: flex;
+}
+
+.sidebar {
+    flex: 1;
+}
+
+.multiruntab {
+    flex: 8;
+}
+
+.opaque {
+    display: flex;
+    flex-direction: column;
+}
