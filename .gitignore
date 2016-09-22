@@ -67,3 +67,6 @@ target/
 # keeper specific directories
 /logs/
 venv/
+
+# Oracle tnsnames file
+tnsnames.ora
