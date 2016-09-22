@@ -15,8 +15,8 @@ db_vendor: sqlite
 # path to sqlite DB file (when of using one)
 sqlite_db_path: test.db
 
-# location of file containing TNS for Oracle
-tns_file: /pclmh/tnsnames.ora
+# name of Oracle Database registered in CERN tnsnames.ora file
+oracle_db: devdb12
 
 # path to file containing Oracle DB credentials
 oracle_secret: /pclmh/.oracle
