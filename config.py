@@ -39,7 +39,7 @@ class Config():
 
     config = dict()
     config['db_vendor'] = 'oracle'
-    config['tns_file'] = '/pclmh/tnsnames.ora'
+    config['oracle_db'] = 'devdb12'
     config['oracle_secret'] = '/pclmh/.oracle'
     SQLALCHEMY_DATABASE_URI = dbConnection.get_connection_string(config)
 
