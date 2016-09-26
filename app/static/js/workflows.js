@@ -71,19 +71,24 @@ angular.module('multirunApp', [])
     'run_class_name': {
         'name': 'Run Class Name',
         'show': false
-    }
-  }
-
-  $scope.showColumn = {
-        'id': true,
-        'dataset': true,
-        'state': true
+    },
+    'processing_times': {
+        'name': 'Processing Times',
+        'show': false
+    },
+    'runs': {
+        'name': 'Runs',
+        'show': false
+    },
   }
 
    $scope.getData = function() {
     $http({method: 'GET', url: '/multiruns_by_workflow/'})
         .success(function(data, status) {
             $scope.multiruns = data['json_list'];
+            for (var i = 0; i < $scope.multiruns.length; i++) {
+                $scope.multiruns[i]["details"] = false;
+            }
             console.log($scope.multiruns)
         })
         .error(function(data, status) {
@@ -112,5 +117,15 @@ angular.module('multirunApp', [])
         return {
             "background-color": $scope.stateColors[state]
         };
+  }
+
+  $scope.visibleCols = function() {
+        // 1 is for the button column which is not in the columns definitions
+        var visibleCounter = 1;
+        for (var id in $scope.columns){
+
+            if ($scope.columns[id]['show'] === true) visibleCounter++;
+        }
+        return visibleCounter;
   }
 });
