@@ -71,7 +71,7 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
                 "Run {} already exists in local database but the stream was not completed".format(run[u'runnumber']))
 
             if t0api.run_stream_completed(run[u'runnumber']) and \
-                    previous_runs_completed(run[u'runumber'], incomplete_stream_runs):
+                    previous_runs_completed(run[u'runnumber'], incomplete_stream_runs):
                 logger.info(
                     "Stream for run {} is now completed. It can be thus included in multi-runs".format(
                         run[u'runnumber']))
