@@ -1,0 +1,91 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multirun Harvesting Overview</title>
+
+    <!-- CSS -->
+    <link href="/static/css/workflows.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/sandstone/bootstrap.min.css">
+
+    <!-- JS -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="/static/js/workflows.js"></script>
+
+</head>
+<body style="margin: 20px">
+
+
+<div class="opaque">
+    <div class="container" ng-app="multirunApp" ng-controller="mainController" ng-init="getData()">
+
+
+        <div class="header">
+            <div class="alert alert-info">
+                <p>Search Query: {{ searchMultirun }}</p>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon"><i class="fa fa-search"></i></div>
+
+                        <input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">
+
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <ul>
+            <li ng-repeat="(id, col) in columns" class="flexli">
+                <label class="checkbox flexlabel">
+                    <input type="checkbox" ng-model="col['show']">
+                    {{col['name']}}
+                </label>
+            </li>
+        </ul>
+
+
+        <div class="multiruntab" style="overflow-x:auto">
+
+            <div ng-repeat="(workflow, mrns) in multiruns">
+
+                <h2>{{ workflow }}</h2>
+                <table class="table table-bordered table-striped">
+
+                    <thead>
+                    <tr>
+
+                        <td ng-repeat="(id, col) in columns" ng-show="col['show']">
+                            <a href="#" ng-click="sortBy(id)">
+                                {{ col['name'] }}
+                                <span ng-show="sortPredicate == id && !sortReverse" class="fa fa-caret-down"></span>
+                                <span ng-show="sortPredicate == id && sortReverse" class="fa fa-caret-up"></span>
+                            </a>
+                        </td>
+
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr ng-repeat="m in mrns | orderBy:sortPredicate:sortReverse | filter:searchMultirun"
+                        ng-style="{{rowColor(m['state'])}}">
+                        <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']"
+                            ng-style="{{rowColor(m['state'])}}">{{ m[id] }}
+                        </td>
+                    </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+</body>
+</html>

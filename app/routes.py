@@ -135,6 +135,10 @@ def multirun_new():
 def gen_mh():
     return app.send_static_file('templates/gen_mh.html')
 
+@app.route('/w/')
+def w_mh():
+    return app.send_static_file('templates/workflows.html')
+
 
 @app.route('/multiruns/')
 def get_multiruns():

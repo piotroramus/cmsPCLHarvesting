@@ -1,0 +1,29 @@
+.multiruntab {
+    display: flex;
+    flex-direction: column;
+}
+
+.opaque {
+    display: flex;
+    flex-direction: column;
+}
+
+ul {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+}
+
+li{
+    display: flex;
+    flex-direction: row;
+    flex: 8;
+}
+
+input[type=checkbox]{
+    margin-right: 5;
+    margin-left: 0;
+    height: 15px;
+    width: 15px;
+    flex: 1;
+}
