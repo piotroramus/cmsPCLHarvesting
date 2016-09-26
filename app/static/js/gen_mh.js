@@ -12,12 +12,24 @@ angular.module('multirunApp', [])
         'name': 'ID',
         'show': true
     },
+    'state': {
+        'name': 'State',
+        'show': true
+    },
     'dataset': {
         'name': 'Dataset',
         'show': true
     },
-    'state': {
-        'name': 'State',
+    'failure_retries': {
+        'name': 'Failure Retries',
+        'show': true
+    },
+    'no_payload_retries': {
+        'name': 'No payload retries',
+        'show': true
+    },
+    'perform_payload_upload': {
+        'name': 'Payload upload',
         'show': true
     },
     'bfield': {
@@ -36,14 +48,6 @@ angular.module('multirunApp', [])
         'name': 'EOS directories',
         'show': true
     },
-    'failure_retries': {
-        'name': 'Failure Retries',
-        'show': true
-    },
-    'no_payload_retries': {
-        'name': 'No payload retries',
-        'show': true
-    },
     'global_tag': {
         'name': 'Global Tag',
         'show': false
@@ -56,10 +60,6 @@ angular.module('multirunApp', [])
         'name': 'No payload retries',
         'show': true
     },
-    'perform_payload_upload': {
-        'name': 'Payload upload',
-        'show': true
-    },
     'scram_arch': {
         'name': 'SCRAM architecture',
         'show': false
@@ -69,7 +69,7 @@ angular.module('multirunApp', [])
         'show': false
     },
     'run_class_name': {
-        'name': 'RunClassName',
+        'name': 'Run Class Name',
         'show': false
     }
   }
@@ -81,7 +81,7 @@ angular.module('multirunApp', [])
   }
 
    $scope.getData = function() {
-    $http({method: 'GET', url: '/get_multiruns/'})
+    $http({method: 'GET', url: '/multiruns/'})
         .success(function(data, status) {
             $scope.multiruns = data['json_list'];
             console.log($scope.multiruns)
@@ -95,4 +95,22 @@ angular.module('multirunApp', [])
     $scope.sortReverse = ($scope.sortPredicate === sortPredicate) ? !$scope.sortReverse : false;
     $scope.sortPredicate = sortPredicate;
   };
+
+  $scope.stateColors = {
+    'need_more_data' : "#DCE775",
+    'ready' : "#81D4FA",
+    'processing' : "#80CBC4",
+    'processed_ok' : "90CAF9",
+    'processing_failed' : "#E57373",
+    'dqm_upload_ok' : "#FFE082",
+    'dqm_upload_failed' : "#CE93D8",
+    'dropbox_upload_failed' : "#F48FB1",
+    'uploads_ok' : "#FFCC80",
+  }
+
+  $scope.rowColor = function(state) {
+        return {
+            "background-color": $scope.stateColors[state]
+        };
+  }
 });
