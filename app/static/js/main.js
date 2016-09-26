@@ -14,7 +14,7 @@ angular.module('multirunApp', [])
   }
 
    $scope.getData = function() {
-    $http({method: 'GET', url: '/get_multiruns/'})
+    $http({method: 'GET', url: '/multiruns/'})
         .success(function(data, status) {
             $scope.multiruns = data['json_list'];
             console.log($scope.multiruns)

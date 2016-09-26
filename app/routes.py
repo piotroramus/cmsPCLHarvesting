@@ -1,4 +1,4 @@
-import os 
+import os
 import subprocess
 
 from app import db
@@ -15,8 +15,12 @@ from os.path import join
 from .models import User
 
 from backend.python import model
+from backend.python.utils.workflows import extract_workflow
+
 from flask_httpauth import HTTPBasicAuth
+
 auth = HTTPBasicAuth()
+
 
 # This app relies on authentication being done in the frontend process via SSO.
 
@@ -29,15 +33,18 @@ def index():
     # return render_template('index.html', lastUpdate=datetime.utcnow(), gitInfo=gitInfo)
     return redirect(url_for('display'))
 
+
 @app.route('/heartbeat')
 def heartbeat():
-    gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
-    return jsonify( {'lastUpdate' : datetime.utcnow(), 'gitInfo' : gitInfo } )
+    gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell=True)
+    return jsonify({'lastUpdate': datetime.utcnow(), 'gitInfo': gitInfo})
+
 
 # a simple "echo" method
 @app.route('/echo/<string:what>', methods=['POST'])
 def echo(what):
-    return jsonify( { 'echo' : str(what) } )
+    return jsonify({'echo': str(what)})
+
 
 # --- error handlers
 
@@ -47,29 +54,36 @@ def unauthorized():
     # auth dialog
     return make_response(jsonify({'message': 'Unauthorized access'}), 403)
 
+
 @app.errorhandler(400)
 def bad_request(error):
     return make_response(jsonify({'message': 'Bad request'}), 400)
+
 
 @app.errorhandler(404)
 def not_found(error):
     return error404()
 
+
 @app.errorhandler(409)
 def integration_error(error):
     return make_response(jsonify({'message': 'Duplicate entry'}), 409)
 
+
 @app.errorhandler(500)
 def internal_error(error):
     return make_response(jsonify({'message': 'Internal server error'}), 500)
+
 
 # --- utilities
 
 def success():
     return make_response(jsonify({'success': True}), 200)
 
+
 def error404():
     return make_response(jsonify({'message': 'Not found'}), 404)
+
 
 def run_in_shell(*popenargs, **kwargs):
     process = subprocess.Popen(*popenargs, stdout=subprocess.PIPE, **kwargs)
@@ -81,6 +95,7 @@ def run_in_shell(*popenargs, **kwargs):
     if returnCode:
         raise subprocess.CalledProcessError(returnCode, cmd)
     return stdout
+
 
 def get_data():
     return db.session.query(model.Multirun).all()
@@ -95,13 +110,14 @@ def create_eos_path(multirun):
         paths.append(path)
     return paths
 
+
 #
 @app.route('/test/')
 def test():
     print get_data()
     return "response"
-#
-#
+
+
 @app.route('/display/')
 def display():
     multiruns = get_data()
@@ -109,16 +125,34 @@ def display():
         multirun.eos_dir = create_eos_path(multirun)
     return render_template('multirun_table.html', multiruns=multiruns)
 
+
 @app.route('/m/')
 def multirun_new():
     return app.send_static_file('templates/main.html')
+
 
 @app.route('/g/')
 def gen_mh():
     return app.send_static_file('templates/gen_mh.html')
 
-@app.route('/get_multiruns/')
+
+@app.route('/multiruns/')
 def get_multiruns():
     data = get_data()
     j = [m.to_json() for m in data]
     return jsonify(json_list=j)
+
+
+@app.route('/multiruns_by_workflow/')
+def get_multiruns_by_workflow():
+    data = get_data()
+    m_by_workflows = dict()
+    for multirun in data:
+        m_json = multirun.to_json()
+        workflow = extract_workflow(multirun.dataset.dataset)
+        if not workflow in m_by_workflows:
+            m_by_workflows[workflow] = [m_json]
+        else:
+            m_by_workflows[workflow].append(m_json)
+
+    return jsonify(json_list=m_by_workflows)
