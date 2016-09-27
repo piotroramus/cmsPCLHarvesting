@@ -36,8 +36,8 @@
             </form>
         </div>
 
-        <ul>
-            <li ng-repeat="(id, col) in columns" class="flexli">
+        <ul class="ulflex">
+            <li ng-repeat="(id, col) in columns" class="liflex">
                 <label class="checkbox flexlabel">
                     <input type="checkbox" ng-model="col['show']">
                     {{col['name']}}
@@ -82,6 +82,14 @@
                                 ID: {{ m['id'] }}
                             </p>
                             <p>
+                                Runs:
+                                <ul>
+                                    <li ng-repeat="run in m['runs'] | orderBy:'number'">
+                                        {{ run['number'] }}
+                                    </li>
+                                </ul>
+                            </p>
+                            <p>
                                 State: {{ m['state'] }}
                             </p>
                             <p>
@@ -94,7 +102,7 @@
                                 No payload retries: {{ m['no_payload_retries'] }}
                             </p>
                             <p>
-                                Perform payload upload: {{ m['perform_payload_upload'] }}
+                                Perform payload upload: {{ m['perform_payload_upload'] ? 'YES' : 'NO'}}
                             </p>
                             <p>
                                 Number of events: {{ m['number_of_events'] }}
@@ -129,9 +137,6 @@
                             </p>
                             <p>
                                 Processing times: {{ m['processing_times'] }}
-                            </p>
-                            <p>
-                                Runs: {{ m['runs'] }}
                             </p>
                         </div>
                     </td>

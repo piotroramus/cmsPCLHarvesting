@@ -102,15 +102,15 @@ angular.module('multirunApp', [])
   };
 
   $scope.stateColors = {
-    'need_more_data' : "#DCE775",
-    'ready' : "#81D4FA",
-    'processing' : "#80CBC4",
-    'processed_ok' : "90CAF9",
-    'processing_failed' : "#E57373",
-    'dqm_upload_ok' : "#FFE082",
-    'dqm_upload_failed' : "#CE93D8",
-    'dropbox_upload_failed' : "#F48FB1",
-    'uploads_ok' : "#FFCC80",
+    'Need more data' : "#DCE775",
+    'Ready' : "#81D4FA",
+    'Processing' : "#80CBC4",
+    'Processed OK' : "90CAF9",
+    'Processing failed' : "#E57373",
+    'DQM upload OK' : "#FFE082",
+    'DQM upload failed' : "#CE93D8",
+    'Dropbox upload failed' : "#F48FB1",
+    'Uploads OK' : "#FFCC80",
   }
 
   $scope.rowColor = function(state) {

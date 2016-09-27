@@ -98,20 +98,37 @@ def run_in_shell(*popenargs, **kwargs):
 
 
 def get_data():
-    return db.session.query(model.Multirun).all()
+    multiruns = db.session.query(model.Multirun).all()
+    m_json = [m.to_json() for m in multiruns]
+    for m in m_json:
+        m['state'] = state_names[m['state']]
+    return m_json
 
 
 def create_eos_path(multirun):
+    print multirun['eos_dirs']
     paths = []
-    for dir in multirun.eos_dirs:
+    for d in multirun['eos_dirs']:
         # TODO: can be optimized a little bit
         path = app.config['EOS_ROOT']
-        path = "{}/{}/{}/{}/".format(path, multirun.scram_arch, multirun.cmssw, dir.eos_dir)
+        path = "{}/{}/{}/{}/".format(path, multirun['scram_arch'], multirun['cmssw'], d)
         paths.append(path)
     return paths
 
 
-#
+state_names = {
+    u'need_more_data': "Need more data",
+    u'ready': "Ready",
+    u'processing': "Processing",
+    u'processed_ok': "Processed OK",
+    u'processing_failed': "Processing failed",
+    u'dqm_upload_ok': "DQM upload OK",
+    u'dqm_upload_failed': "DQM upload failed",
+    u'dropbox_upload_failed': "Dropbox upload failed",
+    u'uploads_ok': "Uploads OK",
+}
+
+
 @app.route('/test/')
 def test():
     print get_data()
@@ -122,7 +139,7 @@ def test():
 def display():
     multiruns = get_data()
     for multirun in multiruns:
-        multirun.eos_dir = create_eos_path(multirun)
+        multirun['eos_dir'] = create_eos_path(multirun)
     return render_template('multirun_table.html', multiruns=multiruns)
 
 
@@ -135,6 +152,7 @@ def multirun_new():
 def gen_mh():
     return app.send_static_file('templates/gen_mh.html')
 
+
 @app.route('/w/')
 def w_mh():
     return app.send_static_file('templates/workflows.html')
@@ -143,8 +161,7 @@ def w_mh():
 @app.route('/multiruns/')
 def get_multiruns():
     data = get_data()
-    j = [m.to_json() for m in data]
-    return jsonify(json_list=j)
+    return jsonify(json_list=data)
 
 
 @app.route('/multiruns_by_workflow/')
@@ -152,11 +169,15 @@ def get_multiruns_by_workflow():
     data = get_data()
     m_by_workflows = dict()
     for multirun in data:
-        m_json = multirun.to_json()
-        workflow = extract_workflow(multirun.dataset.dataset)
-        if not workflow in m_by_workflows:
-            m_by_workflows[workflow] = [m_json]
+        workflow = extract_workflow(multirun['dataset'])
+        if workflow not in m_by_workflows:
+            m_by_workflows[workflow] = [multirun]
         else:
-            m_by_workflows[workflow].append(m_json)
+            m_by_workflows[workflow].append(multirun)
 
     return jsonify(json_list=m_by_workflows)
+
+
+@app.route('/color_test/')
+def color_test():
+    return app.send_static_file('templates/color_test.html')

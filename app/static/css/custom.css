@@ -8,13 +8,13 @@
     flex-direction: column;
 }
 
-ul {
+.ulflex {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
 }
 
-li{
+.liflex{
     display: flex;
     flex-direction: row;
     flex: 8;
