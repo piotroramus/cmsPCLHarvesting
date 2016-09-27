@@ -102,11 +102,11 @@ def get_data():
     m_json = [m.to_json() for m in multiruns]
     for m in m_json:
         m['state'] = state_names[m['state']]
+        m['eos_dirs'] = create_eos_path(m)
     return m_json
 
 
 def create_eos_path(multirun):
-    print multirun['eos_dirs']
     paths = []
     for d in multirun['eos_dirs']:
         # TODO: can be optimized a little bit
@@ -138,8 +138,6 @@ def test():
 @app.route('/display/')
 def display():
     multiruns = get_data()
-    for multirun in multiruns:
-        multirun['eos_dir'] = create_eos_path(multirun)
     return render_template('multirun_table.html', multiruns=multiruns)
 
 
