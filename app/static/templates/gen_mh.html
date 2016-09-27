@@ -71,15 +71,69 @@
                         <button ng-if="m.details" ng-click="m.details = false">-</button>
                         <button ng-if="!m.details" ng-click="m.details = true">+</button>
                     </td>
-                    <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']"
-                        ng-style="{{rowColor(m['state'])}}">{{ m[id] }}
+                    <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']">
+                        {{ m[id] }}
                     </td>
                 </tr>
                 <tr ng-if="m.details" ng-repeat-end>
-                    <td colspan=" {{ visibleCols() }}">
-                        <p ng-repeat="(id, col) in columns">
-                            {{ id }} : {{ m[id] }}
-                        </p>
+                    <td colspan=" {{ visibleCols() }}" class="cleantd">
+                        <div class="well">
+                            <p>
+                                ID: {{ m['id'] }}
+                            </p>
+                            <p>
+                                State: {{ m['state'] }}
+                            </p>
+                            <p>
+                                Dataset: {{ m['dataset'] }}
+                            </p>
+                            <p>
+                                Failure retries: {{ m['failure_retries'] }}
+                            </p>
+                            <p>
+                                No payload retries: {{ m['no_payload_retries'] }}
+                            </p>
+                            <p>
+                                Perform payload upload: {{ m['perform_payload_upload'] }}
+                            </p>
+                            <p>
+                                Number of events: {{ m['number_of_events'] }}
+                            </p>
+                            <p>
+                                BField: {{ m['bfield'] }}
+                            </p>
+                            <p>
+                                CMSSW: {{ m['cmssw'] }}
+                            </p>
+                            <p>
+                                Dropbox upload log:
+                                <span ng-show="m['dropbox_log'] == null">
+                                      N/A
+                                </span>
+                                <a href="{{ m['dropbox_log'] }}">{{ m['dropbox_log'] }}</a>
+                            </p>
+                            <p>
+                                EOS dirs: {{ m['eos_dirs'] }}
+                            </p>
+                            <p>
+                                Global tag: {{ m['global_tag'] }}
+                            </p>
+                            <p>
+                                SCRAM architecture: {{ m['scram_arch'] }}
+                            </p>
+                            <p>
+                                Scenario: {{ m['scenario'] }}
+                            </p>
+                            <p>
+                                Run class name: {{ m['run_class_name'] }}
+                            </p>
+                            <p>
+                                Processing times: {{ m['processing_times'] }}
+                            </p>
+                            <p>
+                                Runs: {{ m['runs'] }}
+                            </p>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

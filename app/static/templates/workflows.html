@@ -75,8 +75,8 @@
                             <button ng-if="m.details" ng-click="m.details = false">-</button>
                             <button ng-if="!m.details" ng-click="m.details = true">+</button>
                         </td>
-                        <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']"
-                            ng-style="{{rowColor(m['state'])}}">{{ m[id] }}
+                        <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']">
+                            {{ m[id] }}
                         </td>
                     </tr>
                     <tr ng-if="m.details" ng-repeat-end>

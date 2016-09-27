@@ -34,19 +34,19 @@ angular.module('multirunApp', [])
     },
     'bfield': {
         'name': 'BField',
-        'show': true
+        'show': false
     },
     'cmssw': {
         'name': 'CMSSW',
-        'show': true
+        'show': false
     },
     'dropbox_log': {
         'name': 'Dropbox log URL',
-        'show': true
+        'show': false
     },
     'eos_dirs': {
         'name': 'EOS directories',
-        'show': true
+        'show': false
     },
     'global_tag': {
         'name': 'Global Tag',
@@ -54,7 +54,7 @@ angular.module('multirunApp', [])
     },
     'number_of_events': {
         'name': 'Events',
-        'show': true
+        'show': false
     },
     'no_payload_retries': {
         'name': 'No payload retries',
