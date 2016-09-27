@@ -2,17 +2,18 @@ import os
 
 from keeperService import getConnections, getEncryptionString
 from backend.python.utils import dbConnection
+from backend.python.utils import configReader
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-class Config():
 
+class Config():
     SECRET_KEY = getEncryptionString()
     SSL_DISABLE = False
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_RECORD_QUERIES = True
-    SQLALCHEMY_POOL_RECYCLE = 7200 #2 hours
+    SQLALCHEMY_POOL_RECYCLE = 7200  # 2 hours, needed for Oracle
 
     MAIL_SERVER = 'smtp.cern.ch'
     MAIL_PORT = 587
@@ -21,9 +22,9 @@ class Config():
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
     CDB_UPLOAD_MAIL_SUBJECT_PREFIX = '[myService]'
-    CDB_UPLOAD_MAIL_SENDER         = 'me@example.com'
-    CDB_UPLOAD_ADMIN               = os.environ.get('CDB_UPLOAD_ADMIN')
-    CDB_UPLOAD_SLOW_DB_QUERY_TIME  = 0.5
+    CDB_UPLOAD_MAIL_SENDER = 'me@example.com'
+    CDB_UPLOAD_ADMIN = os.environ.get('CDB_UPLOAD_ADMIN')
+    CDB_UPLOAD_SLOW_DB_QUERY_TIME = 0.5
 
     # Logging
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -31,20 +32,20 @@ class Config():
     LOGGING_DIR = os.path.join(BASE_DIR, 'logs/myService/')
     LOGGING_FILE = os.path.join(LOGGING_DIR, 'log')
 
-    # EOS ROOT
-    EOS_ROOT = "/eos/cms/store/group/alca_global/multiruns/results/jenkins"
+    # env variable should be set before running the web application
+    # in other case a default 'local' config is used
+    multirun_config_path = os.getenv('MULTIRUN_CONFIG', 'backend/python/config/local.yml')
+    MULTIRUN_CFG = configReader.read(multirun_config_path)
 
     # get some DB connections from the secrets file (as they may contain credentials):
     # SQLALCHEMY_DATABASE_URI = getConnections( 'userDB' )
 
-    config = dict()
-    config['db_vendor'] = 'oracle'
-    config['oracle_db'] = 'devdb12'
-    config['oracle_secret'] = '/pclmh/.oracle'
-    SQLALCHEMY_DATABASE_URI = dbConnection.get_connection_string(config)
+    SQLALCHEMY_DATABASE_URI = dbConnection.get_connection_string(MULTIRUN_CFG)
 
-    LOG_DB  = getConnections( 'logDB' )
-    DEST_DB = getConnections( 'destDB' ).replace('oracle://','').replace(':', '/')     # 'cms_orcoff_prep/<pwd>@CMS_CONDITIONS_002'
+    LOG_DB = getConnections('logDB')
+    DEST_DB = getConnections('destDB').replace('oracle://', '').replace(':',
+                                                                        '/')  # 'cms_orcoff_prep/<pwd>@CMS_CONDITIONS_002'
+
     # RUN_INFO_DB = getConnections( 'runInfoDB' ) # 'oracle://cms_orcon_adg/CMS_CONDITIONS'
 
     # SQLALCHEMY_BINDS = {
@@ -57,15 +58,17 @@ class Config():
     def init_app(app):
         pass
 
+
 class DevelopmentConfig(Config):
     DEBUG = True
+
 
 class TestingConfig(Config):
     TESTING = True
     WTF_CSRF_ENABLED = False
 
-class ProductionConfig(Config):
 
+class ProductionConfig(Config):
     @classmethod
     def init_app(cls, app):
         Config.init_app(app)
@@ -92,9 +95,9 @@ class ProductionConfig(Config):
 
 config = {
     'development': DevelopmentConfig,
-    'testing'    : TestingConfig,
-    'production' : ProductionConfig,
+    'testing': TestingConfig,
+    'production': ProductionConfig,
 
-    'default'    : DevelopmentConfig,
-    'private'    : DevelopmentConfig,
+    'default': DevelopmentConfig,
+    'private': DevelopmentConfig,
 }

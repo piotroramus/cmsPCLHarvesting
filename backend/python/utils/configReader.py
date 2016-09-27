@@ -2,7 +2,11 @@ import yaml
 import logging
 import os
 
-import logs.logger as logs
+# because _this_ module is imported from different levels
+try:
+    import logs.logger as logs
+except ImportError:
+    import backend.python.logs.logger as logs
 
 
 def read(config_file):

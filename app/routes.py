@@ -110,7 +110,7 @@ def create_eos_path(multirun):
     paths = []
     for d in multirun['eos_dirs']:
         # TODO: can be optimized a little bit
-        path = app.config['EOS_ROOT']
+        path = app.config['MULTIRUN_CFG']['eos_workspace_path']
         path = "{}/{}/{}/{}/".format(path, multirun['scram_arch'], multirun['cmssw'], d)
         paths.append(path)
     return paths
@@ -179,3 +179,8 @@ def get_multiruns_by_workflow():
 @app.route('/color_test/')
 def color_test():
     return app.send_static_file('templates/color_test.html')
+
+@app.route('/config_test/')
+def config_test():
+    result = app.config['MULTIRUN_CFG']['eos_workspace_path']
+    return result
