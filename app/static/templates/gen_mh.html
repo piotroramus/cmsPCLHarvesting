@@ -83,11 +83,11 @@
                             </p>
                             <p>
                                 Runs:
-                                <ul>
-                                    <li ng-repeat="run in m['runs'] | orderBy:'number'">
-                                        {{ run['number'] }}
-                                    </li>
-                                </ul>
+                            <ul>
+                                <li ng-repeat="run in m['runs'] | orderBy:'number'">
+                                    {{ run['number'] }}
+                                </li>
+                            </ul>
                             </p>
                             <p>
                                 State: {{ m['state'] }}
@@ -121,7 +121,15 @@
                                 <a href="{{ m['dropbox_log'] }}">{{ m['dropbox_log'] }}</a>
                             </p>
                             <p>
-                                EOS dirs: {{ m['eos_dirs'] }}
+                                EOS dirs:
+                                <span ng-show="m['eos_dirs'].length == 0">
+                                      Upload not performed
+                                </span>
+                                <ul>
+                                    <li ng-repeat="dir in m['eos_dirs']">
+                                        {{ dir }}
+                                    </li>
+                                </ul>
                             </p>
                             <p>
                                 Global tag: {{ m['global_tag'] }}
@@ -136,7 +144,15 @@
                                 Run class name: {{ m['run_class_name'] }}
                             </p>
                             <p>
-                                Processing times: {{ m['processing_times'] }}
+                                Processing times:
+                                <span ng-show="m['processing_times'].length == 0">
+                                      Processing not started
+                                </span>
+                                <ul>
+                                    <li ng-repeat="pt in m['processing_times']">
+                                        {{ pt }}
+                                    </li>
+                                </ul>
                             </p>
                         </div>
                     </td>
