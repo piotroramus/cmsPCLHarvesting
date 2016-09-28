@@ -1,9 +1,9 @@
 angular.module('multirunApp', [])
 
 .controller('mainController', function($scope, $http) {
-  $scope.sortPredicate     = 'ID'; // set the default sort type
-  $scope.sortReverse  = false;  // set the default sort order
-  $scope.searchMultirun   = '';     // set the default search/filter term
+  $scope.sortPredicate     = 'creation_time';
+  $scope.sortReverse  = true;  // the 'newest' multirun first
+  $scope.searchMultirun   = ''; // display everything
 
   $scope.multiruns = []
 
@@ -80,6 +80,10 @@ angular.module('multirunApp', [])
         'name': 'Runs',
         'show': false
     },
+    'creation_time': {
+        'name': 'Creation time',
+        'show': false
+    }
   }
 
    $scope.getData = function() {
