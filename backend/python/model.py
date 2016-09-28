@@ -52,7 +52,7 @@ class Multirun(Base):
     __tablename__ = 'multirun'
 
     id = Column(Integer, Sequence('id'), primary_key=True)
-    creation_time = Column(DateTime)
+    creation_time = Column(DateTime, nullable=False)
     number_of_events = Column(Integer)
     bfield = Column(Float)
     run_class_name = Column(String(64))
