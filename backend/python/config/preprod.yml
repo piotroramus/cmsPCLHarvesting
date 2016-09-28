@@ -40,8 +40,10 @@ dqm_upload_host: https://cmsweb.cern.ch/dqm/dev/
 days_old_runs: 7
 
 # how many days to wait for the express stream for the run to be completed
-# if the strem is not completed after given number of days, run will not be included in any multi-run
-run_stream_timeout: 2
+# (completed stream run can be included into multi-runs)
+# if the strem is not completed after given number of days,
+# run will processed with the data it has for the moment
+run_stream_timeout: 3
 
 # how many events multirun should contain to be qualified as ready to start
 events_threshold: 100000

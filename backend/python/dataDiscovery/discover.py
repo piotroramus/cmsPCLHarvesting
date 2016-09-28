@@ -125,8 +125,7 @@ def discover(config, session):
     valid_runs = (r for r in recent_runs if r[u'starttime'])
 
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
-    local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date,
-                                               RunInfo.stream_timeout == False).all()
+    local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
     update_runs(logger, session, t0api, config, local_runs, valid_runs)
 
