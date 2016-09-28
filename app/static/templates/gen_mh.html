@@ -37,134 +37,16 @@
         </div>
 
         <!--<ul class="ulflex">-->
-            <!--<li ng-repeat="(id, col) in columns" class="liflex">-->
-                <!--<label class="checkbox flexlabel">-->
-                    <!--<input type="checkbox" ng-model="col['show']">-->
-                    <!--{{col['name']}}-->
-                <!--</label>-->
-            <!--</li>-->
+        <!--<li ng-repeat="(id, col) in columns" class="liflex">-->
+        <!--<label class="checkbox flexlabel">-->
+        <!--<input type="checkbox" ng-model="col['show']">-->
+        <!--{{col['name']}}-->
+        <!--</label>-->
+        <!--</li>-->
         <!--</ul>-->
 
 
-        <div class="multiruntab" style="overflow-x:auto">
-            <table class="table table-bordered table-striped">
-
-                <thead>
-                <tr>
-
-                    <td></td>
-                    <td ng-repeat="(id, col) in columns" ng-show="col['show']">
-                        <a href="#" ng-click="sortBy(id)">
-                            {{ col['name'] }}
-                            <span ng-show="sortPredicate == id && !sortReverse" class="fa fa-caret-down"></span>
-                            <span ng-show="sortPredicate == id && sortReverse" class="fa fa-caret-up"></span>
-                        </a>
-                    </td>
-
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr ng-repeat-start="m in multiruns | orderBy:sortPredicate:sortReverse | filter:searchMultirun"
-                    ng-style="{{rowColor(m['state'])}}">
-                    <td>
-                        <button ng-if="m.details" ng-click="m.details = false">-</button>
-                        <button ng-if="!m.details" ng-click="m.details = true">+</button>
-                    </td>
-                    <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']">
-                        {{ m[id] }}
-                    </td>
-                </tr>
-                <tr ng-if="m.details" ng-repeat-end>
-                    <td colspan=" {{ visibleCols() }}" class="cleantd">
-                        <div class="well">
-                            <p>
-                                <span class="textbold">ID:</span> {{ m['id'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Runs:</span>
-                            <ul>
-                                <li ng-repeat="run in m['runs'] | orderBy:'number'">
-                                    {{ run['number'] }}
-                                </li>
-                            </ul>
-                            </p>
-                            <p>
-                                <span class="textbold">State:</span> {{ m['state'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Dataset:</span> {{ m['dataset'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Creation time:</span> {{ m['creation_time'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Failure retries:</span> {{ m['failure_retries'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">No payload retries:</span> {{ m['no_payload_retries'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Perform payload upload:</span>
-                                    {{ m['perform_payload_upload'] ? 'YES' : 'NO'}}
-                            </p>
-                            <p>
-                                <span class="textbold">Number of events:</span> {{ m['number_of_events'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">BField:</span> {{ m['bfield'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">CMSSW:</span> {{ m['cmssw'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Dropbox upload log:</span>
-                                <span ng-show="m['dropbox_log'] == null">
-                                      N/A
-                                </span>
-                                <a href="{{ m['dropbox_log'] }}">{{ m['dropbox_log'] }}</a>
-                            </p>
-                            <p>
-                                <span class="textbold">EOS dirs:</span>
-                                <span ng-show="m['eos_dirs'].length == 0">
-                                      Upload not performed
-                                </span>
-                                <ul>
-                                    <li ng-repeat="dir in m['eos_dirs']">
-                                        {{ dir }}
-                                    </li>
-                                </ul>
-                            </p>
-                            <p>
-                                <span class="textbold">Global tag:</span> {{ m['global_tag'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">SCRAM architecture:</span> {{ m['scram_arch'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Scenario:</span> {{ m['scenario'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Run class name:</span> {{ m['run_class_name'] }}
-                            </p>
-                            <p>
-                                <span class="textbold">Processing times:</span>
-                                <span ng-show="m['processing_times'].length == 0">
-                                      Processing not started
-                                </span>
-                                <ul>
-                                    <li ng-repeat="pt in m['processing_times']">
-                                        {{ pt }}
-                                    </li>
-                                </ul>
-                            </p>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-
-            </table>
-        </div>
+        <div class="multiruntab" style="overflow-x:auto" ng-include="'/static/templates/mtable.html'"></div>
 
 
     </div>

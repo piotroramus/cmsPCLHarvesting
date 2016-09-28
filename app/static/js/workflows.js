@@ -5,7 +5,7 @@ angular.module('multirunApp', [])
   $scope.sortReverse  = false;  // set the default sort order
   $scope.searchMultirun   = '';     // set the default search/filter term
 
-  $scope.multiruns = []
+  $scope.multiruns_by_workflow = []
 
   $scope.columns = {
     'id': {
@@ -30,7 +30,7 @@ angular.module('multirunApp', [])
     },
     'perform_payload_upload': {
         'name': 'Payload upload',
-        'show': true
+        'show': false
     },
     'bfield': {
         'name': 'BField',
@@ -80,16 +80,20 @@ angular.module('multirunApp', [])
         'name': 'Runs',
         'show': false
     },
+    'creation_time': {
+        'name': 'Creation time',
+        'show': false
+    }
   }
 
    $scope.getData = function() {
     $http({method: 'GET', url: '/multiruns_by_workflow/'})
         .success(function(data, status) {
-            $scope.multiruns = data['json_list'];
-            for (var i = 0; i < $scope.multiruns.length; i++) {
-                $scope.multiruns[i]["details"] = false;
+            $scope.multiruns_by_workflow = data['json_list'];
+            for (var i = 0; i < $scope.multiruns_by_workflow.length; i++) {
+                $scope.multiruns_by_workflow[i]["details"] = false;
             }
-            console.log($scope.multiruns)
+            console.log($scope.multiruns_by_workflow)
         })
         .error(function(data, status) {
             console.error("Error while loading multiruns");

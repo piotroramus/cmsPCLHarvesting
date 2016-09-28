@@ -30,7 +30,7 @@ angular.module('multirunApp', [])
     },
     'perform_payload_upload': {
         'name': 'Payload upload',
-        'show': true
+        'show': false
     },
     'bfield': {
         'name': 'BField',
