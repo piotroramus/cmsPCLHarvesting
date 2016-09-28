@@ -77,6 +77,7 @@ class Multirun(Base):
     def to_json(self):
         return {
             'id': self.id,
+            'creation_time': self.creation_time,
             'number_of_events': self.number_of_events,
             'bfield': self.bfield,
             'run_class_name': self.run_class_name,
@@ -112,6 +113,7 @@ class Multirun(Base):
 
     def __repr__(self):
         return ("Multirun(id={}, "
+                "creation_time={}, "
                 "number_of_events={}, "
                 "dataset={}, "
                 "bfield={}, "
@@ -124,7 +126,7 @@ class Multirun(Base):
                 "no_payload_retries={}, "
                 "failure_retries={}, "
                 "state={}, "
-                "run_numbers={})").format(self.id, self.number_of_events, self.dataset, self.bfield,
+                "run_numbers={})").format(self.id, self.creation_time, self.number_of_events, self.dataset, self.bfield,
                                           self.run_class_name, self.cmssw, self.scram_arch, self.scenario,
                                           self.global_tag, self.perform_payload_upload, self.no_payload_retries,
                                           self.failure_retries, self.state, self.run_numbers)
