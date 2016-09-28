@@ -224,6 +224,7 @@ def assembly_multiruns(config, session):
                 payload_upload = to_be_uploaded(dataset, config)
                 need_more_data_state = session.query(MultirunState).filter(
                     MultirunState.state == 'need_more_data').one()
+                now = datetime.datetime.now()
                 multirun = Multirun(number_of_events=0,
                                     dataset=dataset_object,
                                     bfield=run.bfield,
@@ -235,7 +236,8 @@ def assembly_multiruns(config, session):
                                     perform_payload_upload=payload_upload,
                                     no_payload_retries=0,
                                     failure_retries=0,
-                                    state=need_more_data_state)
+                                    state=need_more_data_state,
+                                    creation_time=now)
                 session.add(multirun)
                 # force generation of multirun.id which is accessed later on in this code
                 session.flush()
