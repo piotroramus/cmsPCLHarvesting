@@ -7,15 +7,15 @@
     <title>Multirun Harvesting Overview</title>
 
     <!-- CSS -->
-    <link href="/static/css/custom.css" rel="stylesheet">
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
 
     <!-- JS -->
     <script src="/static/js/angular.min.js"></script>
     <script src="/static/js/gen_mh.js"></script>
 
 </head>
-<body style="margin: 20px">
+<body class="mhbody">
 
 
 <div class="opaque">
@@ -36,14 +36,14 @@
             </form>
         </div>
 
-        <ul class="ulflex">
-            <li ng-repeat="(id, col) in columns" class="liflex">
-                <label class="checkbox flexlabel">
-                    <input type="checkbox" ng-model="col['show']">
-                    {{col['name']}}
-                </label>
-            </li>
-        </ul>
+        <!--<ul class="ulflex">-->
+            <!--<li ng-repeat="(id, col) in columns" class="liflex">-->
+                <!--<label class="checkbox flexlabel">-->
+                    <!--<input type="checkbox" ng-model="col['show']">-->
+                    <!--{{col['name']}}-->
+                <!--</label>-->
+            <!--</li>-->
+        <!--</ul>-->
 
 
         <div class="multiruntab" style="overflow-x:auto">
@@ -79,10 +79,10 @@
                     <td colspan=" {{ visibleCols() }}" class="cleantd">
                         <div class="well">
                             <p>
-                                ID: {{ m['id'] }}
+                                <span class="textbold">ID:</span> {{ m['id'] }}
                             </p>
                             <p>
-                                Runs:
+                                <span class="textbold">Runs:</span>
                             <ul>
                                 <li ng-repeat="run in m['runs'] | orderBy:'number'">
                                     {{ run['number'] }}
@@ -90,38 +90,39 @@
                             </ul>
                             </p>
                             <p>
-                                State: {{ m['state'] }}
+                                <span class="textbold">State:</span> {{ m['state'] }}
                             </p>
                             <p>
-                                Dataset: {{ m['dataset'] }}
+                                <span class="textbold">Dataset:</span> {{ m['dataset'] }}
                             </p>
                             <p>
-                                Failure retries: {{ m['failure_retries'] }}
+                                <span class="textbold">Failure retries:</span> {{ m['failure_retries'] }}
                             </p>
                             <p>
-                                No payload retries: {{ m['no_payload_retries'] }}
+                                <span class="textbold">No payload retries:</span> {{ m['no_payload_retries'] }}
                             </p>
                             <p>
-                                Perform payload upload: {{ m['perform_payload_upload'] ? 'YES' : 'NO'}}
+                                <span class="textbold">Perform payload upload:</span>
+                                    {{ m['perform_payload_upload'] ? 'YES' : 'NO'}}
                             </p>
                             <p>
-                                Number of events: {{ m['number_of_events'] }}
+                                <span class="textbold">Number of events:</span> {{ m['number_of_events'] }}
                             </p>
                             <p>
-                                BField: {{ m['bfield'] }}
+                                <span class="textbold">BField:</span> {{ m['bfield'] }}
                             </p>
                             <p>
-                                CMSSW: {{ m['cmssw'] }}
+                                <span class="textbold">CMSSW:</span> {{ m['cmssw'] }}
                             </p>
                             <p>
-                                Dropbox upload log:
+                                <span class="textbold">Dropbox upload log:</span>
                                 <span ng-show="m['dropbox_log'] == null">
                                       N/A
                                 </span>
                                 <a href="{{ m['dropbox_log'] }}">{{ m['dropbox_log'] }}</a>
                             </p>
                             <p>
-                                EOS dirs:
+                                <span class="textbold">EOS dirs:</span>
                                 <span ng-show="m['eos_dirs'].length == 0">
                                       Upload not performed
                                 </span>
@@ -132,19 +133,19 @@
                                 </ul>
                             </p>
                             <p>
-                                Global tag: {{ m['global_tag'] }}
+                                <span class="textbold">Global tag:</span> {{ m['global_tag'] }}
                             </p>
                             <p>
-                                SCRAM architecture: {{ m['scram_arch'] }}
+                                <span class="textbold">SCRAM architecture:</span> {{ m['scram_arch'] }}
                             </p>
                             <p>
-                                Scenario: {{ m['scenario'] }}
+                                <span class="textbold">Scenario:</span> {{ m['scenario'] }}
                             </p>
                             <p>
-                                Run class name: {{ m['run_class_name'] }}
+                                <span class="textbold">Run class name:</span> {{ m['run_class_name'] }}
                             </p>
                             <p>
-                                Processing times:
+                                <span class="textbold">Processing times:</span>
                                 <span ng-show="m['processing_times'].length == 0">
                                       Processing not started
                                 </span>

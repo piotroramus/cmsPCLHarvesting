@@ -37,3 +37,18 @@ input[type=checkbox]{
     vertical-align: baseline;
     background: transparent;
 }
+
+.mhbody {
+    margin: 20px;
+    background-color: #f5f5f5;
+    /*
+    background-color: #111;
+    background-color: #fbfbfb;
+    background-color: #191919;
+    background-color: #000;
+    */
+}
+
+.textbold {
+    font-weight: bold
+}
