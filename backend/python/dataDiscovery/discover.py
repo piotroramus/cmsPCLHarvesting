@@ -60,14 +60,14 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
     logger.info("Updating local database with newly fetched runs")
     for run in recent_runs:
 
-        logger.debug("Checking run {} fetched from Run Registry".format(run[u'runnumber']))
+        logger.info("Checking run {} fetched from Run Registry".format(run[u'runnumber']))
 
         if run[u'runnumber'] in complete_stream_runs:
-            logger.debug("Run {} already exists in local database".format(run[u'runnumber']))
+            logger.info("Run {} already exists in local database".format(run[u'runnumber']))
             continue
 
         if run[u'runnumber'] in incomplete_stream_runs:
-            logger.debug(
+            logger.info(
                 "Run {} already exists in local database but the stream was not completed".format(run[u'runnumber']))
 
             if t0api.run_stream_completed(run[u'runnumber']) and \
@@ -78,7 +78,7 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
                 run_to_update = session.query(RunInfo).filter(RunInfo.number == run[u'runnumber']).one()
                 run_to_update.stream_completed = True
             else:
-                logger.debug("Stream for run {} is still not completed".format(run[u'runnumber']))
+                logger.info("Stream for run {} is still not completed".format(run[u'runnumber']))
                 if run[u'starttime'] < stream_timeout:  # TODO: test
                     logger.warning("Stream for run {} is not completed for {} days now.".
                                    format(run[u'runnumber'], config['run_stream_timeout']))
