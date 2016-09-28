@@ -9,7 +9,7 @@ except ImportError:
     import backend.python.logs.logger as logs
 
 
-def read(config_file):
+def read(config_file=None):
     logger = logging.getLogger(__name__)
     logs.setup_logging()
 
