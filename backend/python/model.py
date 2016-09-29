@@ -77,7 +77,7 @@ class Multirun(Base):
     def to_json(self):
         return {
             'id': self.id,
-            'creation_time': self.creation_time,
+            'creation_time': self.creation_time.isoformat(),
             'number_of_events': self.number_of_events,
             'bfield': self.bfield,
             'run_class_name': self.run_class_name,
@@ -103,6 +103,7 @@ class Multirun(Base):
         times = list()
         for t in self.processing_times:
             single_entry = list()
+            # TODO: isoformat
             single_entry.append(t.start_time)
             single_entry.append(t.end_time)
             times.append(single_entry)
