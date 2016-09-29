@@ -6,6 +6,8 @@ angular.module('multirunApp', [])
   $scope.searchMultirun   = ''; // display everything
 
   $scope.multiruns = []
+  $scope.MultirunsByWorkflow = []
+  $scope.splitByWorkflows = false;
 
   $scope.columns = {
     'id': {
@@ -86,24 +88,41 @@ angular.module('multirunApp', [])
     }
   }
 
-   $scope.getData = function() {
+   $scope.getMultiruns = function() {
     $http({method: 'GET', url: '/multiruns/'})
         .success(function(data, status) {
             $scope.multiruns = data['json_list'];
             for (var i = 0; i < $scope.multiruns.length; i++) {
                 $scope.multiruns[i]["details"] = false;
             }
-            console.log($scope.multiruns)
         })
         .error(function(data, status) {
             console.error("Error while loading multiruns");
         })
    }
 
+    $scope.getMultirunsByWorkflow = function() {
+    $http({method: 'GET', url: '/multiruns_by_workflow/'})
+        .success(function(data, status) {
+            $scope.multirunsByWorkflow = data['json_list'];
+            for (var i = 0; i < $scope.multirunsByWorkflow.length; i++) {
+                $scope.multirunsByWorkflow[i]["details"] = false;
+            }
+        })
+        .error(function(data, status) {
+            console.error("Error while loading multiruns");
+        })
+   }
+
+    $scope.switchView = function() {
+        $scope.splitByWorkflows = ($scope.splitByWorkflows === true) ? false : true;
+    }
+
    $scope.sortBy = function(sortPredicate) {
     $scope.sortReverse = ($scope.sortPredicate === sortPredicate) ? !$scope.sortReverse : false;
     $scope.sortPredicate = sortPredicate;
   };
+
 
   $scope.stateColors = {
     'Need more data' : "#DCE775",

@@ -19,8 +19,19 @@
 
 
 <div class="opaque">
-    <div class="container" ng-app="multirunApp" ng-controller="mainController" ng-init="getData()">
+    <div class="container" ng-app="multirunApp" ng-controller="mainController">
 
+
+        <div class="navbuttons">
+            <button type="button" class="btn btn-default" ng-click="switchView()">
+                <span ng-show="splitByWorkflows === true">
+                    Show all
+                </span>
+                <span ng-show="splitByWorkflows === false">
+                    Split by workflows
+                </span>
+            </button>
+        </div>
 
         <div class="header">
 
@@ -45,8 +56,22 @@
         <!--</li>-->
         <!--</ul>-->
 
+        <span ng-if="splitByWorkflows == true">
+            <span ng-init="getMultirunsByWorkflow()"></span>
 
-        <div class="multiruntab" style="overflow-x:auto" ng-include="'/static/templates/mtable.html'"></div>
+            <div class="multiruntab" style="overflow-x:auto" ng-repeat="(workflow, multiruns) in multirunsByWorkflow">
+
+                <h2>{{ workflow }}</h2>
+                <div ng-include="'/static/templates/mtable.html'"></div>
+
+            </div>
+        </span>
+
+        <span ng-if="splitByWorkflows == false">
+            <span ng-init="getMultiruns()"></span>
+            <div class="multiruntab" style="overflow-x:auto" ng-include="'/static/templates/mtable.html'"></div>
+        </span>
+
 
 
     </div>

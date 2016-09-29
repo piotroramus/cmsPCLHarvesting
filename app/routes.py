@@ -31,7 +31,7 @@ auth = HTTPBasicAuth()
 def index():
     # gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
     # return render_template('index.html', lastUpdate=datetime.utcnow(), gitInfo=gitInfo)
-    return redirect(url_for('display'))
+    return redirect(url_for('gen_mh'))
 
 
 @app.route('/heartbeat')
