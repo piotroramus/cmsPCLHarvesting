@@ -94,6 +94,7 @@ angular.module('multirunApp', [])
             $scope.multiruns = data['json_list'];
             for (var i = 0; i < $scope.multiruns.length; i++) {
                 $scope.multiruns[i]["details"] = false;
+                $scope.multiruns[i]["creation_time"] = Date.parse($scope.multiruns[i]["creation_time"]);
             }
         })
         .error(function(data, status) {
