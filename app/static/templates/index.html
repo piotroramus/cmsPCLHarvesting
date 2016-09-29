@@ -19,40 +19,30 @@
 
 <body class="mhbody">
 
-<div class="opaque">
-    <div class="container" ng-app="multirunApp" ng-controller="mainController">
+<div class="container" ng-app="multirunApp" ng-controller="mainController">
 
 
-        <div class="navbuttons">
-            <button type="button" class="btn btn-default" ng-click="switchView()">
+    <div class="navbuttons">
+        <button type="button" class="btn btn-default" ng-click="switchView()">
                 <span ng-show="splitByWorkflows === true">
                     Do not split
                 </span>
                 <span ng-show="splitByWorkflows === false">
                     Split by workflows
                 </span>
-            </button>
-        </div>
+        </button>
+    </div>
 
-        <form>
-            <div class="form-group">
-                <div class="input-group">
-                    <div class="input-group-addon"></div>
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon"></div>
 
-                    <input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">
+                <input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">
 
-                </div>
             </div>
-        </form>
-
-        <!--<ul class="ulflex">-->
-        <!--<li ng-repeat="(id, col) in columns" class="liflex">-->
-        <!--<label class="checkbox flexlabel">-->
-        <!--<input type="checkbox" ng-model="col['show']">-->
-        <!--{{col['name']}}-->
-        <!--</label>-->
-        <!--</li>-->
-        <!--</ul>-->
+        </div>
+    </form>
 
         <span ng-if="splitByWorkflows == true">
             <span ng-init="getMultirunsByWorkflow()"></span>
@@ -71,7 +61,6 @@
         </span>
 
 
-    </div>
 </div>
 </body>
 </html>

@@ -4,7 +4,7 @@
     <tr>
 
         <th></th>
-        <th ng-repeat="(id, col) in columns" ng-show="col['show']">
+        <th ng-repeat="(id, col) in columns" ng-show="col['show']" id="thvert">
             <a href="#" ng-click="sortBy(id)">
                 {{ col['name'] }}
                 <span ng-show="sortPredicate == id && !sortReverse" class="fa fa-caret-down"></span>
