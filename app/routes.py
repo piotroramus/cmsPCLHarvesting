@@ -31,7 +31,7 @@ auth = HTTPBasicAuth()
 def index():
     # gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
     # return render_template('index.html', lastUpdate=datetime.utcnow(), gitInfo=gitInfo)
-    return redirect(url_for('gen_mh'))
+    return redirect(url_for('display'))
 
 
 @app.route('/heartbeat')
@@ -135,8 +135,8 @@ def test():
     return "response"
 
 
-@app.route('/display/')
-def display():
+@app.route('/display_plain/')
+def display_plain():
     multiruns = get_data()
     return render_template('multirun_table.html', multiruns=multiruns)
 
@@ -146,14 +146,9 @@ def multirun_new():
     return app.send_static_file('templates/main.html')
 
 
-@app.route('/g/')
-def gen_mh():
+@app.route('/display/')
+def display():
     return app.send_static_file('templates/gen_mh.html')
-
-
-@app.route('/w/')
-def w_mh():
-    return app.send_static_file('templates/workflows.html')
 
 
 @app.route('/multiruns/')
@@ -180,7 +175,8 @@ def get_multiruns_by_workflow():
 def color_test():
     return app.send_static_file('templates/color_test.html')
 
-@app.route('/config_test/')
-def config_test():
-    result = app.config['MULTIRUN_CFG']['eos_workspace_path']
-    return result
+
+@app.route('/configuration/')
+def get_config():
+    # TODO: fix
+    return jsonify(json_list=app.config)
