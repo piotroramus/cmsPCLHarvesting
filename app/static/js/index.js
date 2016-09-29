@@ -22,6 +22,10 @@ angular.module('multirunApp', [])
         'name': 'Dataset',
         'show': true
     },
+    'number_of_events': {
+        'name': 'Events',
+        'show': true
+    },
     'failure_retries': {
         'name': 'Failure Retries',
         'show': true
@@ -52,10 +56,6 @@ angular.module('multirunApp', [])
     },
     'global_tag': {
         'name': 'Global Tag',
-        'show': false
-    },
-    'number_of_events': {
-        'name': 'Events',
         'show': false
     },
     'no_payload_retries': {
@@ -94,7 +94,7 @@ angular.module('multirunApp', [])
             $scope.multiruns = data['json_list'];
             for (var i = 0; i < $scope.multiruns.length; i++) {
                 $scope.multiruns[i]["details"] = false;
-                $scope.multiruns[i]["creation_time"] = Date.parse($scope.multiruns[i]["creation_time"]);
+                $scope.multiruns[i]["creation_time"] = new Date($scope.multiruns[i]["creation_time"]);
             }
         })
         .error(function(data, status) {
@@ -108,6 +108,7 @@ angular.module('multirunApp', [])
             $scope.multirunsByWorkflow = data['json_list'];
             for (var i = 0; i < $scope.multirunsByWorkflow.length; i++) {
                 $scope.multirunsByWorkflow[i]["details"] = false;
+                $scope.multirunsByWorkflow[i]["creation_time"] = new Date($scope.multirunsByWorkflow[i]["creation_time"]);
             }
         })
         .error(function(data, status) {

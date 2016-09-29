@@ -100,14 +100,7 @@ class Multirun(Base):
         return [ed.eos_dir for ed in self.eos_dirs]
 
     def __processing_times_json(self):
-        times = list()
-        for t in self.processing_times:
-            single_entry = list()
-            # TODO: isoformat
-            single_entry.append(t.start_time)
-            single_entry.append(t.end_time)
-            times.append(single_entry)
-        return times
+        return [t.to_json() for t in self.processing_times]
 
     def __runs__json(self):
         return [r.to_json() for r in self.run_numbers]
@@ -152,8 +145,15 @@ class ProcessingTime(Base):
 
     multirun_id = Column(Integer, ForeignKey('multirun.id'))
 
-    def __repr__(self):
-        return "[{} - {}]".format(self.start_time, self.end_time)
+    def to_json(self):
+        return [
+            self.start_time.isoformat() if self.start_time else None,
+            self.end_time.isoformat() if self.end_time else None
+        ]
+
+
+def __repr__(self):
+    return "[{} - {}]".format(self.start_time, self.end_time)
 
 
 class RunInfo(Base):

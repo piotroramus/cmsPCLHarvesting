@@ -47,7 +47,8 @@
                     <span class="textbold">Dataset:</span> {{ m['dataset'] }}
                 </p>
                 <p>
-                    <span class="textbold">Creation time:</span> {{ m['creation_time'] }}
+                    <span class="textbold">Creation time:</span>
+                    {{ m['creation_time'].toISOString() }}
                 </p>
                 <p>
                     <span class="textbold">Failure retries:</span> {{ m['failure_retries'] }}
@@ -100,14 +101,14 @@
                 </p>
                 <p>
                     <span class="textbold">Processing times:</span>
-                                <span ng-show="m['processing_times'].length == 0">
-                                      Processing not started
-                                </span>
-                <ul>
-                    <li ng-repeat="pt in m['processing_times']">
-                        {{ pt }}
-                    </li>
-                </ul>
+                    <span ng-show="m['processing_times'].length == 0">
+                          Processing not started
+                    </span>
+                    <ul>
+                        <li ng-repeat="pt in m['processing_times']">
+                            {{ pt }}
+                        </li>
+                    </ul>
                 </p>
             </div>
         </td>
