@@ -15,8 +15,9 @@
     <script src="/static/js/gen_mh.js"></script>
 
 </head>
-<body class="mhbody">
 
+
+<body class="mhbody">
 
 <div class="opaque">
     <div class="container" ng-app="multirunApp" ng-controller="mainController">
@@ -25,7 +26,7 @@
         <div class="navbuttons">
             <button type="button" class="btn btn-default" ng-click="switchView()">
                 <span ng-show="splitByWorkflows === true">
-                    Show all
+                    Do not split
                 </span>
                 <span ng-show="splitByWorkflows === false">
                     Split by workflows
@@ -34,7 +35,6 @@
         </div>
 
         <div class="header">
-
             <form>
                 <div class="form-group">
                     <div class="input-group">

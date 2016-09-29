@@ -29,8 +29,6 @@ auth = HTTPBasicAuth()
 @app.route('/')
 @app.route('/index')
 def index():
-    # gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell = True)
-    # return render_template('index.html', lastUpdate=datetime.utcnow(), gitInfo=gitInfo)
     return redirect(url_for('display'))
 
 
@@ -138,7 +136,7 @@ def test():
 @app.route('/display_plain/')
 def display_plain():
     multiruns = get_data()
-    return render_template('multirun_table.html', multiruns=multiruns)
+    return render_template('plain_table.html', multiruns=multiruns)
 
 
 @app.route('/m/')
@@ -148,7 +146,7 @@ def multirun_new():
 
 @app.route('/display/')
 def display():
-    return app.send_static_file('templates/gen_mh.html')
+    return app.send_static_file('templates/index.html')
 
 
 @app.route('/multiruns/')
