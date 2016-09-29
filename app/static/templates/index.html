@@ -34,18 +34,16 @@
             </button>
         </div>
 
-        <div class="header">
-            <form>
-                <div class="form-group">
-                    <div class="input-group">
-                        <div class="input-group-addon"><i class="fa fa-search"></i></div>
+        <form>
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon"></div>
 
-                        <input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">
+                    <input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">
 
-                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
 
         <!--<ul class="ulflex">-->
         <!--<li ng-repeat="(id, col) in columns" class="liflex">-->
@@ -71,7 +69,6 @@
             <span ng-init="getMultiruns()"></span>
             <div class="multiruntab" style="overflow-x:auto" ng-include="'/static/templates/mtable.html'"></div>
         </span>
-
 
 
     </div>

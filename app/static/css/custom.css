@@ -60,3 +60,7 @@ input[type=checkbox]{
     margin-left: 0;
     margin-right: 0;
 }
+
+input[type=text] {
+    height: 40px;
+}
