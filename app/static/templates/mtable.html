@@ -3,14 +3,14 @@
     <thead>
     <tr>
 
-        <td></td>
-        <td ng-repeat="(id, col) in columns" ng-show="col['show']">
+        <th></th>
+        <th ng-repeat="(id, col) in columns" ng-show="col['show']">
             <a href="#" ng-click="sortBy(id)">
                 {{ col['name'] }}
                 <span ng-show="sortPredicate == id && !sortReverse" class="fa fa-caret-down"></span>
                 <span ng-show="sortPredicate == id && sortReverse" class="fa fa-caret-up"></span>
             </a>
-        </td>
+        </th>
 
     </tr>
     </thead>
