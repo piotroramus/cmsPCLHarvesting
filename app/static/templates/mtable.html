@@ -48,7 +48,7 @@
                 </p>
                 <p>
                     <span class="textbold">Creation time:</span>
-                    {{ m['creation_time'].toISOString() }}
+                    {{ m['creation_time'].toUTCString() }}
                 </p>
                 <p>
                     <span class="textbold">Failure retries:</span> {{ m['failure_retries'] }}
@@ -106,7 +106,7 @@
                     </span>
                     <ul>
                         <li ng-repeat="pt in m['processing_times']">
-                            {{ pt }}
+                            {{ pt[0].toUTCString() }} - {{ pt[1].toUTCString() }}
                         </li>
                     </ul>
                 </p>

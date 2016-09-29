@@ -94,6 +94,7 @@ angular.module('multirunApp', [])
             $scope.multiruns = data['json_list'];
             for (var i = 0; i < $scope.multiruns.length; i++) {
                 $scope.multiruns[i]["details"] = false;
+                $scope.multiruns[i]["processing_times"] = $scope.parseProcessingTimes($scope.multiruns[i]["processing_times"]);
                 $scope.multiruns[i]["creation_time"] = new Date($scope.multiruns[i]["creation_time"]);
             }
         })
@@ -108,6 +109,7 @@ angular.module('multirunApp', [])
             $scope.multirunsByWorkflow = data['json_list'];
             for (var i = 0; i < $scope.multirunsByWorkflow.length; i++) {
                 $scope.multirunsByWorkflow[i]["details"] = false;
+                $scope.multirunsByWorkflow[i]["processing_times"] = $scope.parseProcessingTimes($scope.multirunsByWorkflow[i]["processing_times"]);
                 $scope.multirunsByWorkflow[i]["creation_time"] = new Date($scope.multirunsByWorkflow[i]["creation_time"]);
             }
         })
@@ -125,6 +127,23 @@ angular.module('multirunApp', [])
     $scope.sortPredicate = sortPredicate;
   };
 
+    $scope.parseProcessingTimes = function(pt_json){
+        // parses list of string dates into Date() objects
+        var result = [];
+        for (var t = 0; t < pt_json.length; t++){
+            var attempt = [];
+            var start_time = pt_json[t][0];
+            var end_time = pt_json[t][1];
+            // end_time can be null, but start_time can't
+            attempt.push(new Date(start_time));
+            if (end_time == null)
+                attempt.push(end_time)
+            else
+                attempt.push(new Date(end_time));
+            result.push(attempt);
+        }
+        return result;
+    };
 
   $scope.stateColors = {
     'Need more data' : "#DCE775",
