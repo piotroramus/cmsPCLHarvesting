@@ -6,7 +6,7 @@ angular.module('multirunApp', [])
   $scope.searchMultirun   = ''; // display everything
 
   $scope.multiruns = []
-  $scope.MultirunsByWorkflow = []
+  $scope.multirunsByWorkflow = []
   $scope.splitByWorkflows = false;
 
   $scope.columns = {
@@ -107,10 +107,12 @@ angular.module('multirunApp', [])
     $http({method: 'GET', url: '/multiruns_by_workflow/'})
         .success(function(data, status) {
             $scope.multirunsByWorkflow = data['json_list'];
-            for (var i = 0; i < $scope.multirunsByWorkflow.length; i++) {
-                $scope.multirunsByWorkflow[i]["details"] = false;
-                $scope.multirunsByWorkflow[i]["processing_times"] = $scope.parseProcessingTimes($scope.multirunsByWorkflow[i]["processing_times"]);
-                $scope.multirunsByWorkflow[i]["creation_time"] = new Date($scope.multirunsByWorkflow[i]["creation_time"]);
+            for (var workflow in $scope.multirunsByWorkflow) {
+                for (var i = 0; i < $scope.multirunsByWorkflow[workflow].length; i++) {
+                    $scope.multirunsByWorkflow[workflow][i]["details"] = false;
+                    $scope.multirunsByWorkflow[workflow][i]["processing_times"] = $scope.parseProcessingTimes($scope.multirunsByWorkflow[workflow][i]["processing_times"]);
+                    $scope.multirunsByWorkflow[workflow][i]["creation_time"] = new Date($scope.multirunsByWorkflow[workflow][i]["creation_time"]);
+                }
             }
         })
         .error(function(data, status) {
