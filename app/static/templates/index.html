@@ -11,54 +11,111 @@
     <link href="/static/css/custom.css" rel="stylesheet">
 
     <!-- JS -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/angular.min.js"></script>
     <script src="/static/js/index.js"></script>
 
 </head>
 
 
-<body class="mhbody">
+<body class="mhbody" ng-app="multirunApp" ng-controller="mainController">
 
-<div class="container" ng-app="multirunApp" ng-controller="mainController">
-
-
-    <div class="navbuttons">
-        <button type="button" class="btn btn-default" ng-click="switchView()">
-                <span ng-show="splitByWorkflows === true">
-                    Do not split
-                </span>
-                <span ng-show="splitByWorkflows === false">
-                    Split by workflows
-                </span>
-        </button>
-    </div>
-
-    <form>
-        <div class="form-group">
-            <div class="input-group">
-                <div class="input-group-addon"></div>
-
-                <input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">
-
-            </div>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Multi-run Harvesting Overview</a>
         </div>
-    </form>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li ng-click="switchView()">
+                    <a href="#">
+                    <span ng-show="splitByWorkflows === true">
+                        Do not split
+                    </span>
+                    <span ng-show="splitByWorkflows === false">
+                        Split by workflows
+                    </span>
+                    </a>
+                </li>
+                <li><a href="#about">About</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="true">Legend <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Nav header</li>
+                        <li><a href="#">Separated link</a></li>
+                        <li><a href="#">One more separated link</a></li>
+                    </ul>
+                </li>
+                <li id="searchli">
+                    <form class="navbar-form navbar-left" id="searchnavbar">
+                        <div class="form-group">
+                                <input type="text" id="mrunsearchform" class="form-control" placeholder="Search" ng-model="searchMultirun">
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
 
-        <span ng-if="splitByWorkflows == true">
-            <span ng-init="getMultirunsByWorkflow()"></span>
+<div class="container tabcontainer">
 
-            <div class="multiruntab" style="overflow-x:auto" ng-repeat="(workflow, multiruns) in multirunsByWorkflow">
+    <!--<div class="headbar">-->
 
-                <h2>{{ workflow }}</h2>
-                <div ng-include="'/static/templates/mtable.html'"></div>
+        <!--<div class="splitbutton">-->
+        <!--<button type="button" class="btn btn-default" ng-click="switchView()">-->
+        <!--<span ng-show="splitByWorkflows === true">-->
+        <!--Do not split-->
+        <!--</span>-->
+        <!--<span ng-show="splitByWorkflows === false">-->
+        <!--Split by workflows-->
+        <!--</span>-->
+        <!--</button>-->
+        <!--</div>-->
 
-            </div>
-        </span>
+        <!--<div class="searchform">-->
+            <!--<form>-->
+                <!--<div class="form-group">-->
+                    <!--<div class="input-group">-->
+                        <!--<div class="input-group-addon"></div>-->
 
-        <span ng-if="splitByWorkflows == false">
-            <span ng-init="getMultiruns()"></span>
-            <div class="multiruntab" style="overflow-x:auto" ng-include="'/static/templates/mtable.html'"></div>
-        </span>
+                        <!--<input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">-->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</form>-->
+        <!--</div>-->
+
+    <!--</div>-->
+
+    <span ng-if="splitByWorkflows == true">
+        <span ng-init="getMultirunsByWorkflow()"></span>
+
+        <div class="multiruntab" ng-repeat="(workflow, multiruns) in multirunsByWorkflow">
+
+            <h2>{{ workflow }}</h2>
+            <div ng-include="'/static/templates/mtable.html'"></div>
+
+        </div>
+    </span>
+
+    <span ng-if="splitByWorkflows == false">
+        <span ng-init="getMultiruns()"></span>
+        <div class="multiruntab" ng-include="'/static/templates/mtable.html'"></div>
+    </span>
 
 
 </div>
