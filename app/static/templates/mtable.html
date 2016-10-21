@@ -4,11 +4,15 @@
     <tr>
 
         <th></th>
-        <th ng-repeat="(id, col) in columns" ng-show="col['show']" id="thvert">
+        <th ng-repeat="(id, col) in columns" ng-show="col['show']" id="thvert1">
             <a href="#" ng-click="sortBy(id)">
                 {{ col['name'] }}
-                <span ng-show="sortPredicate == id && !sortReverse" class="fa fa-caret-down"></span>
-                <span ng-show="sortPredicate == id && sortReverse" class="fa fa-caret-up"></span>
+            </a>
+        </th>
+        <!-- Run column need to be handled separately because it has a different structure -->
+        <th id="thvert2">
+            <a href="#">
+                Runs
             </a>
         </th>
 
@@ -24,6 +28,11 @@
         </td>
         <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']">
             {{ m[id] }}
+        </td>
+        <td>
+            <span ng-repeat="run in m['runs']">
+                {{ run['number'] }}
+            </span>
         </td>
     </tr>
     <tr ng-if="m.details" ng-repeat-end>
@@ -104,11 +113,11 @@
                     <span ng-show="m['processing_times'].length == 0">
                           Processing not started
                     </span>
-                    <ul>
-                        <li ng-repeat="pt in m['processing_times']">
-                            {{ pt[0].toUTCString() }} - {{ pt[1].toUTCString() }}
-                        </li>
-                    </ul>
+                <ul>
+                    <li ng-repeat="pt in m['processing_times'] | orderBy:'pt[0]'">
+                        {{ pt[0].toUTCString() }} - {{ pt[1].toUTCString() }}
+                    </li>
+                </ul>
                 </p>
             </div>
         </td>
