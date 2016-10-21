@@ -58,10 +58,6 @@ angular.module('multirunApp', [])
         'name': 'Global Tag',
         'show': false
     },
-    'no_payload_retries': {
-        'name': 'No payload retries',
-        'show': true
-    },
     'scram_arch': {
         'name': 'SCRAM architecture',
         'show': false
