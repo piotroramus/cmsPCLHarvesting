@@ -1,3 +1,4 @@
+import copy
 import os
 import subprocess
 
@@ -211,6 +212,9 @@ def color_test():
 
 @app.route('/configuration/')
 def get_config():
-    # TODO: fix
-    # return app.config['MULTIRUN_CFG']['eos_workspace_path']
-    return jsonify(config=app.config)
+    # This method can expose a sensitive data, so it in this shape
+    # should be only used for debugging!
+    config = copy.deepcopy(app.config)
+    # date is not json-serializable, so it have to be handled manually
+    config['PERMANENT_SESSION_LIFETIME'] = str(config['PERMANENT_SESSION_LIFETIME'])
+    return jsonify(config=config)
