@@ -12,6 +12,11 @@
     height: 5px;
 }
 
+.centered {
+    display: flex;
+    justify-content: center;
+}
+
 input[type=checkbox]{
     margin-right: 5;
     margin-left: 0;

@@ -1,6 +1,10 @@
-angular.module('multirunApp', [])
+angular.module('multirunApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
 .controller('mainController', function($scope, $http) {
+
+  /* jshint validthis: true */
+  var vm = this;
+
   $scope.sortPredicate     = 'creation_time';
   $scope.sortReverse  = true;  // the 'newest' multirun first
   $scope.searchMultirun   = ''; // display everything
@@ -8,6 +12,30 @@ angular.module('multirunApp', [])
   $scope.multiruns = []
   $scope.multirunsByWorkflow = []
   $scope.splitByWorkflows = false;
+
+//  $scope.currentPage = 1;
+  vm.currentPage = 1;
+  vm.limit = 25;
+  vm.totalItems = 125;
+
+//    #TODO: add totalItems when this works (totalItems can be in particular < limit)
+  $scope.tracks = [];
+
+  function getData() {
+    $http.get("https://api.spotify.com/v1/search?query=iron+&offset="+($scope.currentPage-1)*$scope.limit+"&limit=20&type=artist")
+      .then(function(response) {
+        $scope.totalItems = response.data.artists.total
+        angular.copy(response.data.artists.items, $scope.tracks)
+
+
+      });
+  }
+
+  vm.pageChanged = function() {
+    console.log("Page changed to: " + vm.currentPage);
+//    # TODO: what about multiruns by workflow?
+    $scope.getMultiruns();
+  };
 
   $scope.columns = {
     'id': {
@@ -85,14 +113,21 @@ angular.module('multirunApp', [])
   }
 
    $scope.getMultiruns = function() {
-    $http({method: 'GET', url: '/multiruns/'})
+//   TODO: test if the arithmetic operations are correct and everything works as expected
+//    console.log("THIS FUNCTION HAS JUST BEEN INVOKED");
+//    console.log("Current Page: " + $scope.currentPage);
+//    $http({method: 'GET', url: "/multiruns/?limit=25&offset=0"})
+    $http({method: 'GET', url: "/multiruns/?limit="+vm.limit+"&offset="+(vm.currentPage-1)*vm.limit})
         .success(function(data, status) {
-            $scope.multiruns = data['json_list'];
+            $scope.multiruns = data['multiruns'];
             for (var i = 0; i < $scope.multiruns.length; i++) {
                 $scope.multiruns[i]["details"] = false;
                 $scope.multiruns[i]["processing_times"] = $scope.parseProcessingTimes($scope.multiruns[i]["processing_times"]);
                 $scope.multiruns[i]["creation_time"] = new Date($scope.multiruns[i]["creation_time"]);
             }
+            vm.totalItems = data['total'];
+            console.log("RECEIVED "+data['multiruns'].length+" ITEMS")
+            console.log("TOTAL "+data['total'])
         })
         .error(function(data, status) {
             console.error("Error while loading multiruns");
@@ -102,7 +137,7 @@ angular.module('multirunApp', [])
     $scope.getMultirunsByWorkflow = function() {
     $http({method: 'GET', url: '/multiruns_by_workflow/'})
         .success(function(data, status) {
-            $scope.multirunsByWorkflow = data['json_list'];
+            $scope.multirunsByWorkflow = data['multiruns'];
             for (var workflow in $scope.multirunsByWorkflow) {
                 for (var i = 0; i < $scope.multirunsByWorkflow[workflow].length; i++) {
                     $scope.multirunsByWorkflow[workflow][i]["details"] = false;
@@ -170,4 +205,5 @@ angular.module('multirunApp', [])
         }
         return visibleCounter;
   }
+
 });

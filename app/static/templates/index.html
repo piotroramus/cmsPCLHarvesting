@@ -7,19 +7,28 @@
     <title>Multirun Harvesting Overview</title>
 
     <!-- CSS -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="/static/css/bootstrap.min.css" rel="stylesheet">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="/static/css/custom.css" rel="stylesheet">
 
     <!-- JS -->
     <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/angular.min.js"></script>
+    <!--<script src="/static/js/bootstrap.min.js"></script>-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <!--<script src="/static/js/angular.min.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.2.0.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
     <script src="/static/js/index.js"></script>
 
 </head>
 
 
-<body class="mhbody" ng-app="multirunApp" ng-controller="mainController">
+<body class="mhbody" ng-app="multirunApp" ng-controller="mainController as main">
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
@@ -51,14 +60,15 @@
                        aria-expanded="true">Legend <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li ng-repeat="(state, color) in stateColors" style="background-color: {{ color }}">
-                                <a href="#">{{ state }}</a>
+                            <a href="#">{{ state }}</a>
                         </li>
                     </ul>
                 </li>
                 <li id="searchli">
                     <form class="navbar-form navbar-left" id="searchnavbar">
                         <div class="form-group">
-                                <input type="text" id="mrunsearchform" class="form-control" placeholder="Search" ng-model="searchMultirun">
+                            <input type="text" id="mrunsearchform" class="form-control" placeholder="Search"
+                                   ng-model="searchMultirun">
                         </div>
                     </form>
                 </li>
@@ -71,35 +81,36 @@
 
     <!--<div class="headbar">-->
 
-        <!--<div class="splitbutton">-->
-        <!--<button type="button" class="btn btn-default" ng-click="switchView()">-->
-        <!--<span ng-show="splitByWorkflows === true">-->
-        <!--Do not split-->
-        <!--</span>-->
-        <!--<span ng-show="splitByWorkflows === false">-->
-        <!--Split by workflows-->
-        <!--</span>-->
-        <!--</button>-->
-        <!--</div>-->
+    <!--<div class="splitbutton">-->
+    <!--<button type="button" class="btn btn-default" ng-click="switchView()">-->
+    <!--<span ng-show="splitByWorkflows === true">-->
+    <!--Do not split-->
+    <!--</span>-->
+    <!--<span ng-show="splitByWorkflows === false">-->
+    <!--Split by workflows-->
+    <!--</span>-->
+    <!--</button>-->
+    <!--</div>-->
 
-        <!--<div class="searchform">-->
-            <!--<form>-->
-                <!--<div class="form-group">-->
-                    <!--<div class="input-group">-->
-                        <!--<div class="input-group-addon"></div>-->
+    <!--<div class="searchform">-->
+    <!--<form>-->
+    <!--<div class="form-group">-->
+    <!--<div class="input-group">-->
+    <!--<div class="input-group-addon"></div>-->
 
-                        <!--<input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">-->
+    <!--<input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">-->
 
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</form>-->
-        <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</form>-->
+    <!--</div>-->
 
     <!--</div>-->
 
     <span ng-if="splitByWorkflows == true">
         <span ng-init="getMultirunsByWorkflow()"></span>
 
+        <!--<ul uib-pagination total-items="limit" ng-model="currentPage" ng-change="pageChanged()"></ul>-->
         <div class="multiruntab" ng-repeat="(workflow, multiruns) in multirunsByWorkflow">
 
             <h2>{{ workflow }}</h2>
@@ -110,9 +121,18 @@
 
     <span ng-if="splitByWorkflows == false">
         <span ng-init="getMultiruns()"></span>
+
         <div class="multiruntab" ng-include="'/static/templates/mtable.html'"></div>
     </span>
 
+    <!--<ul uib-pagination total-items="limit" ng-model="currentPage" ng-change="pageChanged()"></ul>-->
+
+    <!--<button>-->
+    <!--Previous-->
+    <!--</button>-->
+    <!--<button>-->
+    <!--Next-->
+    <!--</button>-->
 
 </div>
 </body>
