@@ -19,7 +19,10 @@ angular.module('multirunApp', ['ui.bootstrap'])
 
     vm.pageChanged = function() {
         // TODO: what about multiruns by workflow?
-        $scope.getMultiruns();
+        if ($scope.splitByWorkflows === true)
+            $scope.getMultirunsByWorkflow();
+        else
+            $scope.getMultiruns();
     };
 
     $scope.columns = {
