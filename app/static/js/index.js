@@ -15,11 +15,10 @@ angular.module('multirunApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
     $scope.splitByWorkflows = false;
 
     vm.currentPage = 1;
-    vm.limit = 25;
+    vm.itemsPerPage = 25;
     vm.totalItems = 125;
 
     vm.pageChanged = function() {
-        console.log("Page changed to: " + vm.currentPage);
         // TODO: what about multiruns by workflow?
         $scope.getMultiruns();
     };
@@ -101,7 +100,7 @@ angular.module('multirunApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
     $scope.getMultiruns = function() {
         //  TODO: test if the arithmetic operations are correct and everything works as expected
-        var murl = "/multiruns/?limit="+vm.limit+"&offset="+(vm.currentPage-1)*vm.limit
+        var murl = "/multiruns/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
                 $scope.multiruns = data['multiruns'];
@@ -111,8 +110,6 @@ angular.module('multirunApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                     $scope.multiruns[i]["creation_time"] = new Date($scope.multiruns[i]["creation_time"]);
                 }
                 vm.totalItems = data['total'];
-                console.log("RECEIVED "+data['multiruns'].length+" ITEMS")
-                console.log("TOTAL "+data['total'])
             })
             .error(function(data, status) {
                 console.error("Error while loading multiruns");
@@ -120,7 +117,7 @@ angular.module('multirunApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
     }
 
     $scope.getMultirunsByWorkflow = function() {
-        var murl = "/multiruns_by_workflow/?limit="+vm.limit+"&offset="+(vm.currentPage-1)*vm.limit
+        var murl = "/multiruns_by_workflow/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
                 $scope.multirunsByWorkflow = data['multiruns'];

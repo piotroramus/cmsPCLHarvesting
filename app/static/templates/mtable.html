@@ -1,5 +1,12 @@
 <div class="centered">
-    <ul uib-pagination total-items="main.totalItems" ng-model="main.currentPage" ng-change="main.pageChanged()"></ul>
+    <ul uib-pagination
+        total-items="main.totalItems" ng-model="main.currentPage"
+        ng-change="main.pageChanged()" items-per-page="main.itemsPerPage"
+        boundary-links="true" rotate="true" force-ellipses="true"
+        max-size="9" previous-text="&lsaquo;" next-text="&rsaquo;"
+        first-text="&laquo;" last-text="&raquo;"
+        boundary-link-numbers="true">
+    </ul>
 </div>
 
 <table class="table table-bordered table-striped">
@@ -130,3 +137,14 @@
 
 </table>
 
+
+<div class="centered">
+    <ul uib-pagination
+        total-items="main.totalItems" ng-model="main.currentPage"
+        ng-change="main.pageChanged()" items-per-page="main.itemsPerPage"
+        boundary-links="true" rotate="true" force-ellipses="true"
+        max-size="9" previous-text="&lsaquo;" next-text="&rsaquo;"
+        first-text="&laquo;" last-text="&raquo;"
+        boundary-link-numbers="true">
+    </ul>
+</div>
