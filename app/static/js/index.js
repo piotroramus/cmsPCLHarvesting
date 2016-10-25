@@ -1,5 +1,4 @@
-angular.module('multirunApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
-// TODO: try to get rid of useless dependencies
+angular.module('multirunApp', ['ui.bootstrap'])
 
 .controller('mainController', function($scope, $http) {
 
