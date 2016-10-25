@@ -180,7 +180,8 @@ angular.module('multirunApp', ['ui.bootstrap'])
 
     $scope.visibleCols = function() {
         // 1 is for the button column which is not in the columns definitions
-        var visibleCounter = 1;
+        // 2 is for runs column
+        var visibleCounter = 2;
         for (var id in $scope.columns){
 
             if ($scope.columns[id]['show'] === true) visibleCounter++;
