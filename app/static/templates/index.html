@@ -71,38 +71,9 @@
 
 <div class="container tabcontainer">
 
-    <!--<div class="headbar">-->
-
-    <!--<div class="splitbutton">-->
-    <!--<button type="button" class="btn btn-default" ng-click="switchView()">-->
-    <!--<span ng-show="splitByWorkflows === true">-->
-    <!--Do not split-->
-    <!--</span>-->
-    <!--<span ng-show="splitByWorkflows === false">-->
-    <!--Split by workflows-->
-    <!--</span>-->
-    <!--</button>-->
-    <!--</div>-->
-
-    <!--<div class="searchform">-->
-    <!--<form>-->
-    <!--<div class="form-group">-->
-    <!--<div class="input-group">-->
-    <!--<div class="input-group-addon"></div>-->
-
-    <!--<input type="text" class="form-control" placeholder="Search" ng-model="searchMultirun">-->
-
-    <!--</div>-->
-    <!--</div>-->
-    <!--</form>-->
-    <!--</div>-->
-
-    <!--</div>-->
-
     <span ng-if="splitByWorkflows == true">
         <span ng-init="getMultirunsByWorkflow()"></span>
 
-        <!--<ul uib-pagination total-items="limit" ng-model="currentPage" ng-change="pageChanged()"></ul>-->
         <div class="multiruntab" ng-repeat="(workflow, multiruns) in multirunsByWorkflow">
 
             <h2>{{ workflow }}</h2>
@@ -116,15 +87,6 @@
 
         <div class="multiruntab" ng-include="'/static/templates/mtable.html'"></div>
     </span>
-
-    <!--<ul uib-pagination total-items="limit" ng-model="currentPage" ng-change="pageChanged()"></ul>-->
-
-    <!--<button>-->
-    <!--Previous-->
-    <!--</button>-->
-    <!--<button>-->
-    <!--Next-->
-    <!--</button>-->
 
 </div>
 </body>
