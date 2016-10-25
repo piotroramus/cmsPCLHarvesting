@@ -146,7 +146,7 @@ def display_plain():
 
 @app.route('/m/')
 def multirun_new():
-    return app.send_static_file('templates/main.html')
+    return app.send_static_file('templates/basic.html')
 
 
 @app.route('/display/')

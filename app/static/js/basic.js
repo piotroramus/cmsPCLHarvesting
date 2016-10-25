@@ -1,6 +1,6 @@
 angular.module('multirunApp', [])
 
-.controller('mainController', function($scope, $http) {
+.controller('basicController', function($scope, $http) {
   $scope.sortType     = 'id'; // set the default sort type
   $scope.sortReverse  = false;  // set the default sort order
   $scope.searchMultirun   = '';     // set the default search/filter term
