@@ -95,8 +95,13 @@ def run_in_shell(*popenargs, **kwargs):
     return stdout
 
 
-def get_data():
-    multiruns = db.session.query(model.Multirun).all()
+def get_data(offset=0, limit=25):
+    multiruns = db.session. \
+        query(model.Multirun). \
+        order_by(model.Multirun.creation_time.desc()). \
+        limit(limit). \
+        offset(offset). \
+        all()
     m_json = [m.to_json() for m in multiruns]
     for m in m_json:
         m['state'] = state_names[m['state']]
@@ -151,13 +156,31 @@ def display():
 
 @app.route('/multiruns/')
 def get_multiruns():
-    data = get_data()
-    return jsonify(json_list=data)
+    # TODO: common logic with workflow method
+    # probably it is worth to only extract getting multiruns to different method
+    offset = request.args.get('offset')
+    if not offset:
+        offset = 0
+    limit = request.args.get('limit')
+    # TODO: think what to put as a default and also how to get every record
+    if not limit:
+        limit = 25
+    data = get_data(offset, limit)
+    return jsonify(multiruns=data,
+                   limit=limit,
+                   offset=offset,
+                   total=multiruns_total())
 
 
 @app.route('/multiruns_by_workflow/')
 def get_multiruns_by_workflow():
-    data = get_data()
+    offset = request.args.get('offset')
+    if not offset:
+        offset = 0
+    limit = request.args.get('limit')
+    if not limit:
+        limit = 0
+    data = get_data(offset, limit)
     m_by_workflows = dict()
     for multirun in data:
         workflow = extract_workflow(multirun['dataset'])
@@ -166,7 +189,19 @@ def get_multiruns_by_workflow():
         else:
             m_by_workflows[workflow].append(multirun)
 
-    return jsonify(json_list=m_by_workflows)
+    return jsonify(multiruns=m_by_workflows,
+                   limit=limit,
+                   offset=offset,
+                   total=multiruns_total())
+
+
+@app.route('/multiruns_total/')
+def mtotal():
+    return jsonify(total=multiruns_total())
+
+
+def multiruns_total():
+    return db.session.query(model.Multirun).count()
 
 
 @app.route('/color_test/')
@@ -177,4 +212,5 @@ def color_test():
 @app.route('/configuration/')
 def get_config():
     # TODO: fix
-    return jsonify(json_list=app.config)
+    # return app.config['MULTIRUN_CFG']['eos_workspace_path']
+    return jsonify(config=app.config)
