@@ -18,7 +18,6 @@ angular.module('multirunApp', ['ui.bootstrap'])
     vm.totalItems = 125;
 
     vm.pageChanged = function() {
-        // TODO: what about multiruns by workflow?
         if ($scope.splitByWorkflows === true)
             $scope.getMultirunsByWorkflow();
         else
@@ -101,7 +100,6 @@ angular.module('multirunApp', ['ui.bootstrap'])
   }
 
     $scope.getMultiruns = function() {
-        //  TODO: test if the arithmetic operations are correct and everything works as expected
         var murl = "/multiruns/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
