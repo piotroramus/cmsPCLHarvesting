@@ -116,7 +116,7 @@ if [[ $CMS_RUN_RESULT != 0 ]]; then
     exit $CMS_RUN_RESULT
 fi
 
-# append multirun_id to conditions file
+# append multirun_id to conditions filename
 mv promptCalibConditions.db $CONDITIONS_FILE
 
 # create dropbox metadata file
