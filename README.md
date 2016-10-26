@@ -1,56 +1,71 @@
 # CMS PCL MultiRun Harvesting
+## Running data discovery
 
-# NOTE: THIS IS NOT VALID ANYMORE, NEEDS TO BE UPDATED!
+The step looks for a newly available runs and creates multiruns out of them.
 
-## Running data (new runs) discovery
+```
+# setup GRID certificate passing the password as a argument to the script
+cd backend/bin
+source proxy_cert.sh ${GRID_CERT_PASS_PHRASE}
 
-### Get access to DBS python client
+cd ..
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
 
-#### Provide credentials for voms-proxy-init
-
-In the `bin` directory create a file called `voms.pwd` and fill it with the following content:
-
-GRID_PASS_PHRASE=gridphrase
-
-where the `gridphrase` is a phrase for your GRID certificate
-
-#### Source setup file
-
-`cd bin` # if needed
-`source setup.sh`
-`cd ..`
-
-Please note that the script should be sourced from `bin` directory itself.
-Otherwise credentials file will not be recognized.
-
-### Setup python virtual environment
-
-`virtualenv env`
-`source env/bin/activate`
-`pip install -r requirements.txt`
-
-
-### Run data discovery
-
-`python python/runDataDiscovery.py`
-
-It will look for a newly available runs, update local database and create multiruns out of them. 
-One important thing here is that you should follow these steps exactly in this order.
-This is caused by the fact than libraries linked by `setup.sh` should be shadowed be the ones from requirements file.
-
+# example config files can be found in backend/python/config
+python python/runDataDiscovery.py --config ${CONFIG_FILE}
+```
 
 ## Running AlCa Harvesting PCL step
 
-### Setup python virtual environment (if not done yet)
+The step takes the multi-runs created by data discovery step and executes AlCa Harvesting step on them.
 
-`virtualenv env`
-`source env/bin/activate`
-`pip install -r requirements.txt`
+```
+cd backend
 
-###  Run AlCa Harvesting
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
 
-`python python/runAlCaHarvesting.py`
+python python/runAlCaHarvesting.py --config $CONFIG_FILE
+```
 
-It will take the multiruns created by data discovery step and then try to produce
-results of AlCa Harvesting step by using the multiruns as a input data.
+## Running DQM Uploads
 
+Uploads DQM files to DQM GUI produced by previous steps if there are any.
+
+```
+cd backend/bin
+source proxy_cert.sh ${GRID_CERT_PASS_PHRASE}
+
+cd backend
+
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+
+python python/runDQMUpload.py --config $CONFIG_FILE
+
+```
+
+## Running payload uploads
+
+Uploads payload to condition database for workflows specified in the config file
+
+```
+cd backend
+
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+
+python python/runPayloadUpload.py $NETRC_FILE --config $CONFIG_FILE
+```
+
+The .netrc file which contains credentials necessary for uploading should contain following entry:
+```
+machine ConditionUploader
+        login LOGIN
+        password PASSWORD
+```
