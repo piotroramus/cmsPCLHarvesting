@@ -1,7 +1,8 @@
-angular.module('multirunApp', ['ui.bootstrap'])
+angular
+    .module('multirunApp', ['ui.bootstrap'])
+    .controller('multirunController', MultirunController)
 
-.controller('multirunController', function($scope, $http) {
-
+function MultirunController($scope, $http) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -194,4 +195,4 @@ angular.module('multirunApp', ['ui.bootstrap'])
         return visibleCounter;
     }
 
-});
+};
