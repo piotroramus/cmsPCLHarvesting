@@ -5,7 +5,7 @@
 
         <th></th>
         <th ng-repeat="(id, col) in mh.columns" ng-show="col['show']" id="thvert1">
-            <a href="#" ng-click="sortBy(id)">
+            <a href="#" ng-click="vm.sortBy(id)">
                 {{ col['name'] }}
             </a>
         </th>
@@ -20,7 +20,7 @@
     </thead>
 
     <tbody>
-    <tr ng-repeat-start="m in multiruns | orderBy:sortPredicate:sortReverse | filter:searchMultirun"
+    <tr ng-repeat-start="m in multiruns | orderBy:mh.sortPredicate:mh.sortReverse | filter:mh.filterMultiruns"
         ng-style="{{ rowColor(m['state']) }}">
         <td>
             <button ng-if="m.details" ng-click="m.details = false">-</button>

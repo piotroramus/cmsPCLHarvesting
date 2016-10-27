@@ -5,9 +5,9 @@ angular.module('multirunApp', ['ui.bootstrap'])
     /* jshint validthis: true */
     var vm = this;
 
-    $scope.sortPredicate     = 'creation_time';
-    $scope.sortReverse  = true;  // the 'newest' multirun first
-    $scope.searchMultirun   = ''; // display everything
+    vm.sortPredicate = 'creation_time';
+    vm.sortReverse = true;  // most recent multirun first
+    vm.filterMultiruns = ''; // display everything
 
     $scope.multiruns = []
     $scope.multirunsByWorkflow = []
@@ -138,9 +138,9 @@ angular.module('multirunApp', ['ui.bootstrap'])
         $scope.splitByWorkflows = ($scope.splitByWorkflows === true) ? false : true;
     }
 
-    $scope.sortBy = function(sortPredicate) {
-        $scope.sortReverse = ($scope.sortPredicate === sortPredicate) ? !$scope.sortReverse : false;
-        $scope.sortPredicate = sortPredicate;
+    vm.sortBy = function(sortPredicate) {
+        vm.sortReverse = (vm.sortPredicate === sortPredicate) ? !vm.sortReverse : false;
+        vm.sortPredicate = sortPredicate;
     };
 
     $scope.parseProcessingTimes = function(pt_json){
