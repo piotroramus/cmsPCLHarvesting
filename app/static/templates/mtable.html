@@ -114,8 +114,8 @@
                           Processing not started
                     </span>
                 <ul>
-                    <li ng-repeat="pt in m['processing_times'] | orderBy:pt[0]">
-                        {{ pt[0].toUTCString() }} - {{ pt[1].toUTCString() }}
+                    <li ng-repeat="pt in m['processing_times'] | orderBy:'start'">
+                        {{ pt['start'].toUTCString() }} - {{ pt['end'].toUTCString() }}
                     </li>
                 </ul>
                 </p>

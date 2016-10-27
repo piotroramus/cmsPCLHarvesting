@@ -113,7 +113,7 @@ function MultirunController($scope, $http) {
                 vm.multiruns = data['multiruns'];
                 for (var i = 0; i < vm.multiruns.length; i++) {
                     vm.multiruns[i]["details"] = false;
-                    vm.multiruns[i]["processing_times"] = vm.parseProcessingTimes(vm.multiruns[i]["processing_times"]);
+                    vm.multiruns[i]["processing_times"] = parseProcessingTimes(vm.multiruns[i]["processing_times"]);
                     vm.multiruns[i]["creation_time"] = new Date(vm.multiruns[i]["creation_time"]);
                 }
                 vm.totalItems = data['total'];
@@ -131,7 +131,7 @@ function MultirunController($scope, $http) {
                 for (var workflow in vm.multirunsByWorkflow) {
                     for (var i = 0; i < vm.multirunsByWorkflow[workflow].length; i++) {
                         vm.multirunsByWorkflow[workflow][i]["details"] = false;
-                        vm.multirunsByWorkflow[workflow][i]["processing_times"] = vm.parseProcessingTimes(vm.multirunsByWorkflow[workflow][i]["processing_times"]);
+                        vm.multirunsByWorkflow[workflow][i]["processing_times"] = parseProcessingTimes(vm.multirunsByWorkflow[workflow][i]["processing_times"]);
                         vm.multirunsByWorkflow[workflow][i]["creation_time"] = new Date(vm.multirunsByWorkflow[workflow][i]["creation_time"]);
                     }
                 }
@@ -150,19 +150,18 @@ function MultirunController($scope, $http) {
         vm.sortPredicate = sortPredicate;
     };
 
-    vm.parseProcessingTimes = function(pt_json){
+    function parseProcessingTimes(pt_json){
         // parses list of string dates into Date() objects
         var result = [];
         for (var t = 0; t < pt_json.length; t++){
-            var attempt = [];
+            var attempt = {};
             var start_time = pt_json[t][0];
             var end_time = pt_json[t][1];
             // end_time can be null, but start_time can't
-            attempt.push(new Date(start_time));
-            if (end_time == null)
-                attempt.push(end_time)
-            else
-                attempt.push(new Date(end_time));
+            attempt['start'] = new Date(start_time);
+            attempt['end'] = null;
+            if (end_time != null)
+                attempt['end'] = new Date(end_time);
             result.push(attempt);
         }
         return result;
