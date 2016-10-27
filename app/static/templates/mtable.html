@@ -4,7 +4,7 @@
     <tr>
 
         <th></th>
-        <th ng-repeat="(id, col) in columns" ng-show="col['show']" id="thvert1">
+        <th ng-repeat="(id, col) in mh.columns" ng-show="col['show']" id="thvert1">
             <a href="#" ng-click="sortBy(id)">
                 {{ col['name'] }}
             </a>
@@ -26,7 +26,7 @@
             <button ng-if="m.details" ng-click="m.details = false">-</button>
             <button ng-if="!m.details" ng-click="m.details = true">+</button>
         </td>
-        <td ng-repeat="(id, col) in columns" ng-show="columns[id]['show']">
+        <td ng-repeat="(id, col) in mh.columns" ng-show="mh.columns[id]['show']">
             {{ m[id] }}
         </td>
         <td>

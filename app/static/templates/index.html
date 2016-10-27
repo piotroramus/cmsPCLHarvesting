@@ -20,7 +20,7 @@
 </head>
 
 
-<body class="mhbody" ng-app="multirunApp" ng-controller="mainController as main">
+<body class="mhbody" ng-app="multirunApp" ng-controller="multirunController as mh">
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
@@ -90,8 +90,8 @@
 
     <div class="centered">
         <ul uib-pagination
-            total-items="main.totalItems" ng-model="main.currentPage"
-            ng-change="main.pageChanged()" items-per-page="main.itemsPerPage"
+            total-items="mh.totalItems" ng-model="mh.currentPage"
+            ng-change="mh.pageChanged()" items-per-page="mh.itemsPerPage"
             boundary-links="true" rotate="true" force-ellipses="true"
             max-size="9" previous-text="&lsaquo;" next-text="&rsaquo;"
             first-text="&laquo;" last-text="&raquo;"

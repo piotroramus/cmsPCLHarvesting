@@ -1,6 +1,6 @@
 angular.module('multirunApp', ['ui.bootstrap'])
 
-.controller('mainController', function($scope, $http) {
+.controller('multirunController', function($scope, $http) {
 
     /* jshint validthis: true */
     var vm = this;
@@ -24,7 +24,7 @@ angular.module('multirunApp', ['ui.bootstrap'])
             $scope.getMultiruns();
     };
 
-    $scope.columns = {
+    vm.columns = {
     'id': {
         'name': 'ID',
         'show': true
@@ -183,9 +183,9 @@ angular.module('multirunApp', ['ui.bootstrap'])
         // 1 is for the button column which is not in the columns definitions
         // 2 is for runs column
         var visibleCounter = 2;
-        for (var id in $scope.columns){
+        for (var id in vm.columns){
 
-            if ($scope.columns[id]['show'] === true) visibleCounter++;
+            if (vm.columns[id]['show'] === true) visibleCounter++;
         }
         return visibleCounter;
     }
