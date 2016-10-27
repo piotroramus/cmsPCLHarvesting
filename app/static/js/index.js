@@ -18,6 +18,7 @@ function MultirunController($scope, $http) {
     vm.itemsPerPage = 25;
     vm.totalItems = 125;
 
+    vm.chooseMultiruns = chooseMultiruns;
     vm.pageChanged = pageChanged;
     vm.rowColor = rowColor;
     vm.sortBy = sortBy;
@@ -30,6 +31,11 @@ function MultirunController($scope, $http) {
 
     vm.stateColors = {};
     vm.columns = {};
+
+    function chooseMultiruns(multiruns) {
+        /* the argument will be defined only when there is a split */
+        return vm.splitByWorkflows ? multiruns : vm.multiruns;
+    }
 
     function pageChanged() {
         if (vm.splitByWorkflows === true)
