@@ -9,105 +9,111 @@ angular.module('multirunApp', ['ui.bootstrap'])
     vm.sortReverse = true;  // most recent multirun first
     vm.filterMultiruns = ''; // display everything
 
-    $scope.multiruns = []
-    $scope.multirunsByWorkflow = []
-    $scope.splitByWorkflows = false;
+    vm.multiruns = []
+    vm.multirunsByWorkflow = []
+    vm.splitByWorkflows = false;
 
     vm.currentPage = 1;
     vm.itemsPerPage = 25;
     vm.totalItems = 125;
 
     vm.pageChanged = function() {
-        if ($scope.splitByWorkflows === true)
-            $scope.getMultirunsByWorkflow();
+        if (vm.splitByWorkflows === true)
+            vm.getMultirunsByWorkflow();
         else
-            $scope.getMultiruns();
+            vm.getMultiruns();
     };
 
-    vm.columns = {
-    'id': {
-        'name': 'ID',
-        'show': true
-    },
-    'state': {
-        'name': 'State',
-        'show': true
-    },
-    'dataset': {
-        'name': 'Dataset',
-        'show': true
-    },
-    'number_of_events': {
-        'name': 'Events',
-        'show': true
-    },
-    'failure_retries': {
-        'name': 'Failure Retries',
-        'show': true
-    },
-    'no_payload_retries': {
-        'name': 'No payload retries',
-        'show': true
-    },
-    'perform_payload_upload': {
-        'name': 'Payload upload',
-        'show': false
-    },
-    'bfield': {
-        'name': 'BField',
-        'show': false
-    },
-    'cmssw': {
-        'name': 'CMSSW',
-        'show': false
-    },
-    'dropbox_log': {
-        'name': 'Dropbox log URL',
-        'show': false
-    },
-    'eos_dirs': {
-        'name': 'EOS directories',
-        'show': false
-    },
-    'global_tag': {
-        'name': 'Global Tag',
-        'show': false
-    },
-    'scram_arch': {
-        'name': 'SCRAM architecture',
-        'show': false
-    },
-    'scenario': {
-        'name': 'Scenario',
-        'show': false
-    },
-    'run_class_name': {
-        'name': 'Run Class Name',
-        'show': false
-    },
-    'processing_times': {
-        'name': 'Processing Times',
-        'show': false
-    },
-    'runs': {
-        'name': 'Runs',
-        'show': false
-    },
-    'creation_time': {
-        'name': 'Creation time',
-        'show': false
+    vm.splitButtonText = function() {
+        var splitText = "Split by workflows";
+        var doNotSplitText = "Do not split";
+        return vm.splitByWorkflows ? doNotSplitText : splitText;
     }
-  }
 
-    $scope.getMultiruns = function() {
+    vm.columns = {
+        'id': {
+            'name': 'ID',
+            'show': true
+        },
+        'state': {
+            'name': 'State',
+            'show': true
+        },
+        'dataset': {
+            'name': 'Dataset',
+            'show': true
+        },
+        'number_of_events': {
+            'name': 'Events',
+            'show': true
+        },
+        'failure_retries': {
+            'name': 'Failure Retries',
+            'show': true
+        },
+        'no_payload_retries': {
+            'name': 'No payload retries',
+            'show': true
+        },
+        'perform_payload_upload': {
+            'name': 'Payload upload',
+            'show': false
+        },
+        'bfield': {
+            'name': 'BField',
+            'show': false
+        },
+        'cmssw': {
+            'name': 'CMSSW',
+            'show': false
+        },
+        'dropbox_log': {
+            'name': 'Dropbox log URL',
+            'show': false
+        },
+        'eos_dirs': {
+            'name': 'EOS directories',
+            'show': false
+        },
+        'global_tag': {
+            'name': 'Global Tag',
+            'show': false
+        },
+        'scram_arch': {
+            'name': 'SCRAM architecture',
+            'show': false
+        },
+        'scenario': {
+            'name': 'Scenario',
+            'show': false
+        },
+        'run_class_name': {
+            'name': 'Run Class Name',
+            'show': false
+        },
+        'processing_times': {
+            'name': 'Processing Times',
+            'show': false
+        },
+        'runs': {
+            'name': 'Runs',
+            'show': false
+        },
+        'creation_time': {
+            'name': 'Creation time',
+            'show': false
+        }
+    }
+
+    vm.getMultiruns = function() {
         var murl = "/multiruns/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
-                $scope.multiruns = data['multiruns'];
-                for (var i = 0; i < $scope.multiruns.length; i++) {
-                    $scope.multiruns[i]["details"] = false;
-                    $scope.multiruns[i]["processing_times"] = $scope.parseProcessingTimes($scope.multiruns[i]["processing_times"]);
-                    $scope.multiruns[i]["creation_time"] = new Date($scope.multiruns[i]["creation_time"]);
+                vm.multiruns = data['multiruns'];
+                for (var i = 0; i < vm.multiruns.length; i++) {
+                    vm.multiruns[i]["details"] = false;
+                    vm.multiruns[i]["processing_times"] = vm.parseProcessingTimes(vm.multiruns[i]["processing_times"]);
+                    vm.multiruns[i]["creation_time"] = new Date(vm.multiruns[i]["creation_time"]);
                 }
                 vm.totalItems = data['total'];
             })
@@ -116,16 +122,16 @@ angular.module('multirunApp', ['ui.bootstrap'])
             })
     }
 
-    $scope.getMultirunsByWorkflow = function() {
+    vm.getMultirunsByWorkflow = function() {
         var murl = "/multiruns_by_workflow/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
-                $scope.multirunsByWorkflow = data['multiruns'];
-                for (var workflow in $scope.multirunsByWorkflow) {
-                    for (var i = 0; i < $scope.multirunsByWorkflow[workflow].length; i++) {
-                        $scope.multirunsByWorkflow[workflow][i]["details"] = false;
-                        $scope.multirunsByWorkflow[workflow][i]["processing_times"] = $scope.parseProcessingTimes($scope.multirunsByWorkflow[workflow][i]["processing_times"]);
-                        $scope.multirunsByWorkflow[workflow][i]["creation_time"] = new Date($scope.multirunsByWorkflow[workflow][i]["creation_time"]);
+                vm.multirunsByWorkflow = data['multiruns'];
+                for (var workflow in vm.multirunsByWorkflow) {
+                    for (var i = 0; i < vm.multirunsByWorkflow[workflow].length; i++) {
+                        vm.multirunsByWorkflow[workflow][i]["details"] = false;
+                        vm.multirunsByWorkflow[workflow][i]["processing_times"] = vm.parseProcessingTimes(vm.multirunsByWorkflow[workflow][i]["processing_times"]);
+                        vm.multirunsByWorkflow[workflow][i]["creation_time"] = new Date(vm.multirunsByWorkflow[workflow][i]["creation_time"]);
                     }
                 }
             })
@@ -134,8 +140,8 @@ angular.module('multirunApp', ['ui.bootstrap'])
             })
    }
 
-    $scope.switchView = function() {
-        $scope.splitByWorkflows = ($scope.splitByWorkflows === true) ? false : true;
+    vm.switchView = function() {
+        vm.splitByWorkflows = (vm.splitByWorkflows === true) ? false : true;
     }
 
     vm.sortBy = function(sortPredicate) {
@@ -143,7 +149,7 @@ angular.module('multirunApp', ['ui.bootstrap'])
         vm.sortPredicate = sortPredicate;
     };
 
-    $scope.parseProcessingTimes = function(pt_json){
+    vm.parseProcessingTimes = function(pt_json){
         // parses list of string dates into Date() objects
         var result = [];
         for (var t = 0; t < pt_json.length; t++){
@@ -161,7 +167,7 @@ angular.module('multirunApp', ['ui.bootstrap'])
         return result;
     };
 
-    $scope.stateColors = {
+    vm.stateColors = {
         'Need more data' : "#DCE775",
         'Ready' : "#81D4FA",
         'Processing' : "#80CBC4",
@@ -173,20 +179,18 @@ angular.module('multirunApp', ['ui.bootstrap'])
         'Uploads OK' : "#FFCC80",
     }
 
-    $scope.rowColor = function(state) {
+    vm.rowColor = function(state) {
         return {
-            "background-color": $scope.stateColors[state]
+            "background-color": vm.stateColors[state]
         };
     }
 
-    $scope.visibleCols = function() {
+    vm.visibleCols = function() {
         // 1 is for the button column which is not in the columns definitions
         // 2 is for runs column
         var visibleCounter = 2;
-        for (var id in vm.columns){
-
+        for (var id in vm.columns)
             if (vm.columns[id]['show'] === true) visibleCounter++;
-        }
         return visibleCounter;
     }
 

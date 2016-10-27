@@ -36,15 +36,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li ng-click="switchView()">
-                    <a href="#">
-                    <span ng-show="splitByWorkflows === true">
-                        Do not split
-                    </span>
-                    <span ng-show="splitByWorkflows === false">
-                        Split by workflows
-                    </span>
-                    </a>
+                <li ng-click="mh.switchView()">
+                    <a href="#">{{ mh.splitButtonText() }}</a>
                 </li>
                 <li><a href="#about">About</a></li>
                 <li class="dropdown">
@@ -71,10 +64,10 @@
 
 <div class="container tabcontainer">
 
-    <span ng-if="splitByWorkflows == true">
-        <span ng-init="getMultirunsByWorkflow()"></span>
+    <span ng-if="mh.splitByWorkflows == true">
+        <span ng-init="mh.getMultirunsByWorkflow()"></span>
 
-        <div class="multiruntab" ng-repeat="(workflow, multiruns) in multirunsByWorkflow">
+        <div class="multiruntab" ng-repeat="(workflow, multiruns) in mh.multirunsByWorkflow">
 
             <h2>{{ workflow }}</h2>
             <div ng-include="'/static/templates/mtable.html'"></div>
@@ -82,8 +75,8 @@
         </div>
     </span>
 
-    <span ng-if="splitByWorkflows == false">
-        <span ng-init="getMultiruns()"></span>
+    <span ng-if="mh.splitByWorkflows == false">
+        <span ng-init="mh.getMultiruns()"></span>
 
         <div class="multiruntab" ng-include="'/static/templates/mtable.html'"></div>
     </span>
