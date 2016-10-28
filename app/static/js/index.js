@@ -25,12 +25,14 @@ function MultirunController($scope, $http) {
     vm.splitButtonText = splitButtonText;
     vm.switchView = switchView;
     vm.visibleCols = visibleCols;
+    vm.eosDirValue = eosDirValue;
 
     vm.getMultiruns = getMultiruns;
     vm.getMultirunsByWorkflow = getMultirunsByWorkflow;
 
     vm.stateColors = {};
     vm.columns = {};
+
 
     function chooseMultiruns(multiruns) {
         /* the argument will be defined only when there is a split */
@@ -72,6 +74,31 @@ function MultirunController($scope, $http) {
         for (var id in vm.columns)
             if (vm.columns[id]['show'] === true) visibleCounter++;
         return visibleCounter;
+    }
+
+    function eosDirValue(dir) {
+
+        /*
+        EOS dirs for multiruns have a following naming convention:
+
+        PREFIX_0p_0f/ OR PREFIX/
+
+        The goal is to sort them by the sum of the two numbers.
+        The sum will always be different, because each time either of
+        the two numbers is incremented.
+
+        This approach sorts the dirs in the same order as they are
+        produced by the system in time.
+        */
+
+        var pattern = /^.*_(\d*)p_(\d*)f\/$/g;
+        var match = pattern.exec(dir);
+        var sum = 0;
+        if (match){
+            // unary + operator converts string to a number
+            sum = (+match[1]) + (+match[2]);
+        }
+        return sum;
     }
 
     function getMultiruns() {
