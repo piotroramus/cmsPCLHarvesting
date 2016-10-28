@@ -20,6 +20,7 @@ function MultirunController($scope, $http) {
 
     vm.chooseMultiruns = chooseMultiruns;
     vm.pageChanged = pageChanged;
+    vm.refreshPage = refreshPage;
     vm.rowColor = rowColor;
     vm.sortBy = sortBy;
     vm.splitButtonText = splitButtonText;
@@ -45,6 +46,10 @@ function MultirunController($scope, $http) {
         else
             vm.getMultiruns();
     };
+
+    function refreshPage() {
+        location.reload();
+    }
 
     function rowColor(state) {
         return {
