@@ -11,9 +11,10 @@ DQM_UPLOAD_HOST="$3"
 MULTIRUN_ID="$4"
 PYTHON_DIR="$5"
 
-echo -e "\nGoing to refresh GRID certificate..."
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $SCRIPT_DIR/setup.sh
+# TODO: this is done by Jenkins now before running the job - consider what to do with it
+#echo -e "\nGoing to refresh GRID certificate..."
+#SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+#source $SCRIPT_DIR/proxy_cert.sh
 
 echo -e "\n Starting to perfrom DQM upload"
 echo "Multi-run ID: ${MULTIRUN_ID}"
