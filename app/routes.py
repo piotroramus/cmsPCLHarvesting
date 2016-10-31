@@ -1,5 +1,6 @@
 import copy
 import os
+import re
 import subprocess
 
 from app import db
@@ -107,6 +108,7 @@ def get_data(offset=0, limit=25):
     for m in m_json:
         m['state'] = state_names[m['state']]
         m['eos_dirs'] = create_eos_path(m)
+        m['dqm_url'] = generate_dqm_url(m)
     return m_json
 
 
@@ -118,6 +120,30 @@ def create_eos_path(multirun):
         path = "{}/{}/{}/{}/".format(path, multirun['scram_arch'], multirun['cmssw'], d)
         paths.append(path)
     return paths
+
+
+def generate_dqm_url(multirun):
+    gui_url = app.config['MULTIRUN_CFG']['dqm_upload_host']
+
+    # TODO: think if it is possible to unify this behaviour with DQM things - code duplication!
+    # rebuild dataset name adding run range
+    pattern = r'/(?P<primary_dataset>.*)/(?P<era_wf_ver>.*?)/ALCAPROMPT'
+    ds = re.match(pattern, multirun['dataset'])
+    primary_dataset, era_wf_ver = ds.group('primary_dataset'), ds.group('era_wf_ver')
+
+    run_numbers = [run['number'] for run in multirun['runs']]
+    min_run, max_run = min(run_numbers), max(run_numbers)
+
+    dataset = '/{}/{}-{}-{}/ALCAPROMPT' \
+        .format(primary_dataset, era_wf_ver, min_run, max_run)
+
+    url = ("{}/start?"
+           "runnr=999999;"
+           "dataset={};"
+           "root=AlCaReco;"
+           "workspace=Everything;"
+           "sampletype=offline_data;").format(gui_url, dataset)
+    return url
 
 
 state_names = {
