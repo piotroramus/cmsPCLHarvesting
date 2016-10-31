@@ -58,6 +58,9 @@
                     <span class="textbold">Dataset:</span> {{ m['dataset'] }}
                 </p>
                 <p>
+                    <span class="textbold">Number of events:</span> {{ m['number_of_events'] }}
+                </p>
+                <p>
                     <span class="textbold">Creation time:</span>
                     {{ m['creation_time'].toUTCString() }}
                 </p>
@@ -72,15 +75,6 @@
                     {{ m['perform_payload_upload'] ? 'YES' : 'NO'}}
                 </p>
                 <p>
-                    <span class="textbold">Number of events:</span> {{ m['number_of_events'] }}
-                </p>
-                <p>
-                    <span class="textbold">BField:</span> {{ m['bfield'] }}
-                </p>
-                <p>
-                    <span class="textbold">CMSSW:</span> {{ m['cmssw'] }}
-                </p>
-                <p>
                     <span class="textbold">Dropbox upload log:</span>
                                 <span ng-show="m['dropbox_log'] == null">
                                       N/A
@@ -88,15 +82,7 @@
                     <a href="{{ m['dropbox_log'] }}">{{ m['dropbox_log'] }}</a>
                 </p>
                 <p>
-                    <span class="textbold">EOS dirs:</span>
-                                <span ng-show="m['eos_dirs'].length == 0">
-                                      Backup not performed yet
-                                </span>
-                <ul>
-                    <li ng-repeat="dir in m['eos_dirs'] | orderBy:mh.eosDirValue">
-                        {{ dir }}
-                    </li>
-                </ul>
+                    <span class="textbold">BField:</span> {{ m['bfield'] }}
                 </p>
                 <p>
                     <span class="textbold">Global tag:</span> {{ m['global_tag'] }}
@@ -109,6 +95,20 @@
                 </p>
                 <p>
                     <span class="textbold">Run class name:</span> {{ m['run_class_name'] }}
+                </p>
+                <p>
+                    <span class="textbold">CMSSW:</span> {{ m['cmssw'] }}
+                </p>
+                <p>
+                    <span class="textbold">EOS dirs:</span>
+                                <span ng-show="m['eos_dirs'].length == 0">
+                                      Backup not performed yet
+                                </span>
+                <ul>
+                    <li ng-repeat="dir in m['eos_dirs'] | orderBy:mh.eosDirValue">
+                        {{ dir }}
+                    </li>
+                </ul>
                 </p>
                 <p>
                     <span class="textbold">Processing times:</span>
