@@ -45,21 +45,35 @@ days_old_runs: 7
 # run will processed with the data it has for the moment
 run_stream_timeout: 3
 
-# how many events multirun should contain to be qualified as ready to start
-events_threshold: 100000
-
 # how many times multirun should be processed if cmsRun exits with non-zero code
 max_failure_retries: 5
 
-# only specified runClasses will be processed while using the particular workflow
-workflow_run_classes:
-    'PromptCalibProd': ['Collisions15', 'Collisions16']
-    'PromptCalibProdSiStrip': ['Collisions15', 'Collisions16']
-    'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16']
-    'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16']
-    'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16']
+# for every workflow that should be processed specify:
+#  - minimal number of events for a multi-run to be processed
+#  - which runClassNames to consider for processing
+#  - whether to perform payload upload
+workflows:
+  'PromptCalibProd':
+      'min_events': 100000
+      'run_classes': ['Collisions15', 'Collisions16']
+      'payload_upload': false
 
-# only multi-runs with dataset dedicated for given workflows will be uploaded to DropBox
-workflows_to_upload:
-    - 'PromptCalibProdSiStripGainsAfterAbortGap'
-    - 'PromptCalibProdSiStripGains'
+  'PromptCalibProdSiStrip':
+      'min_events': 100000
+      'payload_upload': false
+      'run_classes': ['Collisions15', 'Collisions16']
+
+  'PromptCalibProdSiPixelAli':
+      'min_events': 100000
+      'payload_upload': false
+      'run_classes': ['Collisions15', 'Collisions16']
+
+  'PromptCalibProdSiStripGains':
+      'min_events': 100000
+      'payload_upload': true
+      'run_classes': ['Collisions15', 'Collisions16']
+
+  'PromptCalibProdSiStripGainsAfterAbortGap':
+      'min_events': 100000
+      'payload_upload': true
+      'run_classes': ['Collisions16']

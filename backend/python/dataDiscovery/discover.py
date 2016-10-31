@@ -20,22 +20,6 @@ def get_base_release(full_release):
     return base_release.group('release')
 
 
-def get_run_class_names(workflow_run_classes):
-    run_class_names = set()
-    for workflow_list in workflow_run_classes.itervalues():
-        for workflow in workflow_list:
-            run_class_names.add(workflow)
-    return run_class_names
-
-
-def to_be_uploaded(dataset, config):
-    for workflow in config['workflows_to_upload']:
-        pattern = r'^/.*/.*{}.*/ALCAPROMPT$'.format(workflow)
-        if re.match(pattern, dataset):
-            return True
-    return False
-
-
 def previous_runs_completed(run_number, incomplete_runs):
     for run in incomplete_runs:
         if run < run_number:
@@ -113,7 +97,7 @@ def discover(config, session):
     days_old_runs_date = datetime.date \
         .fromordinal(datetime.date.today().toordinal() - config['days_old_runs'])
 
-    run_class_names = get_run_class_names(config['workflow_run_classes'])
+    run_class_names = workflows.get_run_class_names(config)
 
     recent_runs = rrapi.query(days_old_runs_date, run_class_names)
 
@@ -167,7 +151,7 @@ def assembly_multiruns(config, session):
 
         for dataset in datasets:
 
-            available_workflows = config['workflow_run_classes'].keys()
+            available_workflows = config['workflows'].keys()
             dataset_workflow = workflows.extract_workflow(dataset, available_workflows)
             if dataset_workflow not in release['workflows']:
                 logger.warning(
@@ -175,11 +159,11 @@ def assembly_multiruns(config, session):
                         dataset, dataset_workflow, run.number, release['workflows']))
                 continue
 
-            if run.run_class_name not in config['workflow_run_classes'][dataset_workflow]:
+            if run.run_class_name not in config['workflows'][dataset_workflow]['run_classes']:
                 logger.debug(
                     "Ignoring dataset {} for run {} since runClassName {} for the run is not specified for this dataset workflow {}:{}".format(
                         dataset, run.number, run.run_class_name, dataset_workflow,
-                        config['workflow_run_classes'][dataset_workflow]))
+                        config['workflows'][dataset_workflow]['run_classes']))
                 continue
 
             dataset_object = session.query(Dataset).filter(Dataset.dataset == dataset).one_or_none()
@@ -221,7 +205,7 @@ def assembly_multiruns(config, session):
                 .one_or_none()
 
             if not multirun:
-                payload_upload = to_be_uploaded(dataset, config)
+                payload_upload = workflows.to_be_uploaded(dataset, config)
                 need_more_data_state = session.query(MultirunState).filter(
                     MultirunState.state == 'need_more_data').one()
                 now = datetime.datetime.now()
@@ -271,7 +255,7 @@ def assembly_multiruns(config, session):
                 for f in files:
                     multirun_file = Filename(filename=f['logical_file_name'], multirun=multirun.id)
                     session.add(multirun_file)
-                if multirun.number_of_events > config['events_threshold']:
+                if multirun.number_of_events >= config['workflows'][dataset_workflow]['min_events']:
                     logger.info(
                         "Multirun {} with {} events ready to be processed".format(multirun.id,
                                                                                   multirun.number_of_events))

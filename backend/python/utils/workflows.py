@@ -14,3 +14,19 @@ def extract_workflow(dataset, available_workflows=None):
             "Dataset {} contains unknown workflow {}. Check config for possible workflow set!".format(dataset, result))
 
     return result
+
+
+def get_run_class_names(config):
+    run_class_names = set()
+    for workflow_list in config['workflows'].itervalues():
+        for rcn in workflow_list['run_classes']:
+                run_class_names.add(rcn)
+    return run_class_names
+
+
+def to_be_uploaded(dataset, config):
+    dataset_workflow = extract_workflow(dataset)
+    for workflow in config['workflows']:
+        if workflow == dataset_workflow:
+            return config['workflows'][workflow]['payload_upload']
+    return False
