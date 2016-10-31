@@ -58,12 +58,12 @@ workflows:
       'run_classes': ['Collisions15', 'Collisions16']
       'payload_upload': false
 
-  'PromptCalibProdSiStrip':
+  'PromptCalibProdSiPixelAli':
       'min_events': 100000
       'payload_upload': false
       'run_classes': ['Collisions15', 'Collisions16']
 
-  'PromptCalibProdSiPixelAli':
+  'PromptCalibProdSiStrip':
       'min_events': 100000
       'payload_upload': false
       'run_classes': ['Collisions15', 'Collisions16']
