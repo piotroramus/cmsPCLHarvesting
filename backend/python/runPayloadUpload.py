@@ -31,9 +31,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     netrc = args.netrc
-    config_file = None
-    if args.config:
-        config_file = args.config
+    config_file = args.config
     config = configReader.read(config_file)
 
     connection_string = dbConnection.get_connection_string(config)

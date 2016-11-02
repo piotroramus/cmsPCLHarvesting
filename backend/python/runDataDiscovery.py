@@ -18,9 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
     args = parser.parse_args()
 
-    config_file = None
-    if args.config:
-        config_file = args.config
+    config_file = args.config
     config = configReader.read(config_file)
 
     logger.info("Prepopulating database if needed")

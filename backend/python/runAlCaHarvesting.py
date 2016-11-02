@@ -10,11 +10,11 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
+    parser.add_argument('--jenkinsJob', help='URL to Jenkins job', required=False)
     args = parser.parse_args()
 
-    config_file = None
-    if args.config:
-        config_file = args.config
+    config_file = args.config
+    jenkins_job = args.jenkinsJob
 
     logger.info("Preparing AlCa Harvesting config")
     alcaHarvesting.envAssembler.prepare_multirun_environment(config_file)
