@@ -44,7 +44,7 @@ def prepare_config(params_file, alca_config_file="alcaConfig.py", job_report_fil
                   alca_config_file, job_report_file)
 
 
-def prepare_multirun_environment(config_file):
+def prepare_multirun_environment(config_file, jenkins_build_url):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
@@ -114,6 +114,7 @@ def prepare_multirun_environment(config_file):
             f.write("FAILURE_RETRIES={}\n".format(multirun.failure_retries))
             f.write("NO_PAYLOAD_RETRIES={}\n".format(multirun.no_payload_retries))
             f.write("CONFIG_FILE={}\n".format(config_file))
+            f.write("JENKINS_BUILD_URL={}\n".format(jenkins_build_url))
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well
         session.commit()
