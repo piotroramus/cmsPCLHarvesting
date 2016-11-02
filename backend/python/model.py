@@ -54,7 +54,8 @@ class JenkinsJobType(Base):
     id = Column(Integer, Sequence('id'), primary_key=True)
     type = Column(String(32), unique=True)
 
-    # TODO: repr
+    def __repr__(self):
+        return self.type
 
 
 class JenkinsBuildUrl(Base):
@@ -67,7 +68,12 @@ class JenkinsBuildUrl(Base):
 
     type = relationship('JenkinsJobType')
 
-    # TODO: repr
+    def __repr__(self):
+        return ("JenkinsBuildUrl("
+                "url={}, "
+                "type={}, "
+                "multirun_id={}"
+                ).format(self.url, self.type, self.multirun_id)
 
 
 class Multirun(Base):
@@ -114,6 +120,7 @@ class Multirun(Base):
             'dropbox_log': self.dropbox_log,
             'dataset': self.dataset.dataset,
             'eos_dirs': self.__eos_dirs_json(),
+            'jenkins_builds': self.jenkins_builds,
             'processing_times': self.__processing_times_json(),
             'runs': self.__runs__json(),
             'state': self.state.state,
