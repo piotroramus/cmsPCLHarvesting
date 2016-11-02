@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import model
+import updateJenkinsBuildUrl
 import logs.logger as logs
 import utils.configReader as configReader
 import utils.dbConnection as dbConnection
@@ -28,8 +29,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
+    parser.add_argument('--jenkinsBuildUrl', help='URL to Jenkins job', required=False)
     args = parser.parse_args()
 
+    jenkins_build_url = args.jenkinsBuildUrl
     config_file = args.config
     config = configReader.read(config_file)
 
@@ -82,6 +85,9 @@ if __name__ == '__main__':
         cmd = "{} {} {} {} {} {}".format(dqm_script_path, dqm_filename, dqm_file_location,
                                          config['dqm_upload_host'], multirun.id, script_path)
         result = subprocess.call(cmd, shell=True)
+
+        updateJenkinsBuildUrl.update_jenkins_build_url(multirun.id, jenkins_build_url, type="dqm_upload",
+                                                       config=config, logger=logger)
 
         if result != 0:
             dqm_failed_state = session \

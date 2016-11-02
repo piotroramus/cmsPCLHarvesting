@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import model
+import updateJenkinsBuildUrl
 import logs.logger as logs
 import utils.configReader as configReader
 import utils.dbConnection as dbConnection
@@ -28,9 +29,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('netrc', help='path to .netrc file containing dropbox credentials')
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
+    parser.add_argument('--jenkinsBuildUrl', help='URL to Jenkins job', required=False)
+
     args = parser.parse_args()
 
     netrc = args.netrc
+    jenkins_build_url = args.jenkinsBuildUrl
+
     config_file = args.config
     config = configReader.read(config_file)
 
@@ -81,13 +86,16 @@ if __name__ == '__main__':
         script_path = os.path.dirname(os.path.realpath(__file__))
         payload_script_path = script_path.replace("/python", "/bin/payload_upload.sh")
         log_file = "{}/dropbox_upload_log.txt".format(os.getcwd())
-        cmd = "{} {} {} {} {} {} {} {} {}".format(payload_script_path, netrc, eos_path, conditions_filename, metadata_filename,
-                                               multirun.scram_arch, multirun.cmssw, multirun.id, log_file)
+        cmd = "{} {} {} {} {} {} {} {} {}".format(payload_script_path, netrc, eos_path, conditions_filename,
+                                                  metadata_filename, multirun.scram_arch, multirun.cmssw, multirun.id,
+                                                  log_file)
 
         result = subprocess.call(cmd, shell=True)
 
-        logger.info("Collecting log URL from the log file...")
+        updateJenkinsBuildUrl.update_jenkins_build_url(multirun.id, jenkins_build_url, type="payload_upload",
+                                                       config=config, logger=logger)
 
+        logger.info("Collecting log URL from the log file...")
         if not os.path.isfile(log_file):
             logger.error("Log file does not exists!")
         else:

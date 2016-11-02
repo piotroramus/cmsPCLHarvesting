@@ -52,4 +52,6 @@ if __name__ == '__main__':
             .one()
         processing_time_obj.end_time = now
 
+
+
     session.commit()

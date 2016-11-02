@@ -48,6 +48,28 @@ class Filename(Base):
         return self.filename
 
 
+class JenkinsJobType(Base):
+    __tablename__ = 'jenkins_job_type'
+
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    type = Column(String(32), unique=True)
+
+    # TODO: repr
+
+
+class JenkinsBuildUrl(Base):
+    __tablename__ = 'jenkins_build_url'
+
+    id = Column(Integer, Sequence('id'), primary_key=True)
+    url = Column(String(128))
+    type_id = Column(Integer, ForeignKey('jenkins_job_type.id'), nullable=False)
+    multirun_id = Column(Integer, ForeignKey('multirun.id'))
+
+    type = relationship('JenkinsJobType')
+
+    # TODO: repr
+
+
 class Multirun(Base):
     __tablename__ = 'multirun'
 
@@ -70,6 +92,7 @@ class Multirun(Base):
     dataset = relationship("Dataset")
     eos_dirs = relationship("EosDir")
     filenames = relationship("Filename")
+    jenkins_builds = relationship("JenkinsBuildUrl")
     processing_times = relationship("ProcessingTime")
     run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
     state = relationship("MultirunState")
@@ -151,9 +174,8 @@ class ProcessingTime(Base):
             self.end_time.isoformat() if self.end_time else None
         ]
 
-
-def __repr__(self):
-    return "[{} - {}]".format(self.start_time, self.end_time)
+    def __repr__(self):
+        return "[{} - {}]".format(self.start_time, self.end_time)
 
 
 class RunInfo(Base):

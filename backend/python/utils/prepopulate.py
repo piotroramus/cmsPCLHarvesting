@@ -7,6 +7,12 @@ import utils.dbConnection as dbConnection
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+job_types = [
+    'harvesting',
+    'dqm_upload',
+    'payload_upload'
+]
+
 
 def prepopulate(config):
     logs.setup_logging()
@@ -37,5 +43,9 @@ def prepopulate(config):
         for state in states:
             s = model.MultirunState(state=state)
             session.add(s)
+
+        for job_type in job_types:
+            jt = model.JenkinsJobType(type=job_type)
+            session.add(jt)
 
         session.commit()
