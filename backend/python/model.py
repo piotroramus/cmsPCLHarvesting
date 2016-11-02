@@ -63,7 +63,7 @@ class JenkinsBuildUrl(Base):
     id = Column(Integer, Sequence('id'), primary_key=True)
     url = Column(String(128))
     type_id = Column(Integer, ForeignKey('jenkins_job_type.id'), nullable=False)
-    multirun_id = Column(Integer, ForeignKey('multirun.id'))
+    multirun_id = Column(Integer, ForeignKey('multirun.id'), nullable=False)
 
     type = relationship('JenkinsJobType')
 
