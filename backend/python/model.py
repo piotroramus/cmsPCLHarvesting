@@ -120,7 +120,7 @@ class Multirun(Base):
             'dropbox_log': self.dropbox_log,
             'dataset': self.dataset.dataset,
             'eos_dirs': self.__eos_dirs_json(),
-            'jenkins_builds': self.jenkins_builds,
+            'jenkins_builds': self.__jenkins_builds_json(),
             'processing_times': self.__processing_times_json(),
             'runs': self.__runs__json(),
             'state': self.state.state,
@@ -128,6 +128,15 @@ class Multirun(Base):
 
     def __eos_dirs_json(self):
         return [ed.eos_dir for ed in self.eos_dirs]
+
+    def __jenkins_builds_json(self):
+        builds = dict()
+        for jb in self.jenkins_builds:
+            if jb.type.type not in builds:
+                builds[jb.type.type] = [jb.url]
+            else:
+                builds[jb.type.type].append(jb.url)
+        return builds
 
     def __processing_times_json(self):
         return [t.to_json() for t in self.processing_times]

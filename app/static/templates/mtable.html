@@ -45,11 +45,11 @@
                 </p>
                 <p>
                     <span class="textbold">Runs:</span>
-                <ul>
-                    <li ng-repeat="run in m['runs'] | orderBy:'number'">
-                        {{ run['number'] }}
-                    </li>
-                </ul>
+                    <ul>
+                        <li ng-repeat="run in m['runs'] | orderBy:'number'">
+                            {{ run['number'] }}
+                        </li>
+                    </ul>
                 </p>
                 <p>
                     <span class="textbold">State:</span> {{ m['state'] }}
@@ -76,13 +76,14 @@
                 </p>
                 <p>
                     <span class="textbold">Dropbox upload log:</span>
-                                <span ng-show="m['dropbox_log'] == null">
-                                      N/A
-                                </span>
+                    <span ng-show="m['dropbox_log'] == null">
+                        N/A
+                    </span>
                     <a href="{{ m['dropbox_log'] }}">{{ m['dropbox_log'] }}</a>
                 </p>
                 <p>
                     <span class="textbold">DQM Reference:</span>
+                    <!--TODO: show only when the upload was performed-->
                     <a href="{{ m['dqm_url'] }}">DQM GUI Catalogue</a>
                 </p>
                 <p>
@@ -104,26 +105,37 @@
                     <span class="textbold">CMSSW:</span> {{ m['cmssw'] }}
                 </p>
                 <p>
+                    <span class="textbold">Jenkins builds:</span>
+                    <ul ng-repeat="(job_type, builds) in m['jenkins_builds']">
+                        <li>{{ job_type }}</li>
+                        <ul>
+                            <li ng-repeat="build in builds">
+                                <a href="{{ build }}">{{ build }}</a>
+                            </li>
+                        </ul>
+                    </ul>
+                </p>
+                <p>
                     <span class="textbold">EOS dirs:</span>
-                                <span ng-show="m['eos_dirs'].length == 0">
-                                      Backup not performed yet
-                                </span>
-                <ul>
-                    <li ng-repeat="dir in m['eos_dirs'] | orderBy:mh.eosDirValue">
-                        {{ dir }}
-                    </li>
-                </ul>
+                    <span ng-show="m['eos_dirs'].length == 0">
+                          Backup not performed yet
+                    </span>
+                    <ul>
+                        <li ng-repeat="dir in m['eos_dirs'] | orderBy:mh.eosDirValue">
+                            {{ dir }}
+                        </li>
+                    </ul>
                 </p>
                 <p>
                     <span class="textbold">Processing times:</span>
                     <span ng-show="m['processing_times'].length == 0">
                           Processing not started
                     </span>
-                <ul>
-                    <li ng-repeat="pt in m['processing_times'] | orderBy:'start'">
-                        {{ pt['start'].toUTCString() }} - {{ pt['end'].toUTCString() }}
-                    </li>
-                </ul>
+                    <ul>
+                        <li ng-repeat="pt in m['processing_times'] | orderBy:'start'">
+                            {{ pt['start'].toUTCString() }} - {{ pt['end'].toUTCString() }}
+                        </li>
+                    </ul>
                 </p>
             </div>
         </td>
