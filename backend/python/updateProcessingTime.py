@@ -44,14 +44,12 @@ if __name__ == '__main__':
         # that there should be exactly one multi-run that has a start_time and does not have an end_time
         # (assuming this script is invoked after the processing is finished)
         logger.info("Updating multi-run processing end time with {}".format(now))
-        processing_time_obj = session\
-            .query(model.ProcessingTime)\
-            .filter(model.ProcessingTime.multirun_id == multirun_id)\
-            .filter(model.ProcessingTime.start_time != None)\
-            .filter(model.ProcessingTime.end_time == None)\
+        processing_time_obj = session \
+            .query(model.ProcessingTime) \
+            .filter(model.ProcessingTime.multirun_id == multirun_id) \
+            .filter(model.ProcessingTime.start_time != None) \
+            .filter(model.ProcessingTime.end_time == None) \
             .one()
         processing_time_obj.end_time = now
-
-
 
     session.commit()
