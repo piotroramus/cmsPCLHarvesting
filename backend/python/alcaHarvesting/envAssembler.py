@@ -7,6 +7,7 @@ import utils.workflows as workflows
 import logs.logger as logs
 import utils.configReader as configReader
 import utils.dbConnection as dbConnection
+import utils.jenkins as jenkins
 
 from model import Base, Multirun, MultirunState
 
@@ -87,6 +88,9 @@ def prepare_multirun_environment(config_file, jenkins_build_url):
         logger.info("Creating {} file containing multi-run information".format(multirun_props_file))
         with open(multirun_props_file, 'w') as f:
             f.write(dump)
+
+        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="harvesting", config=config,
+                                         session=session)
 
         script_path = os.path.dirname(os.path.realpath(__file__))
         python_dir_path = script_path.replace("/alcaHarvesting", "")

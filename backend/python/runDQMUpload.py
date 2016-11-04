@@ -7,11 +7,10 @@ import subprocess
 import sys
 
 import model
-import updateJenkinsBuildUrl
 import logs.logger as logs
 import utils.configReader as configReader
 import utils.dbConnection as dbConnection
-
+import utils.jenkins as jenkins
 
 """ Tries to upload DQM file to DQM GUI.
     Can be triggered only after the AlCa Harvesting step has finished successfully or the previous DQM upload failed."""
@@ -86,8 +85,8 @@ if __name__ == '__main__':
                                          config['dqm_upload_host'], multirun.id, script_path)
         result = subprocess.call(cmd, shell=True)
 
-        updateJenkinsBuildUrl.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="dqm_upload",
-                                                       config=config, logger=logger)
+        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="dqm_upload",
+                                         config=config, session=session)
 
         if result != 0:
             dqm_failed_state = session \

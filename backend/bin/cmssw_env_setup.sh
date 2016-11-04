@@ -104,9 +104,6 @@ CMS_RUN_RESULT=${PIPESTATUS[0]}
 # update multi-run processing end time
 python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE end
 
-# add jenkins build url
-python $PYTHON_DIR_PATH/updateJenkinsBuildUrl.py $MULTIRUN_ID $JENKINS_BUILD_URL $CONFIG_FILE
-
 # I was just wondering how is it possible, that cmsRun can return something > 255
 # while it is not feasible on an unix-based OS
 # cmsRun exit codes: https://twiki.cern.ch/twiki/bin/view/CMSPublic/JobExitCodes

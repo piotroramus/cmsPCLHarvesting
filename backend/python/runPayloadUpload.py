@@ -7,10 +7,10 @@ import subprocess
 import sys
 
 import model
-import updateJenkinsBuildUrl
 import logs.logger as logs
 import utils.configReader as configReader
 import utils.dbConnection as dbConnection
+import utils.jenkins as jenkins
 
 """ Tries to upload payload to Dropbox.
     Can be triggered only after the DQM GUI upload has finished successfully or the previous payload upload failed."""
@@ -92,8 +92,8 @@ if __name__ == '__main__':
 
         result = subprocess.call(cmd, shell=True)
 
-        updateJenkinsBuildUrl.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="payload_upload",
-                                                       config=config, logger=logger)
+        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="payload_upload",
+                                         config=config, session=session)
 
         logger.info("Collecting log URL from the log file...")
         if not os.path.isfile(log_file):
