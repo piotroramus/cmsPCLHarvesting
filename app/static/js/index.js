@@ -173,6 +173,7 @@ function MultirunController($scope, $http) {
     };
 
     function totalProcessingTime(start, end){
+/       // x >> 0 operation truncates x by casting x to 32-bit integer
         var seconds = (end - start)/1000;
         var hours = (seconds / 3600) >> 0;
         seconds = seconds - hours * 3600;
