@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 job_types = [
+    'discovery',
     'harvesting',
     'dqm_upload',
     'payload_upload'
@@ -25,6 +26,7 @@ def prepopulate(config):
     session = Session()
 
     # check if there are some states
+    # TODO: maybe I should consider some better condition...
     sts = session.query(model.MultirunState).all()
     if not sts:
         logger.info("Multirun state table is empty. Populating...")

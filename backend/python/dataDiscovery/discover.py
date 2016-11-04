@@ -9,7 +9,7 @@ import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
 import rrapi.rrapi_wrapper as rrApi
 
-from model import RunInfo, Multirun, Filename, Dataset, MultirunState
+from model import RunInfo, Multirun, Filename, Dataset, MultirunState, JenkinsJobType, JenkinsBuildUrl
 
 
 def get_base_release(full_release):
@@ -114,7 +114,7 @@ def discover(config, session):
     update_runs(logger, session, t0api, config, local_runs, valid_runs)
 
 
-def assembly_multiruns(config, session):
+def assembly_multiruns(config, session, jenkins_build_url=None):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
@@ -126,6 +126,11 @@ def assembly_multiruns(config, session):
                                                          RunInfo.used == False).all()
 
     ready_state = session.query(MultirunState).filter(MultirunState.state == 'ready').one()
+
+    jenkins_job_type_obj = session \
+        .query(JenkinsJobType) \
+        .filter(JenkinsJobType.type == 'discovery') \
+        .one()
 
     logger.info("Starting to assemble multiruns...")
     for run in unused_complete_runs:
@@ -235,8 +240,25 @@ def assembly_multiruns(config, session):
 
             # if this is the last dataset in run - mark run as used
             if len(datasets) == 1:
-                logger.debug("All datasets for run {} are now used in multi-runs".format(run.number))
+                logger.info("All datasets for run {} are now used in multi-runs".format(run.number))
                 run.used = True
+
+            logger.info("Updating Jenkins Builds URL for multirun")
+            # since we iteration through runs, the same url can be repeated for the same run
+            # we want to avoid it
+            jenkins_build_obj = session\
+                .query(JenkinsBuildUrl)\
+                .filter(JenkinsBuildUrl.multirun_id == multirun.id)\
+                .filter(JenkinsBuildUrl.url == jenkins_build_url)\
+                .first()
+
+            if not jenkins_build_obj:
+                jenkins_build_obj = JenkinsBuildUrl(
+                    multirun_id=multirun.id,
+                    url=jenkins_build_url,
+                    type=jenkins_job_type_obj
+                )
+                session.add(jenkins_build_obj)
 
             files, number_of_events = [], 0
 

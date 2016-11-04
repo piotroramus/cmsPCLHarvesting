@@ -16,9 +16,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
+    parser.add_argument('--jenkinsBuildUrl', help='URL to Jenkins job', required=False)
     args = parser.parse_args()
 
     config_file = args.config
+    jenkins_build_url = args.jenkinsBuildUrl
+
     config = configReader.read(config_file)
 
     logger.info("Prepopulating database if needed")
@@ -32,5 +35,5 @@ if __name__ == '__main__':
 
     logger.info("Starting data discovery")
     dataDiscovery.discover.discover(config, session)
-    dataDiscovery.discover.assembly_multiruns(config, session)
+    dataDiscovery.discover.assembly_multiruns(config, session, jenkins_build_url)
     logger.info("Data discovery has been finished")
