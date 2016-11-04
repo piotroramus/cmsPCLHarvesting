@@ -52,4 +52,4 @@ if __name__ == '__main__':
 
     config = configReader.read(config_file)
 
-    update_jenkins_build_url(multirun_id, jenkins_url, type="harvesting", config=config, logger=logger)
+    update_jenkins_build_url(multirun_id, jenkins_url, job_type="harvesting", config=config, logger=logger)
