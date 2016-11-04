@@ -25,6 +25,7 @@ function MultirunController($scope, $http) {
     vm.sortBy = sortBy;
     vm.splitButtonText = splitButtonText;
     vm.switchView = switchView;
+    vm.showDQMPlots = showDQMPlots;
     vm.visibleCols = visibleCols;
     vm.eosDirValue = eosDirValue;
 
@@ -70,6 +71,17 @@ function MultirunController($scope, $http) {
 
     function switchView() {
         vm.splitByWorkflows = (vm.splitByWorkflows === true) ? false : true;
+    }
+
+    function showDQMPlots(state) {
+        switch (state) {
+            case 'DQM upload OK':
+            case 'Dropbox upload failed':
+            case 'Uploads OK':
+                return true
+            default:
+                return false
+        }
     }
 
     function visibleCols() {

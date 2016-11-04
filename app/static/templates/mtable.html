@@ -76,15 +76,15 @@
                 </p>
                 <p>
                     <span class="textbold">Dropbox upload log:</span>
-                    <span ng-show="m['dropbox_log'] == null">
-                        N/A
-                    </span>
+                    <span ng-show="m['dropbox_log'] == null">N/A</span>
                     <a href="{{ m['dropbox_log'] }}">{{ m['dropbox_log'] }}</a>
                 </p>
                 <p>
                     <span class="textbold">DQM Reference:</span>
-                    <!--TODO: show only when the upload was performed-->
-                    <a href="{{ m['dqm_url'] }}">DQM GUI Catalogue</a>
+                    <span ng-show="mh.showDQMPlots(m['state'])">
+                        <a href="{{ m['dqm_url'] }}">DQM GUI Catalogue</a>
+                    </span>
+                    <span ng-show="mh.showDQMPlots(m['state']) === false">N/A</span>
                 </p>
                 <p>
                     <span class="textbold">BField:</span> {{ m['bfield'] }}
