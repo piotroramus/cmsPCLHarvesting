@@ -151,12 +151,24 @@ function MultirunController($scope, $http) {
             // end_time can be null, but start_time can't
             attempt['start'] = new Date(start_time);
             attempt['end'] = null;
-            if (end_time != null)
+            if (end_time != null){
                 attempt['end'] = new Date(end_time);
+                attempt['total'] = totalProcessingTime(attempt['start'], attempt['end']);
+            }
             result.push(attempt);
         }
         return result;
     };
+
+    function totalProcessingTime(start, end){
+        var seconds = (end - start)/1000;
+        var hours = (seconds / 3600) >> 0;
+        seconds = seconds - hours * 3600;
+        var minutes = (seconds / 60) >> 0;
+        seconds = seconds - minutes * 60;
+        var timeStr =  hours + "h " + minutes + "m " + seconds + "s";
+        return timeStr;
+    }
 
     vm.stateColors = {
         'Need more data' : "#DCE775",

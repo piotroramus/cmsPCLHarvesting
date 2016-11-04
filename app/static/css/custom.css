@@ -41,6 +41,10 @@
     background: transparent;
 }
 
+.timetext {
+    font-weight: 500;
+}
+
 .itemsFormDiv {
     display: flex;
     justify-content: center;
