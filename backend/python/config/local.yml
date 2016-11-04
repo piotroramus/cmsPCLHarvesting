@@ -21,7 +21,7 @@ oracle_db: devdb12
 # path to file containing Oracle DB credentials
 oracle_secret: /pclmh/.oracle
 
-# where to copy files after processing has been done
+# where to copy files of every AlCa Harvesting processing
 eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/local
 
 # name of file containing AlCa Harvesting config
@@ -37,7 +37,7 @@ cms_run_output: cmsRunOutput.txt
 dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
 
 # how far in the past should we look for new runs
-days_old_runs: 7
+days_old_runs: 10
 
 # how many days to wait for the express stream for the run to be completed
 # (completed stream run can be included into multi-runs)
