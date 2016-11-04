@@ -86,7 +86,7 @@ if __name__ == '__main__':
                                          config['dqm_upload_host'], multirun.id, script_path)
         result = subprocess.call(cmd, shell=True)
 
-        updateJenkinsBuildUrl.update_jenkins_build_url(multirun.id, jenkins_build_url, type="dqm_upload",
+        updateJenkinsBuildUrl.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="dqm_upload",
                                                        config=config, logger=logger)
 
         if result != 0:

@@ -10,9 +10,9 @@ import utils.dbConnection as dbConnection
 import utils.prepopulate
 
 
-def update_jenkins_build_url(multirun_id, url, type, config, logger):
-    if type not in utils.prepopulate.job_types:
-        logger.error("Jenkins Job Type {} not forseen!".format(type))
+def update_jenkins_build_url(multirun_id, url, job_type, config, logger):
+    if job_type not in utils.prepopulate.job_types:
+        logger.error("Jenkins Job Type {} not forseen!".format(job_type))
         sys.exit(1)
 
     connection_string = dbConnection.get_connection_string(config)
@@ -23,7 +23,7 @@ def update_jenkins_build_url(multirun_id, url, type, config, logger):
 
     type_obj = session \
         .query(model.JenkinsJobType) \
-        .filter(model.JenkinsJobType.type == type) \
+        .filter(model.JenkinsJobType.type == job_type) \
         .one()
 
     logger.info("Adding Jenkins Build Url {} for multirun {}".format(url, multirun_id))
