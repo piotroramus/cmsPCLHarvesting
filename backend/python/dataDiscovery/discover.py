@@ -244,12 +244,12 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
                 run.used = True
 
             logger.info("Updating Jenkins Builds URL for multirun")
-            # since we iteration through runs, the same url can be repeated for the same run
+            # since we iteration through runs, the same url can be repeated for the same multi-run
             # we want to avoid it
-            jenkins_build_obj = session\
-                .query(JenkinsBuildUrl)\
-                .filter(JenkinsBuildUrl.multirun_id == multirun.id)\
-                .filter(JenkinsBuildUrl.url == jenkins_build_url)\
+            jenkins_build_obj = session \
+                .query(JenkinsBuildUrl) \
+                .filter(JenkinsBuildUrl.multirun_id == multirun.id) \
+                .filter(JenkinsBuildUrl.url == jenkins_build_url) \
                 .first()
 
             if not jenkins_build_obj:
