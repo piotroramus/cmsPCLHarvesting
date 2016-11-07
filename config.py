@@ -34,7 +34,7 @@ class Config():
 
     # env variable should be set before running the web application
     # in other case a default 'local' config is used
-    multirun_config_path = os.getenv('MULTIRUN_CONFIG', 'backend/python/config/local.yml')
+    multirun_config_path = os.getenv('MULTIRUN_CONFIG', 'resources/referenceBackendCfgs/local.yml')
     MULTIRUN_CFG = configReader.read(multirun_config_path)
 
     # get some DB connections from the secrets file (as they may contain credentials):
