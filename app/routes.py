@@ -1,7 +1,10 @@
+from __future__ import print_function
+
 import copy
 import os
 import re
 import subprocess
+import sys
 
 from app import db
 from app import app
@@ -161,8 +164,8 @@ state_names = {
 
 @app.route('/test/')
 def test():
-    print get_data()
-    return "response"
+    print(get_data(), file=sys.stderr)
+    return "Have a look into logs..."
 
 
 @app.route('/display_plain/')
@@ -206,7 +209,7 @@ def get_multiruns_by_workflow():
         offset = 0
     limit = request.args.get('limit')
     if not limit:
-        limit = 0
+        limit = 25
     data = get_data(offset, limit)
     m_by_workflows = dict()
     for multirun in data:

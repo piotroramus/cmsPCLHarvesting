@@ -119,7 +119,7 @@ function MultirunController($scope, $http) {
     }
 
     function getMultiruns() {
-        var murl = "/multiruns/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage
+        var murl = "/multiruns/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage;
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
                 vm.multiruns = data['multiruns'];
@@ -136,7 +136,8 @@ function MultirunController($scope, $http) {
     }
 
     function getMultirunsByWorkflow() {
-        var murl = "/multiruns_by_workflow/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage
+        var murl = "/multiruns_by_workflow/?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage;
+        console.log(murl);
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
                 vm.multirunsByWorkflow = data['multiruns'];

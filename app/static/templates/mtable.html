@@ -21,8 +21,7 @@
 
     <tbody>
 
-    {{ multiruns=mh.chooseMultiruns(multiruns); ""}}
-    <tr ng-repeat-start="m in multiruns | orderBy:mh.sortPredicate:mh.sortReverse | filter:mh.filterMultiruns"
+    <tr ng-repeat-start="m in mh.chooseMultiruns(multiruns) | orderBy:mh.sortPredicate:mh.sortReverse | filter:mh.filterMultiruns"
         ng-style="{{ mh.rowColor(m['state']) }}">
         <td>
             <button ng-if="m.details" ng-click="m.details = false">-</button>
@@ -109,8 +108,8 @@
                     <ul ng-repeat="(job_type, builds) in m['jenkins_builds']">
                         <li>{{ job_type }}</li>
                         <ul>
-                            <li ng-repeat="build in builds">
-                                <a href="{{ build }}">{{ build }}</a>
+                            <li ng-repeat="build in builds | orderBy:build">
+                                <a href="{{ build }}console">{{ build }}</a>
                             </li>
                         </ul>
                     </ul>
