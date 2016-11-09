@@ -22,7 +22,7 @@ oracle_db: devdb12
 oracle_secret: /pclmh/.oracle
 
 # where to copy files of every AlCa Harvesting processing
-eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/jenkins
+eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/dev
 
 # name of file containing AlCa Harvesting config
 alca_config: alcaConfig.py
