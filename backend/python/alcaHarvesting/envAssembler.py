@@ -5,7 +5,6 @@ import os
 
 import utils.workflows as workflows
 import logs.logger as logs
-import utils.configReader as configReader
 import utils.dbConnection as dbConnection
 import utils.jenkins as jenkins
 
@@ -45,11 +44,9 @@ def prepare_config(params_file, alca_config_file="alcaConfig.py", job_report_fil
                   alca_config_file, job_report_file)
 
 
-def prepare_multirun_environment(config_file, jenkins_build_url):
+def prepare_multirun_environment(config, jenkins_build_url):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
-
-    config = configReader.read(config_file)
 
     connection_string = dbConnection.get_connection_string(config)
     engine = create_engine(connection_string, echo=False)
@@ -117,7 +114,9 @@ def prepare_multirun_environment(config_file, jenkins_build_url):
             f.write("MAX_FAILURE_RETRIES={}\n".format(config['max_failure_retries']))
             f.write("FAILURE_RETRIES={}\n".format(multirun.failure_retries))
             f.write("NO_PAYLOAD_RETRIES={}\n".format(multirun.no_payload_retries))
-            f.write("CONFIG_FILE={}\n".format(config_file))
+            # TODO: think what to do with it - now passing deserialized config to this function
+            # think if this is really needed
+            # f.write("CONFIG_FILE={}\n".format(config_file))
             f.write("JENKINS_BUILD_URL={}\n".format(jenkins_build_url))
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well

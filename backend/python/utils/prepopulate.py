@@ -15,15 +15,9 @@ job_types = [
 ]
 
 
-def prepopulate(config):
+def prepopulate(session):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
-
-    connection_string = dbConnection.get_connection_string(config)
-    engine = create_engine(connection_string, echo=False)
-    model.Base.metadata.create_all(engine, checkfirst=True)
-    Session = sessionmaker(bind=engine)
-    session = Session()
 
     # check if there are some states
     # TODO: maybe I should consider some better condition...

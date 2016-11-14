@@ -9,7 +9,6 @@ import utils.configReader as configReader
 import utils.dbConnection as dbConnection
 import utils.prepopulate as prepopulate
 
-
 if __name__ == '__main__':
     logs.setup_logging()
     logger = logging.getLogger(__name__)
@@ -17,15 +16,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help='pass arbitrary config file', required=False)
     parser.add_argument('--jenkinsBuildUrl', help='URL to Jenkins job', required=False)
+    parser.add_argument('--oracleSecret', help='file containing oracle connection credentials', required=False)
     args = parser.parse_args()
 
     config_file = args.config
     jenkins_build_url = args.jenkinsBuildUrl
+    oracle_secret = args.oracleSecret
 
     config = configReader.read(config_file)
-
-    logger.info("Prepopulating database if needed")
-    prepopulate.prepopulate(config)
+    config['oracle_secret'] = oracle_secret
 
     connection_string = dbConnection.get_connection_string(config)
     engine = sqlalchemy.create_engine(connection_string, echo=False)
@@ -33,7 +32,11 @@ if __name__ == '__main__':
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
+    logger.info("Prepopulating database if needed")
+    prepopulate.prepopulate(session)
+
     logger.info("Starting data discovery")
+
     dataDiscovery.discover.discover(config, session)
     dataDiscovery.discover.assembly_multiruns(config, session, jenkins_build_url)
     logger.info("Data discovery has been finished")
