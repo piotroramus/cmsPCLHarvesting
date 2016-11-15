@@ -15,7 +15,7 @@ print "in ", os.getcwd(), 'secrets from ', secretsDir
 
 from secrets import secrets
 
-serviceName = 'myService'
+serviceName = 'cmsDbMultiRunHarvesting'
 
 def getEncryptionString():
     return secrets[serviceName]['encString']
@@ -50,6 +50,8 @@ productionLevels = {
     'vocms0145.cern.ch': 'dev',
     'vocms0146.cern.ch': 'int',
     'vocms0226.cern.ch': 'pro',
+    'piotri.cern.ch': 'dev',
+    'pclmh.cern.ch': 'pro'
 }
 
 def getProductionLevel(hostName = None):

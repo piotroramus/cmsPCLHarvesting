@@ -37,22 +37,11 @@ class Config():
     multirun_config_path = os.getenv('MULTIRUN_CONFIG', 'resources/referenceBackendCfgs/local.yml')
     MULTIRUN_CFG = configReader.read(multirun_config_path)
 
-    # get some DB connections from the secrets file (as they may contain credentials):
-    # SQLALCHEMY_DATABASE_URI = getConnections( 'userDB' )
+    # get connection to DB from secrets
+    SQLALCHEMY_DATABASE_URI = getConnections('multirunDB')
 
-    SQLALCHEMY_DATABASE_URI = dbConnection.get_connection_string(MULTIRUN_CFG)
-
-    LOG_DB = getConnections('logDB')
-    DEST_DB = getConnections('destDB').replace('oracle://', '').replace(':',
-                                                                        '/')  # 'cms_orcoff_prep/<pwd>@CMS_CONDITIONS_002'
-
-    # RUN_INFO_DB = getConnections( 'runInfoDB' ) # 'oracle://cms_orcon_adg/CMS_CONDITIONS'
-
-    # SQLALCHEMY_BINDS = {
-    #     'log'  : LOG_DB,
-    #     'user' : SQLALCHEMY_DATABASE_URI,
-    #     'runInfo'  : RUN_INFO_DB,
-    # }
+    # in case Oracle is used (almost always) make sure TNS file is present
+    dbConnection.resolve_tns()
 
     @staticmethod
     def init_app(app):
