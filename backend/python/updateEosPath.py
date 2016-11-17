@@ -15,13 +15,16 @@ if __name__ == '__main__':
     parser.add_argument("multirun_id", type=int, help="id of processed multi-run")
     parser.add_argument("multirun_eos_dir", help="directory in the eos multi-run was uploaded to")
     parser.add_argument("config_file", help="path to configuration file")
+    parser.add_argument('--oracleSecret', help='file containing oracle connection credentials', required=False)
     args = parser.parse_args()
 
     multirun_id = args.multirun_id
     eos_dir = args.multirun_eos_dir
     config_file = args.config_file
+    oracle_secret = args.oracleSecret
 
     config = configReader.read(config_file)
+    config['oracle_secret'] = oracle_secret
 
     connection_string = dbConnection.get_connection_string(config)
     engine = sqlalchemy.create_engine(connection_string, echo=False)

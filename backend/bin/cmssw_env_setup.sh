@@ -27,7 +27,7 @@ function upload_available_files() {
         fi
     done
     echo "Updating multi-run eos path"
-    python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $MULTIRUN_DIR $CONFIG_FILE
+    python $PYTHON_DIR_PATH/updateEosPath.py $MULTIRUN_ID $MULTIRUN_DIR $CONFIG_FILE --oracleSecret ${ORACLE_SECRET_FILE}
 }
 
 
@@ -95,14 +95,14 @@ mv $PROPERTIES_FILE_PWD .
 python $PYTHON_DIR_PATH/configPreparator.py $MULTIRUN_PROPS_FILE $ALCA_CONFIG_FILE $JOB_REPORT_FILE
 
 # update multi-run processing start time
-python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE start
+python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE start --oracleSecret ${ORACLE_SECRET_FILE}
 
 # run the AlCaHarvesting step
 cmsRun -j $JOB_REPORT_FILE $ALCA_CONFIG_FILE 2>&1 | tee $CMS_RUN_OUTPUT
 CMS_RUN_RESULT=${PIPESTATUS[0]}
 
 # update multi-run processing end time
-python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE end
+python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE end --oracleSecret ${ORACLE_SECRET_FILE}
 
 # I was just wondering how is it possible, that cmsRun can return something > 255
 # while it is not feasible on an unix-based OS
@@ -111,7 +111,7 @@ python $PYTHON_DIR_PATH/updateProcessingTime.py $MULTIRUN_ID $CONFIG_FILE end
 echo "cmsRun return code: $CMS_RUN_RESULT"
 if [[ $CMS_RUN_RESULT != 0 ]]; then
     echo "cmsRun returned with non-zero exit code: $CMS_RUN_RESULT"
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE --oracleSecret ${ORACLE_SECRET_FILE}
     upload_available_files
     exit $CMS_RUN_RESULT
 fi
@@ -127,13 +127,13 @@ root_files_count=$(ls $DQM_FILE 2>/dev/null | wc -l)
 if [ $root_files_count -lt 1 ]; then
     echo "DQM file is missing!"
     echo "Preparing for retrying the processing..."
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE --oracleSecret ${ORACLE_SECRET_FILE}
     upload_available_files
     exit 1
 elif [ $root_files_count -gt 1 ]; then
     echo "More than one DQM file!"
     echo "Preparing for retrying the processing..."
-    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+    python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE --oracleSecret ${ORACLE_SECRET_FILE}
     upload_available_files
     exit 1
 fi
@@ -143,7 +143,7 @@ for file in ${FILES_TO_SAVE[@]}; do
     if [ ! -f $file ]; then
         echo "Error: $file does not exists"
         echo "Preparing for retrying the processing..."
-        python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE
+        python $PYTHON_DIR_PATH/unprocessedMultirun.py $MULTIRUN_ID $MAX_FAILURE_RETRIES $CONFIG_FILE --oracleSecret ${ORACLE_SECRET_FILE}
         upload_available_files
         exit 1
     fi
@@ -155,7 +155,7 @@ PAYLOAD_ROWS=$(sqlite3 $CONDITIONS_FILE "select count(*) from TAG")
 if [ $PAYLOAD_ROWS -eq 0 ]; then
     echo "No payload has been produced."
     echo "Multi-run now will go to need_more_data state"
-    python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $CONFIG_FILE
+    python $PYTHON_DIR_PATH/noPayloadProcessing.py $MULTIRUN_ID $CONFIG_FILE --oracleSecret ${ORACLE_SECRET_FILE}
     upload_available_files
     exit 0
 else
@@ -163,7 +163,7 @@ else
 fi
 
 # mark multirun as processed
-python $PYTHON_DIR_PATH/markAsProcessed.py $MULTIRUN_ID $CONFIG_FILE
+python $PYTHON_DIR_PATH/markAsProcessed.py $MULTIRUN_ID $CONFIG_FILE --oracleSecret ${ORACLE_SECRET_FILE}
 
 upload_available_files
 

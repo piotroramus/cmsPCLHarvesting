@@ -118,6 +118,7 @@ def prepare_multirun_environment(config, jenkins_build_url):
             # think if this is really needed
             # f.write("CONFIG_FILE={}\n".format(config_file))
             f.write("JENKINS_BUILD_URL={}\n".format(jenkins_build_url))
+            f.write("ORACLE_SECRET_FILE={}\n".format(config['oracle_secret']))
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well
         session.commit()

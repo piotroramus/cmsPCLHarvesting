@@ -17,13 +17,16 @@ if __name__ == '__main__':
     parser.add_argument("max_failure_retries", type=int,
                         help="number of times which multi-run can be repeated in case of failure")
     parser.add_argument("config_file", help="path to configuration file")
+    parser.add_argument('--oracleSecret', help='file containing oracle connection credentials', required=False)
     args = parser.parse_args()
 
     multirun_id = args.multirun_id
     max_failure_retries = args.max_failure_retries
     config_file = args.config_file
+    oracle_secret = args.oracleSecret
 
     config = configReader.read(config_file)
+    config['oracle_secret'] = oracle_secret
 
     connection_string = dbConnection.get_connection_string(config)
     engine = sqlalchemy.create_engine(connection_string, echo=False)

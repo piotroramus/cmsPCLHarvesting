@@ -18,14 +18,18 @@ if __name__ == '__main__':
     parser.add_argument("multirun_id", type=int, help="id of the processed multi-run")
     parser.add_argument("config_file", help="path to configuration file containing DB connection information")
     parser.add_argument("type", help="whether to update start or end processing time", choices=['start', 'end'])
+    parser.add_argument('--oracleSecret', help='file containing oracle connection credentials', required=False)
 
     args = parser.parse_args()
 
     multirun_id = args.multirun_id
     config_file = args.config_file
+    # TODO: type shadows built-ins
     type = args.type
+    oracle_secret = args.oracleSecret
 
     config = configReader.read(config_file)
+    config['oracle_secret'] = oracle_secret
 
     connection_string = dbConnection.get_connection_string(config)
     engine = sqlalchemy.create_engine(connection_string, echo=False)
