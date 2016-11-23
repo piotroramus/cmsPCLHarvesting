@@ -54,7 +54,7 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
             logger.info(
                 "Run {} already exists in local database but the stream was not completed".format(run[u'runnumber']))
 
-            if t0api.run_stream_completed(run[u'runnumber']) and \
+            if t0api.express_stream_completed(run[u'runnumber']) and \
                     previous_runs_completed(run[u'runnumber'], incomplete_stream_runs):
                 logger.info(
                     "Stream for run {} is now completed. It can be thus included in multi-runs".format(
@@ -73,8 +73,8 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
                 continue
 
         else:
-            stream_completed = t0api.run_stream_completed(run[u'runnumber'])
-            if stream_completed != -1:
+            stream_completed = t0api.express_stream_completed(run[u'runnumber'])
+            if stream_completed:
                 logger.info("New run: {}".format(run[u'runnumber']))
                 if stream_completed and not previous_runs_completed(run[u'runnumber'], incomplete_stream_runs):
                     stream_completed = False
@@ -136,7 +136,7 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
     for run in unused_complete_runs:
 
         logger.debug("Retrieving express config for run {}".format(run.number))
-        release = t0api.get_run_info(run.number)
+        release = t0api.get_run_info(run.number, config)
         if not release:
             logger.debug("Express config for run {} is not available".format(run.number))
             continue

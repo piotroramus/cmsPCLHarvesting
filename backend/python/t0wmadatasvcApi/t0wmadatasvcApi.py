@@ -28,39 +28,42 @@ class Tier0Api(object):
 
     def get_run_express_config(self, run_number):
         url = "{}?run={}".format(self.express_url, run_number)
-        return self.process_request(url)
+        t0_configs = self.process_request(url)
+        try:
+            for t0_config in t0_configs[u'result']:
+                if "Express" in t0_config[u'stream']:
+                    return t0_config
+        except KeyError:
+            pass
 
-    def get_run_info(self, run_number):
-        cfg = self.get_run_express_config(run_number)
+        # returned here rather than in except part
+        # because we want to handle the case when the for loop passes without return
+        self.logger.error('Express config not available for run {}'.format(run_number))
+        return None
+
+    def get_run_info(self, run_number, job_config):
+        express_config = self.get_run_express_config(run_number)
         try:
             result = dict()
-            result['cmssw'] = cfg[u'result'][0][u'reco_cmssw']
-            result['scram_arch'] = cfg[u'result'][0][u'reco_scram_arch']
-            result['scenario'] = cfg[u'result'][0][u'scenario']
-            result['global_tag'] = cfg[u'result'][0][u'global_tag']
-            workflows = cfg[u'result'][0][u'alca_skim']
-            # TODO: where will be problem with this probably only when there is no express stream entry
-            # add check for getting the stream express, but it is important to have in mind that there can be no stream express
-            if workflows:
-                wfls = workflows.split(',')
-                # TODO: this is somehow inconsistent with config workflows
-                result['workflows'] = [w for w in wfls if w.startswith('PromptCalibProd')]
+            result['cmssw'] = express_config[u'reco_cmssw']
+            result['scram_arch'] = express_config[u'reco_scram_arch']
+            result['scenario'] = express_config[u'scenario']
+            result['global_tag'] = express_config[u'global_tag']
+            allowed_workflows = [x for x in job_config['workflows'].keys()]
+            stream_workflows = express_config[u'alca_skim'].split(',')
+            result['workflows'] = [w for w in stream_workflows if w in allowed_workflows]
             return result
-        except (KeyError, IndexError):
-            self.logger.debug('Express config not available for run {}'.format(run_number))
+        except KeyError:
+            self.logger.error('Cannot parse express config for run {}'.format(run_number))
             return None
 
-    def run_stream_completed(self, run_number):
-        cfg = self.get_run_express_config(run_number)
+    def express_stream_completed(self, run_number):
+        express_config = self.get_run_express_config(run_number)
         try:
-            stream = cfg[u'result'][0][u'stream']
+            stream = express_config[u'stream']
             stream_done_url = "{}?run={}&stream={}".format(self.stream_done_url, run_number, stream)
             result = self.process_request(stream_done_url)
             return result[u'result'][0]
         except IndexError:
             self.logger.debug('Cannot determine if stream is completed for run {}')
-            return -1  # cannot return None, since in simple if it will be equal to False
-
-    def firstconditionsaferun(self):
-        result = self.process_request(self.fcsr_url)
-        return result['result'][0]
+            return False
