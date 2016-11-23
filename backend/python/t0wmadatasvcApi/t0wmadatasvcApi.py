@@ -66,4 +66,7 @@ class Tier0Api(object):
             return result[u'result'][0]
         except IndexError:
             self.logger.debug('Cannot determine if stream is completed for run {}')
-            return False
+
+            # cannot return None, since in simple if it will be equal to False
+            # and eventually after few days the stream will be treated as completed
+            return -1

@@ -74,7 +74,7 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
 
         else:
             stream_completed = t0api.express_stream_completed(run[u'runnumber'])
-            if stream_completed:
+            if stream_completed != -1:
                 logger.info("New run: {}".format(run[u'runnumber']))
                 if stream_completed and not previous_runs_completed(run[u'runnumber'], incomplete_stream_runs):
                     stream_completed = False
