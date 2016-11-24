@@ -59,6 +59,10 @@ class Tier0Api(object):
 
     def express_stream_completed(self, run_number):
         express_config = self.get_run_express_config(run_number)
+        if not express_config:
+            # cannot return None, since in simple if it will be equal to False
+            # and eventually after few days the stream will be treated as completed
+            return -1
         try:
             stream = express_config[u'stream']
             stream_done_url = "{}?run={}&stream={}".format(self.stream_done_url, run_number, stream)
@@ -66,7 +70,4 @@ class Tier0Api(object):
             return result[u'result'][0]
         except IndexError:
             self.logger.debug('Cannot determine if stream is completed for run {}')
-
-            # cannot return None, since in simple if it will be equal to False
-            # and eventually after few days the stream will be treated as completed
             return -1
