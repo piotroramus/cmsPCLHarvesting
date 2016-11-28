@@ -73,10 +73,7 @@ class DBSApi(object):
         except httplib.BadStatusLine:
             raise RuntimeError('Something is really wrong')
         if response.status != 200:
-            # TODO: logger
-            print "Problems quering DBS3 RESTAPI with {}: {}".format(
-                # where does base_url come from ? FIX
-                query.replace('#', '%23'), response.read())
+            print "Problems quering DBS3 RESTAPI with {}: {}".format(query.replace('#', '%23'), response.read())
             return None
         return response.read()
 
