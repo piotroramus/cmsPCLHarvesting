@@ -44,7 +44,7 @@ def prepare_config(params_file, alca_config_file="alcaConfig.py", job_report_fil
                   alca_config_file, job_report_file)
 
 
-def prepare_multirun_environment(config, jenkins_build_url):
+def prepare_multirun_environment(config, config_file, jenkins_build_url):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
@@ -114,9 +114,7 @@ def prepare_multirun_environment(config, jenkins_build_url):
             f.write("MAX_FAILURE_RETRIES={}\n".format(config['max_failure_retries']))
             f.write("FAILURE_RETRIES={}\n".format(multirun.failure_retries))
             f.write("NO_PAYLOAD_RETRIES={}\n".format(multirun.no_payload_retries))
-            # TODO: think what to do with it - now passing deserialized config to this function
-            # think if this is really needed
-            # f.write("CONFIG_FILE={}\n".format(config_file))
+            f.write("CONFIG_FILE={}\n".format(config_file))
             f.write("JENKINS_BUILD_URL={}\n".format(jenkins_build_url))
             f.write("ORACLE_SECRET_FILE={}\n".format(config['oracle_secret']))
 

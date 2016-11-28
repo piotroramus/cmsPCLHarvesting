@@ -23,5 +23,5 @@ if __name__ == '__main__':
     config['oracle_secret'] = oracle_secret
 
     logger.info("Preparing AlCa Harvesting config")
-    alcaHarvesting.envAssembler.prepare_multirun_environment(config, jenkins_build_url)
+    alcaHarvesting.envAssembler.prepare_multirun_environment(config, config_file, jenkins_build_url)
     logger.info("AlCa Harvesting has been finished")
