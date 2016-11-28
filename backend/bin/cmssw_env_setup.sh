@@ -47,9 +47,9 @@ DQM_FILE=DQM_V0001_R*__StreamExpress*__*__ALCAPROMPT.root
 CONDITIONS_FILE="promptCalibConditions$MULTIRUN_ID.db"
 METADATA_FILE="promptCalibConditions$MULTIRUN_ID.txt"
 
-# TODO: copy $CONFIG_FILE?
 # output files to be copied to EOS
 FILES_TO_SAVE=(
+    $CONFIG_FILE
     $ALCA_CONFIG_FILE
     $JOB_REPORT_FILE
     $CMS_RUN_OUTPUT
