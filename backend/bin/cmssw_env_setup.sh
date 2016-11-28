@@ -61,6 +61,7 @@ FILES_TO_SAVE=(
     )
 
 
+echo -e "\n"
 echo "Multi-run ID: ${MULTIRUN_ID}"
 echo "Performing processing in ${PWD}"
 echo "Release to be used: ${CMSSW_RELEASE}"
@@ -78,7 +79,7 @@ CMSSW_RELEASE_DIR=$(
                     awk -v pattern="^$CMSSW_RELEASE$" '$2 ~ pattern {print $3}'
                     )
 
-echo "Sourcing environment from $CMSSW_RELEASE_DIR/src"
+echo -e "Sourcing environment from $CMSSW_RELEASE_DIR/src \n"
 cd $CMSSW_RELEASE_DIR/src
 cmsenv
 
