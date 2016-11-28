@@ -43,6 +43,8 @@ class Tier0Api(object):
 
     def get_run_info(self, run_number, job_config):
         express_config = self.get_run_express_config(run_number)
+        if not express_config:
+            return None
         try:
             result = dict()
             result['cmssw'] = express_config[u'reco_cmssw']
