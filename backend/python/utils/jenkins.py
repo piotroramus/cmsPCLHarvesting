@@ -3,14 +3,15 @@ import sys
 
 import model
 import logs.logger as logs
-import utils.prepopulate
+import utils.prepopulate.get_job_types
 
 
 def update_jenkins_build_url(multirun_id, url, job_type, config, session):
     logs.setup_logging()
     logger = logging.getLogger(__name__)
 
-    if job_type not in utils.prepopulate.job_types:
+    job_types = utils.prepopulate.get_job_types()
+    if job_type not in job_types:
         logger.error("Jenkins Job Type {} not forseen!".format(job_type))
         sys.exit(1)
 

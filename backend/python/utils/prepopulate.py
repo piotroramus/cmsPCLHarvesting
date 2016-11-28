@@ -2,17 +2,16 @@ import logging
 
 import model
 import logs.logger as logs
-import utils.dbConnection as dbConnection
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-job_types = [
-    'discovery',
-    'harvesting',
-    'dqm_upload',
-    'payload_upload'
-]
+def get_job_types():
+    job_types = [
+        'discovery',
+        'harvesting',
+        'dqm_upload',
+        'payload_upload'
+    ]
+    return job_types
 
 
 def prepopulate(session):
@@ -40,6 +39,7 @@ def prepopulate(session):
             s = model.MultirunState(state=state)
             session.add(s)
 
+        job_types = get_job_types()
         for job_type in job_types:
             jt = model.JenkinsJobType(type=job_type)
             session.add(jt)
