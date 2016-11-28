@@ -3,7 +3,7 @@ import sys
 
 import model
 import logs.logger as logs
-import utils.prepopulate.get_job_types
+import utils.prepopulate
 
 
 def update_jenkins_build_url(multirun_id, url, job_type, config, session):
