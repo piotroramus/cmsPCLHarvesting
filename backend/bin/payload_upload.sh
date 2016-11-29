@@ -52,6 +52,7 @@ function upload() {
 }
 
 
+# source common.sh which contains definitions of functions like eos, cmsenv and so on
 BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${BIN_DIR}/common.sh
 
