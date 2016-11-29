@@ -4,7 +4,7 @@
 # script parameters should be placed in properties file which path should be a script argument
 
 
-# source common.sh which contains definitios of functions like eos, cmsenv and so on
+# source common.sh which contains definitions of functions like eos, cmsenv and so on
 BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${BIN_DIR}/common.sh
 
@@ -12,12 +12,12 @@ source ${BIN_DIR}/common.sh
 function upload_available_files() {
     echo -e "\nUploading available output files to EOS..."
     for FILE in ${FILES_TO_SAVE[@]}; do
-        if [ ! -f ${FILE} ]; then
+        if [[ ! -f ${FILE} ]]; then
             echo "${FILE} does not exists - not proceeding with upload"
         else
             eos cp --preserve --checksum ${FILE} ${EOS_MULTIRUN_WORKSPACE}
             RC=$?
-            if [ ${RC} -ne 0 ]; then
+            if [[ ${RC} -ne 0 ]]; then
                 echo "ERROR: Uploading of ${FILE} to EOS resulted in an error ${RC}"
                 exit ${RC}
                 # TODO: when this fails we have problem...
@@ -31,7 +31,7 @@ function upload_available_files() {
 
 
 PROPERTIES_FILE="$1"
-if [ ! -f ${PROPERTIES_FILE} ]; then
+if [[ ! -f ${PROPERTIES_FILE} ]]; then
     echo "Shell properties file ${PROPERTIES_FILE} cannot be localized"
     exit 1
 fi
@@ -116,13 +116,13 @@ python ${PYTHON_DIR_PATH}/createMetadata.py ${JOB_REPORT_FILE} ${METADATA_FILE} 
 
 # check if there is exactly one .root (DQM) file
 ROOT_FILES_COUNT=$(ls ${DQM_FILE} 2>/dev/null | wc -l)
-if [ ${ROOT_FILES_COUNT} -lt 1 ]; then
+if [[ ${ROOT_FILES_COUNT} -lt 1 ]]; then
     echo "DQM file is missing!"
     echo "Preparing for retrying the processing..."
     python ${PYTHON_DIR_PATH}/unprocessedMultirun.py ${MULTIRUN_ID} ${MAX_FAILURE_RETRIES} ${CONFIG_FILE} --oracleSecret ${ORACLE_SECRET_FILE}
     upload_available_files
     exit 1
-elif [ ${ROOT_FILES_COUNT} -gt 1 ]; then
+elif [[ ${ROOT_FILES_COUNT} -gt 1 ]]; then
     echo "More than one DQM file!"
     echo "Preparing for retrying the processing..."
     python ${PYTHON_DIR_PATH}/unprocessedMultirun.py ${MULTIRUN_ID} ${MAX_FAILURE_RETRIES} ${CONFIG_FILE} --oracleSecret ${ORACLE_SECRET_FILE}
@@ -132,7 +132,7 @@ fi
 
 
 for FILE in ${FILES_TO_SAVE[@]}; do
-    if [ ! -f ${FILE} ]; then
+    if [[ ! -f ${FILE} ]]; then
         echo "Error: ${FILE} does not exists"
         echo "Preparing for retrying the processing..."
         python ${PYTHON_DIR_PATH}/unprocessedMultirun.py ${MULTIRUN_ID} ${MAX_FAILURE_RETRIES} ${CONFIG_FILE} --oracleSecret ${ORACLE_SECRET_FILE}
@@ -144,7 +144,7 @@ done
 echo "Checking if the payload has been produced..."
 PAYLOAD_ROWS=$(sqlite3 ${CONDITIONS_FILE} "select count(*) from TAG")
 
-if [ ${PAYLOAD_ROWS} -eq 0 ]; then
+if [[ ${PAYLOAD_ROWS} -eq 0 ]]; then
     echo "No payload has been produced."
     echo "Multi-run now will go to need_more_data state"
     python ${PYTHON_DIR_PATH}/noPayloadProcessing.py ${MULTIRUN_ID} ${CONFIG_FILE} --oracleSecret ${ORACLE_SECRET_FILE}

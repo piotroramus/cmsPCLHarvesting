@@ -18,7 +18,7 @@ function upload() {
     eos cp --preserve --checksum ${CONDITIONS_FILE_LOCATION} ${CONDITIONS_FILENAME}
     EOS_RC=$?
 
-    if [ ${EOS_RC} -ne 0 ]; then
+    if [[ ${EOS_RC} -ne 0 ]]; then
         echo "ERROR: Trying to copy ${CONDITIONS_FILE_LOCATION} from eos resulted in error"
         echo "EOS command returned ${EOS_RC}"
         return ${EOS_RC}
@@ -29,7 +29,7 @@ function upload() {
     eos cp --preserve --checksum ${METADATA_FILE_LOCATION} ${METADATA_FILENAME}
     EOS_RC=$?
 
-    if [ ${EOS_RC} -ne 0 ]; then
+    if [[ ${EOS_RC} -ne 0 ]]; then
         echo "ERROR: Trying to copy ${METADATA_FILE_LOCATION} from eos resulted in error"
         echo "EOS command returned ${EOS_RC}"
         return ${EOS_RC}
@@ -70,7 +70,7 @@ LOG_FILE="$8"
 NETRC_BACKUP=${HOME}/.netrcbackup
 ORIG_NETRC=${HOME}/.netrc
 
-if [ -f ${ORIG_NETRC} ]; then
+if [[ -f ${ORIG_NETRC} ]]; then
 	echo "${ORIG_NETRC} file exists, the backup will be made and after processing it will be restored"
     cp ${ORIG_NETRC} ${NETRC_BACKUP}
     echo "Temporarily swapping the file..."
