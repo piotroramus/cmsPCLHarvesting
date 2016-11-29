@@ -18,7 +18,7 @@ function source_cmssw_env() {
                         awk -v pattern="^${CMSSW_RELEASE}$" '$2 ~ pattern {print $3}'
                         )
 
-    echo "Sourcing environment from ${CMSSW_RELEASE_DIR}/src"
+    echo "Sourcing environment from ${CMSSW_RELEASE_DIR}/src \n"
     cd ${CMSSW_RELEASE_DIR}/src
     cmsenv
 
