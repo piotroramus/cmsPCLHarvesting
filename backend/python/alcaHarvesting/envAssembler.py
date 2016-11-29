@@ -62,7 +62,7 @@ def prepare_multirun_environment(config, config_file, jenkins_build_url):
         logger.info("Cannot find any multi-run ready to be processed - no further steps will be taken")
 
     else:
-        logger.info("Multirun to be processed: {}".format(multirun))
+        logger.info("Multirun to be processed: {}\n".format(multirun))
 
         processing_state = session.query(MultirunState).filter(MultirunState.state == 'processing').one()
         multirun.state = processing_state
@@ -85,9 +85,6 @@ def prepare_multirun_environment(config, config_file, jenkins_build_url):
         logger.info("Creating {} file containing multi-run information".format(multirun_props_file))
         with open(multirun_props_file, 'w') as f:
             f.write(dump)
-
-        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="harvesting", config=config,
-                                         session=session)
 
         script_path = os.path.dirname(os.path.realpath(__file__))
         python_dir_path = script_path.replace("/alcaHarvesting", "")
@@ -120,6 +117,9 @@ def prepare_multirun_environment(config, config_file, jenkins_build_url):
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well
         session.commit()
+
+        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="harvesting", config=config,
+                                         session=session)
 
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         cmd = "{} {}".format(shell_script_path, shell_props_file)
