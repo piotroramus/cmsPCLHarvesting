@@ -15,6 +15,9 @@ db_vendor: sqlite
 # path to sqlite DB file (when of using one)
 sqlite_db_path: test.db
 
+# space where shell scritps will be running (mainly AlCa Harvesting step)
+working_directory: /pclmh/multirun_harvesting
+
 # where to copy files of every AlCa Harvesting processing
 eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/local
 
