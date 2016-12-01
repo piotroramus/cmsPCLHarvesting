@@ -102,6 +102,7 @@ def prepare_multirun_environment(config, config_file, jenkins_build_url):
             f.write("SCRAM_ARCH={}\n".format(multirun.scram_arch))
             f.write("MULTIRUN_ID={}\n".format(multirun.id))
             f.write("MULTIRUN_DIR={}\n".format(multirun_dir))
+            f.write("WORKING_DIR={}\n").format(config['working_directory'])
             f.write("ALCA_CONFIG_FILE={}\n".format(config['alca_config']))
             f.write("JOB_REPORT_FILE={}\n".format(config['job_report']))
             f.write("CMS_RUN_OUTPUT={}\n".format(config['cms_run_output']))
