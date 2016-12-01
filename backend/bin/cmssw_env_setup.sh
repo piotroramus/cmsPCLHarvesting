@@ -33,6 +33,9 @@ function upload_available_files() {
     done
     echo "Updating multi-run eos path"
     python ${PYTHON_DIR_PATH}/updateEosPath.py ${MULTIRUN_ID} ${MULTIRUN_DIR} ${CONFIG_FILE} --oracleSecret ${ORACLE_SECRET_FILE}
+
+    cd ..
+    rm -r ${WORKING_DIR}
 }
 
 
@@ -73,13 +76,17 @@ echo "Release to be used: ${CMSSW_RELEASE}"
 echo "Architecture: ${SCRAM_ARCH}"
 echo -e "\n"
 
-
-CURRENT_WORKSPACE=${PWD}
-EOS_MULTIRUN_WORKSPACE=${EOS_WORKSPACE}/${SCRAM_ARCH}/${CMSSW_RELEASE}/${MULTIRUN_DIR}/
-
 source_cmssw_env # defined in common.sh
 
-cd ${CURRENT_WORKSPACE}
+EOS_MULTIRUN_WORKSPACE=${EOS_WORKSPACE}/${SCRAM_ARCH}/${CMSSW_RELEASE}/${MULTIRUN_DIR}/
+
+# if working directory does not exists create it
+if [[ ! -d ${WORKING_DIR} ]]; then
+    mkdir ${WORKING_DIR}
+fi
+cd ${WORKING_DIR}
+echo "Working in ${PWD}"
+
 mkdir ${MULTIRUN_DIR}
 cd ${MULTIRUN_DIR}
 

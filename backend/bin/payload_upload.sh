@@ -6,6 +6,13 @@ function upload() {
     echo "Multi-run ID: ${MULTIRUN_ID}"
     echo -e "\n"
 
+    # if working directory does not exists create it
+    if [[ ! -d ${WORKING_DIR} ]]; then
+        mkdir ${WORKING_DIR}
+    fi
+    cd ${WORKING_DIR}
+    echo "Working in ${PWD}"
+
     TMP_DIR=upload_tmp
     echo "Creating temporary directory ${TMP_DIR}"
     mkdir ${TMP_DIR}
@@ -48,6 +55,9 @@ function upload() {
     cd ..
     rm -r ${TMP_DIR}
 
+    cd ..
+    rm -r ${WORKING_DIR}
+
     return ${UPLOAD_RC}
 }
 
@@ -65,6 +75,7 @@ SCRAM_ARCH="$5"
 CMSSW_RELEASE="$6"
 MULTIRUN_ID="$7"
 LOG_FILE="$8"
+WORKING_DIR="$9"
 
 
 NETRC_BACKUP=${HOME}/.netrcbackup
