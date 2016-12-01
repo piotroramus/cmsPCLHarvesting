@@ -11,7 +11,7 @@ MULTIRUN_ID="$4"
 PYTHON_DIR="$5"
 WORKING_DIR="$6"
 
-echo -e "\n Starting to perfrom DQM upload"
+echo -e "\nStarting to perfrom DQM upload"
 echo "Multi-run ID: ${MULTIRUN_ID}"
 echo -e "\n"
 
