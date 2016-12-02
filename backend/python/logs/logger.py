@@ -3,10 +3,11 @@ import logging.config
 
 import yaml
 
+
 def setup_logging(
-    default_path='logs/logging.yaml',
-    default_level=logging.INFO,
-    env_key='LOG_CFG'
+        default_path='logs/logging.yaml',
+        default_level=logging.INFO,
+        env_key='LOG_CFG'
 ):
     """Setup logging configuration
 
