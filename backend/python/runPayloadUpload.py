@@ -89,9 +89,9 @@ if __name__ == '__main__':
         script_path = os.path.dirname(os.path.realpath(__file__))
         payload_script_path = script_path.replace("/python", "/bin/payload_upload.sh")
         log_file = "{}/dropbox_upload_log.txt".format(os.getcwd())
-        cmd = "{} {} {} {} {} {} {} {} {} {}".format(payload_script_path, netrc, eos_path, conditions_filename,
+        cmd = "{} {} {} {} {} {} {} {} {}".format(payload_script_path, netrc, eos_path, conditions_filename,
                                                   metadata_filename, multirun.scram_arch, multirun.cmssw, multirun.id,
-                                                  log_file, config['working_directory'])
+                                                  log_file)
 
         result = subprocess.call(cmd, shell=True)
 

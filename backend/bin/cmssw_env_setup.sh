@@ -33,9 +33,6 @@ function upload_available_files() {
     done
     echo "Updating multi-run eos path"
     python ${PYTHON_DIR_PATH}/updateEosPath.py ${MULTIRUN_ID} ${MULTIRUN_DIR} ${CONFIG_FILE} --oracleSecret ${ORACLE_SECRET_FILE}
-
-    cd ..
-    rm -r ${WORKING_DIR}
 }
 
 
@@ -50,6 +47,7 @@ source ${PROPERTIES_FILE}
 MULTIRUN_PROPS_FILE_PWD=${PWD}/${MULTIRUN_PROPS_FILE}
 PROPERTIES_FILE_PWD=${PWD}/${PROPERTIES_FILE}
 
+EOS_MULTIRUN_WORKSPACE=${EOS_WORKSPACE}/${SCRAM_ARCH}/${CMSSW_RELEASE}/${MULTIRUN_DIR}/
 
 DQM_FILE=DQM_V0001_R*__StreamExpress*__*__ALCAPROMPT.root
 CONDITIONS_FILE="promptCalibConditions${MULTIRUN_ID}.db"
@@ -77,15 +75,6 @@ echo "Architecture: ${SCRAM_ARCH}"
 echo -e "\n"
 
 source_cmssw_env # defined in common.sh
-
-EOS_MULTIRUN_WORKSPACE=${EOS_WORKSPACE}/${SCRAM_ARCH}/${CMSSW_RELEASE}/${MULTIRUN_DIR}/
-
-# if working directory does not exists create it
-if [[ ! -d ${WORKING_DIR} ]]; then
-    mkdir ${WORKING_DIR}
-fi
-cd ${WORKING_DIR}
-echo "Working in ${PWD}"
 
 mkdir ${MULTIRUN_DIR}
 cd ${MULTIRUN_DIR}
