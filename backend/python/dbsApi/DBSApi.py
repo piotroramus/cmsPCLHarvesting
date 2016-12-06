@@ -84,6 +84,15 @@ class DBSApi(object):
         }
         return self._api('datasets', params)
 
+    def listAlCaPromptDatasets(self, run_num):
+        # processed_ds_name regexp excludes test datasets like SUPERBUNNIES
+        params = {
+            'run_num': run_num,
+            'data_tier_name': 'ALCAPROMPT',
+            'processed_ds_name': '*Run*-*-*-*'
+        }
+        return self._api('datasets', params)
+
     def listBlocks(self, run_num, dataset):
         params = {
             'run_num': run_num,
