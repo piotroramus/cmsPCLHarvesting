@@ -71,8 +71,6 @@ NETRC_BACKUP=${HOME}/.netrcbackup
 ORIG_NETRC=${HOME}/.netrc
 
 if [[ -f ${ORIG_NETRC} ]]; then
-    # TODO: I suspect this code is somehow broken, because if the file is there we have some problems...
-    # I can test it by performing upload with already created file in place
 	echo "${ORIG_NETRC} file exists, the backup will be made and after processing it will be restored"
     cp ${ORIG_NETRC} ${NETRC_BACKUP}
     echo "Temporarily swapping the file..."
@@ -83,7 +81,7 @@ if [[ -f ${ORIG_NETRC} ]]; then
 
     echo "Switching back to the original .netrc file"
     cp ${NETRC_BACKUP} ${ORIG_NETRC}
-    rm ${NETRC_BACKUP}
+    rm -f ${NETRC_BACKUP}
 
     exit ${UPLOAD_RESULT}
 else
@@ -93,6 +91,6 @@ else
     upload
     UPLOAD_RESULT=$?
 
-    rm ${ORIG_NETRC}
+    rm -f ${ORIG_NETRC}
     exit ${UPLOAD_RESULT}
 fi
