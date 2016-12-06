@@ -74,13 +74,13 @@ if [[ -f ${ORIG_NETRC} ]]; then
 	echo "${ORIG_NETRC} file exists, the backup will be made and after processing it will be restored"
     cp ${ORIG_NETRC} ${NETRC_BACKUP}
     echo "Temporarily swapping the file..."
-    cp ${NETRC_FILE} ${ORIG_NETRC}
+    cp -f ${NETRC_FILE} ${ORIG_NETRC}
 
     upload
     UPLOAD_RESULT=$?
 
     echo "Switching back to the original .netrc file"
-    cp ${NETRC_BACKUP} ${ORIG_NETRC}
+    cp -f ${NETRC_BACKUP} ${ORIG_NETRC}
     rm -f ${NETRC_BACKUP}
 
     exit ${UPLOAD_RESULT}
