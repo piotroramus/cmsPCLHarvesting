@@ -3,22 +3,17 @@ from __future__ import print_function
 import copy
 import sys
 
-import config # probably useless...
-
 from app import db
 from app import app
 from backendMethods import get_multiruns_from_db, run_in_shell
-from flask import g, jsonify, abort, request, make_response, render_template, redirect, url_for
-from sqlalchemy.exc import IntegrityError
-from datetime import datetime
 
+from datetime import datetime
+from flask import g, jsonify, abort, request, make_response, render_template, redirect, url_for
 
 from backend.python import model
 from backend.python.utils.workflows import extract_workflow
 
 from flask_httpauth import HTTPBasicAuth
-
-# TODO: organize imports
 
 auth = HTTPBasicAuth()
 
