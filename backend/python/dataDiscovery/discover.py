@@ -144,7 +144,7 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
         base_release = get_base_release(release['cmssw'])
         base_release_pattern = "{}%".format(base_release)
 
-        logger.debug("Getting list of datasets for run {} from DBS".format(run.number))
+        logger.debug("Getting list of ALCAPROMPT datasets for run {} from DBS".format(run.number))
         run_datasets = dbsApi.listAlCaPromptDatasets(run_num=run.number)
 
         logger.debug("Getting datasets that are not part of any multi-run for the given run")
