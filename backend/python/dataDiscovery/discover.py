@@ -3,7 +3,7 @@ import logging
 import re
 import sqlalchemy
 
-import utils.general as utils
+import utils.other as utils
 import dbsApi.DBSApi as dbsapi
 import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
