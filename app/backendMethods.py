@@ -9,10 +9,13 @@ from backend.python import model
 
 def create_eos_path(multirun):
     paths = []
-    for d in multirun['eos_dirs']:
-        # TODO: can be optimized a little bit
-        path = app.config['MULTIRUN_CFG']['eos_workspace_path']
-        path = "{}/{}/{}/{}/".format(path, multirun['scram_arch'], multirun['cmssw'], d)
+    path_template = "{}/{}/{}".format(
+        app.config['MULTIRUN_CFG']['eos_workspace_path'],
+        multirun['scram_arch'],
+        multirun['cmssw']
+    )
+    for eos_dir in multirun['eos_dirs']:
+        path = "{}/{}/".format(path_template, eos_dir)
         paths.append(path)
     return paths
 
