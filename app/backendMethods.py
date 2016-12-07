@@ -47,15 +47,6 @@ def get_multiruns_from_db(offset=0, limit=25):
         offset(offset). \
         all()
     m_json = [m.to_json() for m in multiruns]
-    state_names = get_state_names()
-    for m in m_json:
-        m['state'] = state_names[m['state']]
-        m['eos_dirs'] = create_eos_path(m)
-        m['dqm_url'] = generate_dqm_url(m)
-    return m_json
-
-
-def get_state_names():
     state_names = {
         u'need_more_data': "Need more data",
         u'ready': "Ready",
@@ -67,7 +58,11 @@ def get_state_names():
         u'dropbox_upload_failed': "Dropbox upload failed",
         u'uploads_ok': "Uploads OK",
     }
-    return state_names
+    for m in m_json:
+        m['state'] = state_names[m['state']]
+        m['eos_dirs'] = create_eos_path(m)
+        m['dqm_url'] = generate_dqm_url(m)
+    return m_json
 
 
 def multiruns_total():
