@@ -1,6 +1,12 @@
 import re
 
 
+def extract_dataset_parts(dataset):
+    pattern = r'/(?P<primary_dataset>.*)/(?P<processed_dataset>.*?)/ALCAPROMPT'
+    ds = re.match(pattern, dataset)
+    return ds.group('primary_dataset'), ds.group('processed_dataset')
+
+
 def extract_workflow(dataset, available_workflows=None):
     pattern = r'/(?P<primary_dataset>.*)/(?P<acquisition_era>.*?)-(?P<workflow>.*?)-(?P<version>.*)/ALCAPROMPT'
     workflow = re.match(pattern, dataset)
@@ -20,7 +26,7 @@ def get_run_class_names(config):
     run_class_names = set()
     for workflow_list in config['workflows'].itervalues():
         for rcn in workflow_list['run_classes']:
-                run_class_names.add(rcn)
+            run_class_names.add(rcn)
     return run_class_names
 
 

@@ -1,10 +1,10 @@
-import re
 import subprocess
 
 from app import db
 from app import app
 
 from backend.python import model
+from backend.python.utils.workflows import extract_dataset_parts
 
 
 def create_eos_path(multirun):
@@ -22,11 +22,7 @@ def create_eos_path(multirun):
 
 def generate_dqm_url(multirun):
     gui_url = app.config['MULTIRUN_CFG']['dqm_upload_host']
-    # TODO: think if it is possible to unify this behaviour with DQM things - code duplication!
-    # rebuild dataset name adding run range
-    pattern = r'/(?P<primary_dataset>.*)/(?P<processed_dataset>.*?)/ALCAPROMPT'
-    ds = re.match(pattern, multirun['dataset'])
-    primary_dataset, processed_dataset = ds.group('primary_dataset'), ds.group('processed_dataset')
+    primary_dataset, processed_dataset = extract_dataset_parts(multirun['dataset'])
 
     run_numbers = [run['number'] for run in multirun['runs']]
     min_run, max_run = min(run_numbers), max(run_numbers)

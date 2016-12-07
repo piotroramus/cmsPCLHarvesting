@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import re
 import sqlalchemy
 import subprocess
 import sys
@@ -12,15 +11,10 @@ import utils.configReader as configReader
 import utils.dbConnection as dbConnection
 import utils.jenkins as jenkins
 
+from utils.workflows import extract_dataset_parts
+
 """ Tries to upload DQM file to DQM GUI.
     Can be triggered only after the AlCa Harvesting step has finished successfully or the previous DQM upload failed."""
-
-
-def extract_dataset_parts(dataset):
-    pattern = r'/(?P<primary_dataset>.*)/(?P<processed_dataset>.*?)/ALCAPROMPT'
-    ds = re.match(pattern, dataset)
-    return ds.group('primary_dataset'), ds.group('processed_dataset')
-
 
 if __name__ == '__main__':
     logs.setup_logging()
@@ -86,7 +80,7 @@ if __name__ == '__main__':
         script_path = os.path.dirname(os.path.realpath(__file__))
         dqm_script_path = script_path.replace("/python", "/bin/dqm_upload.sh")
         cmd = "{} {} {} {} {} {}".format(dqm_script_path, dqm_filename, dqm_file_location, config['dqm_upload_host'],
-                                            multirun.id, script_path)
+                                         multirun.id, script_path)
         result = subprocess.call(cmd, shell=True)
 
         jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="dqm_upload",
