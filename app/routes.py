@@ -3,15 +3,13 @@ from __future__ import print_function
 import copy
 import sys
 
-from app import app
-from backendMethods import get_multiruns_from_db, multiruns_total, run_in_shell
-
 from datetime import datetime
 from flask import g, jsonify, abort, request, make_response, render_template, redirect, url_for
-
-from backend.python.utils.workflows import extract_workflow
-
 from flask_httpauth import HTTPBasicAuth
+
+from app import app
+from backendMethods import get_multiruns_from_db, multiruns_total, run_in_shell
+from backend.python.utils.workflows import extract_workflow
 
 auth = HTTPBasicAuth()
 
