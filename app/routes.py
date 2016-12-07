@@ -101,15 +101,8 @@ def display():
 
 @app.route('/multiruns/')
 def get_multiruns():
-    # TODO: common logic with workflow method
-    # probably it is worth to only extract getting multiruns to different method
-    offset = request.args.get('offset')
-    if not offset:
-        offset = 0
-    limit = request.args.get('limit')
-    # TODO: think what to put as a default and also how to get every record
-    if not limit:
-        limit = 25
+    offset = int(request.args.get('offset', default=0))
+    limit = int(request.args.get('limit', default=25))
     data = get_multiruns_from_db(offset, limit)
     return jsonify(multiruns=data,
                    limit=limit,
@@ -119,12 +112,8 @@ def get_multiruns():
 
 @app.route('/multiruns_by_workflow/')
 def get_multiruns_by_workflow():
-    offset = request.args.get('offset')
-    if not offset:
-        offset = 0
-    limit = request.args.get('limit')
-    if not limit:
-        limit = 25
+    offset = int(request.args.get('offset', default=0))
+    limit = int(request.args.get('limit', default=25))
     data = get_multiruns_from_db(offset, limit)
     m_by_workflows = dict()
     for multirun in data:

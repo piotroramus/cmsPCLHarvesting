@@ -40,6 +40,9 @@ def generate_dqm_url(multirun):
 
 
 def get_multiruns_from_db(offset=0, limit=25):
+    # for limit == 0 return all rows
+    if limit == 0:
+        limit = None
     multiruns = db.session. \
         query(model.Multirun). \
         order_by(model.Multirun.creation_time.desc()). \
