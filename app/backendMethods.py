@@ -71,6 +71,10 @@ def get_state_names():
     return state_names
 
 
+def multiruns_total():
+    return db.session.query(model.Multirun).count()
+
+
 def run_in_shell(*popenargs, **kwargs):
     process = subprocess.Popen(*popenargs, stdout=subprocess.PIPE, **kwargs)
     stdout = process.communicate()[0]

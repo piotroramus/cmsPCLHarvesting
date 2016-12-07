@@ -3,14 +3,12 @@ from __future__ import print_function
 import copy
 import sys
 
-from app import db
 from app import app
-from backendMethods import get_multiruns_from_db, run_in_shell
+from backendMethods import get_multiruns_from_db, multiruns_total, run_in_shell
 
 from datetime import datetime
 from flask import g, jsonify, abort, request, make_response, render_template, redirect, url_for
 
-from backend.python import model
 from backend.python.utils.workflows import extract_workflow
 
 from flask_httpauth import HTTPBasicAuth
@@ -80,19 +78,20 @@ def error404():
     return make_response(jsonify({'message': 'Not found'}), 404)
 
 
+# --- Multirun Harvesting concerned methods
 @app.route('/test/')
 def test():
     print(get_multiruns_from_db(), file=sys.stderr)
     return "Have a look into logs..."
 
 
-@app.route('/display_plain/')
+@app.route('/plain_display/')
 def display_plain():
     multiruns = get_multiruns_from_db()
     return render_template('plain_table.html', multiruns=multiruns)
 
 
-@app.route('/m/')
+@app.route('/basic_template/')
 def multirun_new():
     return app.send_static_file('templates/basic.html')
 
@@ -146,10 +145,6 @@ def get_multiruns_by_workflow():
 @app.route('/multiruns_total/')
 def mtotal():
     return jsonify(total=multiruns_total())
-
-
-def multiruns_total():
-    return db.session.query(model.Multirun).count()
 
 
 @app.route('/color_test/')
