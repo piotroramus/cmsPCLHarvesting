@@ -4,7 +4,7 @@ from app import db
 from app import app
 
 from backend.python import model
-from backend.python.utils.workflows import extract_dataset_parts
+from backend.python.utils.other import extract_dataset_parts
 
 
 def create_eos_path(multirun):

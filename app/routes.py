@@ -9,7 +9,7 @@ from flask_httpauth import HTTPBasicAuth
 
 from app import app
 from backendMethods import get_multiruns_from_db, multiruns_total, run_in_shell
-from backend.python.utils.workflows import extract_workflow
+from backend.python.utils.other import extract_workflow
 
 auth = HTTPBasicAuth()
 

@@ -3,7 +3,7 @@ import logging
 import re
 import sqlalchemy
 
-import utils.workflows as workflows
+import utils.general as utils
 import dbsApi.DBSApi as dbsapi
 import logs.logger as logs
 import t0wmadatasvcApi.t0wmadatasvcApi as t0wmadatasvcApi
@@ -97,7 +97,7 @@ def discover(config, session):
     days_old_runs_date = datetime.date \
         .fromordinal(datetime.date.today().toordinal() - config['days_old_runs'])
 
-    run_class_names = workflows.get_run_class_names(config)
+    run_class_names = utils.get_run_class_names(config)
 
     recent_runs = rrapi.query(days_old_runs_date, run_class_names)
 
@@ -157,7 +157,7 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
         for dataset in datasets:
 
             available_workflows = config['workflows'].keys()
-            dataset_workflow = workflows.extract_workflow(dataset, available_workflows)
+            dataset_workflow = utils.extract_workflow(dataset, available_workflows)
             if dataset_workflow not in release['workflows']:
                 logger.warning(
                     "Dataset {} workflow {} is different than workflow from run {} express config: {}".format(
@@ -210,7 +210,7 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
                 .one_or_none()
 
             if not multirun:
-                payload_upload = workflows.to_be_uploaded(dataset, config)
+                payload_upload = utils.to_be_uploaded(dataset, config)
                 need_more_data_state = session.query(MultirunState).filter(
                     MultirunState.state == 'need_more_data').one()
                 now = datetime.datetime.now()

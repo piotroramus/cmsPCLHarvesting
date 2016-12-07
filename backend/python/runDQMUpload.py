@@ -10,8 +10,7 @@ import logs.logger as logs
 import utils.configReader as configReader
 import utils.dbConnection as dbConnection
 import utils.jenkins as jenkins
-
-from utils.workflows import extract_dataset_parts
+import utils.other as utils
 
 """ Tries to upload DQM file to DQM GUI.
     Can be triggered only after the AlCa Harvesting step has finished successfully or the previous DQM upload failed."""
@@ -63,7 +62,7 @@ if __name__ == '__main__':
         run_numbers = [run.number for run in multirun.run_numbers]
         min_run, max_run = min(run_numbers), max(run_numbers)
 
-        primary_dataset, processed_dataset = extract_dataset_parts(multirun.dataset.dataset)
+        primary_dataset, processed_dataset = utils.extract_dataset_parts(multirun.dataset.dataset)
 
         dqm_filename = 'DQM_V0001_R000999999__{}__{}-{}-{}__ALCAPROMPT.root' \
             .format(primary_dataset, processed_dataset, min_run, max_run)

@@ -3,7 +3,7 @@ import json
 import subprocess
 import os
 
-import utils.workflows as workflows
+import utils.other as utils
 import logs.logger as logs
 import utils.dbConnection as dbConnection
 import utils.jenkins as jenkins
@@ -40,7 +40,7 @@ def prepare_config(params_file, alca_config_file="alcaConfig.py", job_report_fil
 
     builder = AlCaHarvestingCfgBuilder()
     dataset_with_rr = dataset_with_runs_range(str(dataset), runs_range)
-    builder.build(dataset_with_rr, workflows.extract_workflow(dataset), input_files, scenario, global_tag,
+    builder.build(dataset_with_rr, utils.extract_workflow(dataset), input_files, scenario, global_tag,
                   alca_config_file, job_report_file)
 
 

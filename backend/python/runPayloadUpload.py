@@ -15,13 +15,6 @@ import utils.jenkins as jenkins
 """ Tries to upload payload to Dropbox.
     Can be triggered only after the DQM GUI upload has finished successfully or the previous payload upload failed."""
 
-
-def extract_dataset_parts(dataset):
-    pattern = r'/(?P<primary_dataset>.*)/(?P<era_wf_ver>.*?)/ALCAPROMPT'
-    ds = re.match(pattern, dataset)
-    return ds.group('primary_dataset'), ds.group('era_wf_ver')
-
-
 if __name__ == '__main__':
     logs.setup_logging()
     logger = logging.getLogger(__name__)
