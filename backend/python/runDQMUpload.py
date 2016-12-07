@@ -17,9 +17,9 @@ import utils.jenkins as jenkins
 
 
 def extract_dataset_parts(dataset):
-    pattern = r'/(?P<primary_dataset>.*)/(?P<era_wf_ver>.*?)/ALCAPROMPT'
+    pattern = r'/(?P<primary_dataset>.*)/(?P<processed_dataset>.*?)/ALCAPROMPT'
     ds = re.match(pattern, dataset)
-    return ds.group('primary_dataset'), ds.group('era_wf_ver')
+    return ds.group('primary_dataset'), ds.group('processed_dataset')
 
 
 if __name__ == '__main__':
@@ -69,10 +69,10 @@ if __name__ == '__main__':
         run_numbers = [run.number for run in multirun.run_numbers]
         min_run, max_run = min(run_numbers), max(run_numbers)
 
-        primary_dataset, era_wf_ver = extract_dataset_parts(multirun.dataset.dataset)
+        primary_dataset, processed_dataset = extract_dataset_parts(multirun.dataset.dataset)
 
         dqm_filename = 'DQM_V0001_R000999999__{}__{}-{}-{}__ALCAPROMPT.root' \
-            .format(primary_dataset, era_wf_ver, min_run, max_run)
+            .format(primary_dataset, processed_dataset, min_run, max_run)
 
         multirun_dir = multirun.id
         if multirun.failure_retries > 0 or multirun.no_payload_retries:

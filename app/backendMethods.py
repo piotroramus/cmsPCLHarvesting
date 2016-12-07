@@ -21,15 +21,15 @@ def generate_dqm_url(multirun):
     gui_url = app.config['MULTIRUN_CFG']['dqm_upload_host']
     # TODO: think if it is possible to unify this behaviour with DQM things - code duplication!
     # rebuild dataset name adding run range
-    pattern = r'/(?P<primary_dataset>.*)/(?P<era_wf_ver>.*?)/ALCAPROMPT'
+    pattern = r'/(?P<primary_dataset>.*)/(?P<processed_dataset>.*?)/ALCAPROMPT'
     ds = re.match(pattern, multirun['dataset'])
-    primary_dataset, era_wf_ver = ds.group('primary_dataset'), ds.group('era_wf_ver')
+    primary_dataset, processed_dataset = ds.group('primary_dataset'), ds.group('processed_dataset')
 
     run_numbers = [run['number'] for run in multirun['runs']]
     min_run, max_run = min(run_numbers), max(run_numbers)
 
     dataset = '/{}/{}-{}-{}/ALCAPROMPT' \
-        .format(primary_dataset, era_wf_ver, min_run, max_run)
+        .format(primary_dataset, processed_dataset, min_run, max_run)
 
     url = ("{}/start?"
            "runnr=999999;"
