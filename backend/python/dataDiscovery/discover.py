@@ -101,17 +101,10 @@ def discover(config, session):
 
     recent_runs = rrapi.query(days_old_runs_date, run_class_names)
 
-    # TODO: think if this is neeeded - if there is not start date then how the query can work?
-    logger.info("Checking if all the runs have start date")
-    for run in recent_runs:
-        if u'starttime' not in run:
-            logger.error("Run without a start date: {}. Ignoring.".format(run[u'runnumber']))
-    valid_runs = (r for r in recent_runs if r[u'starttime'])
-
     logger.info("Getting {} days old runs form local database".format(config['days_old_runs']))
     local_runs = session.query(RunInfo).filter(RunInfo.start_time > days_old_runs_date).all()
 
-    update_runs(logger, session, t0api, config, local_runs, valid_runs)
+    update_runs(logger, session, t0api, config, local_runs, recent_runs)
 
 
 def assembly_multiruns(config, session, jenkins_build_url=None):
