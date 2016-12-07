@@ -17,15 +17,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("multirun_id", type=int, help="id of the processed multi-run")
     parser.add_argument("config_file", help="path to configuration file containing DB connection information")
-    parser.add_argument("type", help="whether to update start or end processing time", choices=['start', 'end'])
+    parser.add_argument("processing_sort", choices=['start', 'end'],
+                        help="whether to update start or end processing time")
     parser.add_argument('--oracleSecret', help='file containing oracle connection credentials', required=False)
 
     args = parser.parse_args()
 
     multirun_id = args.multirun_id
     config_file = args.config_file
-    # TODO: type shadows built-ins
-    type = args.type
+    processing_sort = args.processing_sort
     oracle_secret = args.oracleSecret
 
     config = configReader.read(config_file)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
 
-    if type == 'start':
+    if processing_sort == 'start':
         logger.info("Updating multi-run processing start time with {}".format(now))
         processing_time_obj = model.ProcessingTime()
         processing_time_obj.start_time = now
