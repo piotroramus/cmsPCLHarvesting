@@ -1,3 +1,4 @@
+import datetime
 import os
 import sys
 import unittest
@@ -33,6 +34,7 @@ class ModelTest(unittest.TestCase):
 
     def test_multirun_repr(self):
         id = 32
+        creation_time = datetime.datetime.now()
         number_of_events = 100000
         bfield = 3.8033490534589345
         run_class_name = 'Cosmics'
@@ -40,6 +42,7 @@ class ModelTest(unittest.TestCase):
         scram_arch = 'slc6_amd64_gcc530'
         scenario = 'ppEra_Run2_2016'
         global_tag = '80X_dataRun2_Express_v10'
+        payload_upload = False
         failure_retries = 0
         no_payload_retries = 0
         run_numbers = []
@@ -48,6 +51,7 @@ class ModelTest(unittest.TestCase):
 
         multirun = model.Multirun()
         multirun.id = id
+        multirun.creation_time = creation_time
         multirun.number_of_events = number_of_events
         multirun.bfield = bfield
         multirun.run_class_name = run_class_name
@@ -55,6 +59,7 @@ class ModelTest(unittest.TestCase):
         multirun.scram_arch = scram_arch
         multirun.scenario = scenario
         multirun.global_tag = global_tag
+        multirun.perform_payload_upload = payload_upload
         multirun.no_payload_retries = no_payload_retries
         multirun.failure_retries = failure_retries
         multirun.run_numbers = run_numbers
@@ -63,6 +68,7 @@ class ModelTest(unittest.TestCase):
 
         multirun_repr = str(multirun)
         multirun_expected = ("Multirun(id={}, "
+                             "creation_time={}, "
                              "number_of_events={}, "
                              "dataset={}, "
                              "bfield={}, "
@@ -71,10 +77,14 @@ class ModelTest(unittest.TestCase):
                              "scram_arch={}, "
                              "scenario={}, "
                              "global_tag={}, "
-                             "retries={}, "
+                             "perform_payload_upload={}, "
+                             "no_payload_retries={}, "
+                             "failure_retries={}, "
                              "state={}, "
-                             "run_numbers={})").format(id, number_of_events, dataset, bfield, run_class_name, cmssw,
-                                                       scram_arch, scenario, global_tag, no_payload_retries, state, run_numbers)
+                             "run_numbers={})").format(id, creation_time, number_of_events, dataset, bfield,
+                                                       run_class_name, cmssw, scram_arch, scenario, global_tag,
+                                                       payload_upload, no_payload_retries, failure_retries, state,
+                                                       run_numbers)
 
         self.assertEqual(multirun_repr, multirun_expected)
 
@@ -116,7 +126,7 @@ class ModelTest(unittest.TestCase):
                              "start_time={}, "
                              "stream_completed={}, "
                              "used={}, "
-                             "used_datasets={}").format(number, run_class_name, bfield, start_time, stream_completed,
+                             "used_datasets={})").format(number, run_class_name, bfield, start_time, stream_completed,
                                                         used, used_datasets)
 
         self.assertEqual(run_info_expected, run_info_repr)
