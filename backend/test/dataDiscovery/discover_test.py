@@ -1,4 +1,3 @@
-import datetime
 import os
 import sqlalchemy
 import sys
@@ -23,31 +22,67 @@ class LoggerMock(object):
         if level not in self.available_levels:
             raise ValueError('Invalid logging level')
         self.level = self.available_levels[level]
+        self.messages = dict()
+        self.reset()
 
     def debug(self, msg):
         if self.level <= self.available_levels["DEBUG"]:
-            print msg
+            self.messages["DEBUG"].append(msg)
 
     def info(self, msg):
         if self.level <= self.available_levels["INFO"]:
-            print msg
+            self.messages["INFO"].append(msg)
 
     def warning(self, msg):
         if self.level <= self.available_levels["WARNING"]:
-            print msg
+            self.messages["WARNING"].append(msg)
 
     def error(self, msg):
         if self.level <= self.available_levels["ERROR"]:
-            print msg
+            self.messages["ERROR"].append(msg)
+
+    def reset(self):
+        for lvl in self.available_levels:
+            self.messages[lvl] = []
+
+
+class OrderedLoggerMock(LoggerMock):
+    def __init__(self, level):
+        super(OrderedLoggerMock, self).__init__(level)
+        self.msg_number = 1
+
+    def debug(self, msg):
+        if self.level <= self.available_levels["DEBUG"]:
+            self.messages["DEBUG"].append((self.msg_number, msg))
+            self.msg_number += 1
+
+    def info(self, msg):
+        if self.level <= self.available_levels["INFO"]:
+            self.messages["INFO"].append((self.msg_number, msg))
+            self.msg_number += 1
+
+    def warning(self, msg):
+        if self.level <= self.available_levels["WARNING"]:
+            self.messages["WARNING"].append((self.msg_number, msg))
+            self.msg_number += 1
+
+    def error(self, msg):
+        if self.level <= self.available_levels["ERROR"]:
+            self.messages["ERROR"].append((self.msg_number, msg))
+            self.msg_number += 1
+
+    def reset(self):
+        super(OrderedLoggerMock, self).reset()
+        self.msg_number = 1
 
 
 class T0ApiStreamAlwaysCompleted(Tier0Api):
-    def run_stream_completed(self, run_number):
+    def express_stream_completed(self, run_number):
         return True
 
 
 class T0ApiStreamNeverCompleted(Tier0Api):
-    def run_stream_completed(self, run_number):
+    def express_stream_completed(self, run_number):
         return False
 
 
@@ -91,25 +126,26 @@ class DiscoverTest(unittest.TestCase):
         release = 'CMSSW_7_0_24324'
         self.assertEqual(discover.get_base_release(release), 'CMSSW_7_0_')
 
-    def test_get_run_class_names(self):
-        workflow_run_classes = {'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16'],
-                                'PromptCalibProdSiStrip': ['Collisions15', 'Collisions16'],
-                                'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16'],
-                                'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16'],
-                                'PromptCalibProd': ['Collisions15', 'Collisions16']}
+        # TODO: this has been moved to utils and the test needs to be moved as well
+        # def test_get_run_class_names(self):
+        #     workflow_run_classes = {'PromptCalibProdSiStripGains': ['Collisions15', 'Collisions16'],
+        #                             'PromptCalibProdSiStrip': ['Collisions15', 'Collisions16'],
+        #                             'PromptCalibProdSiPixelAli': ['Collisions15', 'Collisions16'],
+        #                             'PromptCalibProdSiStripGainsAfterAbortGap': ['Collisions16'],
+        #                             'PromptCalibProd': ['Collisions15', 'Collisions16']}
 
-        expected_result = {'Collisions15', 'Collisions16'}
-        run_class_names = discover.get_run_class_names(workflow_run_classes)
-        self.assertEqual(run_class_names, expected_result)
+        # expected_result = {'Collisions15', 'Collisions16'}
+        # run_class_names = discover.get_run_class_names(workflow_run_classes)
+        # self.assertEqual(run_class_names, expected_result)
 
-        imaginary_workflow_run_classes = {'PromptCalibProdSiStripGains': ['Collisions15', 'A'],
-                                          'PromptCalibProdSiStrip': ['ILOVE_CMS', 'Collisions16', 'B', 'C'],
-                                          'RandomWorkflow': ['Collisions15', 'A'],
-                                          'PromptCalibProd': ['E', 'Collisions16']}
+        # imaginary_workflow_run_classes = {'PromptCalibProdSiStripGains': ['Collisions15', 'A'],
+        #                                   'PromptCalibProdSiStrip': ['ILOVE_CMS', 'Collisions16', 'B', 'C'],
+        #                                   'RandomWorkflow': ['Collisions15', 'A'],
+        #                                   'PromptCalibProd': ['E', 'Collisions16']}
 
-        expected_result = {'Collisions15', 'Collisions16', 'A', 'B', 'C', 'E', 'ILOVE_CMS'}
-        run_class_names = discover.get_run_class_names(imaginary_workflow_run_classes)
-        self.assertEqual(run_class_names, expected_result)
+        # expected_result = {'Collisions15', 'Collisions16', 'A', 'B', 'C', 'E', 'ILOVE_CMS'}
+        # run_class_names = discover.get_run_class_names(imaginary_workflow_run_classes)
+        # self.assertEqual(run_class_names, expected_result)
 
 
 class UpdateRunsTest(unittest.TestCase):
@@ -121,7 +157,7 @@ class UpdateRunsTest(unittest.TestCase):
         model.Base.metadata.create_all(engine, checkfirst=True)
         Session = sqlalchemy.orm.sessionmaker(bind=engine)
         self.session = Session()
-        self.logger = LoggerMock('INFO')
+        self.logger = OrderedLoggerMock('DEBUG')
 
         self.t0api_stream_completed = T0ApiStreamAlwaysCompleted()
         self.t0api_stream_not_completed = T0ApiStreamNeverCompleted()
@@ -149,15 +185,17 @@ class UpdateRunsTest(unittest.TestCase):
         pass
 
     def test_no_new_runs(self):
-        # fixed_current_time = datetime()
         run1 = model.RunInfo()
         run1.number = 1
+        run1.stream_completed = True
 
         run2 = model.RunInfo()
         run2.number = 2
+        run2.stream_completed = True
 
         run3 = model.RunInfo()
         run3.number = 3
+        run3.stream_completed = True
 
         recent_run1 = {
             u'runnumber': 1,
@@ -168,7 +206,7 @@ class UpdateRunsTest(unittest.TestCase):
             u'starttime': u'2016-08-11 12:35:56'
         }
         recent_run3 = {
-            u'runnumber': 2,
+            u'runnumber': 3,
             u'starttime': u'2016-08-11 14:35:56'
         }
 
@@ -176,9 +214,21 @@ class UpdateRunsTest(unittest.TestCase):
         local_runs = [run1, run2, run3]
         recent_runs = [recent_run1, recent_run2, recent_run3]
 
-        # discover.update_runs(self.logger, self.session, self.t0api_stream_completed, config, local_runs, recent_runs)
+        discover.update_runs(self.logger, self.session, self.t0api_stream_completed, config, local_runs, recent_runs)
 
-        # TODO: finish when RRApi server is working since real data is needed
+        # it is hard to determine the results itself so the test focuses on the right processing flow
+        expected_info_logs = [
+            (1, 'Updating local database with newly fetched runs'),
+            (2, 'Checking run 1 fetched from Run Registry'),
+            (3, 'Run 1 already exists in local database'),
+            (4, 'Checking run 2 fetched from Run Registry'),
+            (5, 'Run 2 already exists in local database'),
+            (6, 'Checking run 3 fetched from Run Registry'),
+            (7, 'Run 3 already exists in local database')
+        ]
+
+        output_info_logs = self.logger.messages['INFO']
+        self.assertEqual(expected_info_logs, output_info_logs)
 
 
 if __name__ == '__main__':
