@@ -3,9 +3,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.abspath('..'))
-
-from python import model
+import model
 
 
 class ModelTest(unittest.TestCase):
@@ -127,7 +125,7 @@ class ModelTest(unittest.TestCase):
                              "stream_completed={}, "
                              "used={}, "
                              "used_datasets={})").format(number, run_class_name, bfield, start_time, stream_completed,
-                                                        used, used_datasets)
+                                                         used, used_datasets)
 
         self.assertEqual(run_info_expected, run_info_repr)
 
