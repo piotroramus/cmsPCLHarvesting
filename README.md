@@ -69,3 +69,16 @@ machine ConditionUploader
         login LOGIN
         password PASSWORD
 ```
+
+## Running back-end tests
+
+```
+cd backend
+
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+
+cd test
+python -m unittest discover
+```
