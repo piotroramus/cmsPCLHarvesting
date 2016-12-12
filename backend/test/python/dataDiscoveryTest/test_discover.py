@@ -75,7 +75,7 @@ class DiscoverTest(unittest.TestCase):
 class UpdateRunsTest(unittest.TestCase):
     def setUp(self):
         date = time.strftime("%d-%m-%Y_%H.%M.%S")
-        self.database_file = "test-{}.db".format(date)
+        self.database_file = "{}/test-{}.db".format(os.getcwd(), date)
         connection_string = "sqlite:///{}".format(self.database_file)
         engine = sqlalchemy.create_engine(connection_string, echo=False)
         model.Base.metadata.create_all(engine, checkfirst=True)
@@ -97,8 +97,6 @@ class UpdateRunsTest(unittest.TestCase):
 
     def tearDown(self):
         os.remove(self.database_file)
-        # TODO: for some reason the file is not removed
-        # pass
 
     def get_local_runs(self):
         pass
@@ -154,7 +152,3 @@ class UpdateRunsTest(unittest.TestCase):
 
         output_info_logs = self.logger.messages['INFO']
         self.assertEqual(expected_info_logs, output_info_logs)
-
-
-if __name__ == '__main__':
-    unittest.main()

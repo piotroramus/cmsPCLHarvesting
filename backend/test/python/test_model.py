@@ -128,7 +128,3 @@ class ModelTest(unittest.TestCase):
                                                          used, used_datasets)
 
         self.assertEqual(run_info_expected, run_info_repr)
-
-
-if __name__ == '__main__':
-    unittest.main()
