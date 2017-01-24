@@ -184,15 +184,15 @@ function MultirunController($scope, $http) {
     }
 
     vm.stateColors = {
-        'Need more data' : "#DCE775",
-        'Ready' : "#81D4FA",
-        'Processing' : "#80CBC4",
-        'Processed OK' : "90CAF9",
-        'Processing failed' : "#E57373",
-        'DQM upload OK' : "#FFE082",
-        'DQM upload failed' : "#CE93D8",
-        'Dropbox upload failed' : "#F48FB1",
-        'Uploads OK' : "#FFCC80",
+        'Need more data' : "#B3B3BC",
+        'Ready' : "#D1D2F9",
+        'Processing' : "#CCFFFF",
+        'Processed OK' : "#CCCC99",
+        'Processing failed' : "#DE594E",
+        'DQM upload OK' : "#A6D1AB", //alternatively #6699CC
+        'DQM upload failed' : "#FF9900",
+        'Dropbox upload failed' : "#FFCC00",
+        'Uploads OK' : "#45A245",
     }
 
     vm.columns = {
