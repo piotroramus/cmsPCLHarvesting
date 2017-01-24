@@ -21,7 +21,7 @@ class Config():
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
-    CDB_UPLOAD_MAIL_SUBJECT_PREFIX = '[myService]'
+    CDB_UPLOAD_MAIL_SUBJECT_PREFIX = '[cmsDbMultiRunHarvesting]'
     CDB_UPLOAD_MAIL_SENDER = 'me@example.com'
     CDB_UPLOAD_ADMIN = os.environ.get('CDB_UPLOAD_ADMIN')
     CDB_UPLOAD_SLOW_DB_QUERY_TIME = 0.5
@@ -29,7 +29,7 @@ class Config():
     # Logging
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-    LOGGING_DIR = os.path.join(BASE_DIR, 'logs/myService/')
+    LOGGING_DIR = os.path.join(BASE_DIR, 'logs/cmsDbMultiRunHarvesting/')
     LOGGING_FILE = os.path.join(LOGGING_DIR, 'log')
 
     # env variable should be set before running the web application
