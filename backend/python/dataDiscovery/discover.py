@@ -177,7 +177,6 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
                         Multirun.bfield == run.bfield,
                         Multirun.run_class_name == run.run_class_name,
                         Multirun.cmssw.like(base_release_pattern),
-                        # TODO: write tests to find out whether it really works as wanted
                         Multirun.scram_arch == release['scram_arch'],
                         Multirun.scenario == release['scenario'],
                         Multirun.global_tag == release['global_tag']) \
