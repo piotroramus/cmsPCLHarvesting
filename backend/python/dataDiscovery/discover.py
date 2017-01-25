@@ -182,7 +182,7 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
                         Multirun.scenario == release['scenario'],
                         Multirun.global_tag == release['global_tag']) \
                 .filter(sqlalchemy.or_(MultirunState.state == 'ready', MultirunState.state == 'processing')) \
-                .one_or_none()  # TODO: test this or_
+                .one_or_none()
 
             if not_processed_multirun:
                 logger.debug(
