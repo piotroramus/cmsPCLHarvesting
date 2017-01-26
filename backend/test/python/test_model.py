@@ -43,7 +43,7 @@ class ModelTest(unittest.TestCase):
         payload_upload = False
         failure_retries = 0
         no_payload_retries = 0
-        run_numbers = []
+        runs = []
         dataset = '/A/B/C'
         state = 'processed_ok'
 
@@ -60,7 +60,7 @@ class ModelTest(unittest.TestCase):
         multirun.perform_payload_upload = payload_upload
         multirun.no_payload_retries = no_payload_retries
         multirun.failure_retries = failure_retries
-        multirun.run_numbers = run_numbers
+        multirun.runs = runs
         multirun.dataset = dataset
         multirun.state = state
 
@@ -79,10 +79,10 @@ class ModelTest(unittest.TestCase):
                              "no_payload_retries={}, "
                              "failure_retries={}, "
                              "state={}, "
-                             "run_numbers={})").format(id, creation_time, number_of_events, dataset, bfield,
-                                                       run_class_name, cmssw, scram_arch, scenario, global_tag,
-                                                       payload_upload, no_payload_retries, failure_retries, state,
-                                                       run_numbers)
+                             "runs={})").format(id, creation_time, number_of_events, dataset, bfield,
+                                                run_class_name, cmssw, scram_arch, scenario, global_tag,
+                                                payload_upload, no_payload_retries, failure_retries, state,
+                                                runs)
 
         self.assertEqual(multirun_repr, multirun_expected)
 

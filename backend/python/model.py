@@ -100,7 +100,7 @@ class Multirun(Base):
     filenames = relationship("Filename")
     jenkins_builds = relationship("JenkinsBuildUrl")
     processing_times = relationship("ProcessingTime")
-    run_numbers = relationship("RunInfo", secondary=run_multirun_assoc)
+    runs = relationship("RunInfo", secondary=run_multirun_assoc)
     state = relationship("MultirunState")
 
     def to_json(self):
@@ -142,7 +142,7 @@ class Multirun(Base):
         return [t.to_json() for t in self.processing_times]
 
     def __runs__json(self):
-        return [r.to_json() for r in self.run_numbers]
+        return [r.to_json() for r in self.runs]
 
     def __repr__(self):
         return ("Multirun(id={}, "
@@ -159,10 +159,10 @@ class Multirun(Base):
                 "no_payload_retries={}, "
                 "failure_retries={}, "
                 "state={}, "
-                "run_numbers={})").format(self.id, self.creation_time, self.number_of_events, self.dataset, self.bfield,
-                                          self.run_class_name, self.cmssw, self.scram_arch, self.scenario,
-                                          self.global_tag, self.perform_payload_upload, self.no_payload_retries,
-                                          self.failure_retries, self.state, self.run_numbers)
+                "runs={})").format(self.id, self.creation_time, self.number_of_events, self.dataset, self.bfield,
+                                   self.run_class_name, self.cmssw, self.scram_arch, self.scenario, self.global_tag,
+                                   self.perform_payload_upload, self.no_payload_retries, self.failure_retries,
+                                   self.state, self.runs)
 
 
 class MultirunState(Base):

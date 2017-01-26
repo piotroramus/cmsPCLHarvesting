@@ -227,7 +227,7 @@ def assembly_multiruns(config, session, jenkins_build_url=None):
                 session.refresh(multirun)
                 logger.info("Created new multirun {}".format(multirun))
 
-            multirun.run_numbers.append(run)
+            multirun.runs.append(run)
 
             # add dataset to used for given run
             run.used_datasets.append(dataset_object)

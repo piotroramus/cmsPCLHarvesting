@@ -59,7 +59,7 @@ if __name__ == '__main__':
         logger.info("Proceeding with DQM file upload for multirun {}".format(multirun.id))
         logger.info("Determining DQM filename...")
 
-        run_numbers = [run.number for run in multirun.run_numbers]
+        run_numbers = [run.number for run in multirun.runs]
         min_run, max_run = min(run_numbers), max(run_numbers)
 
         primary_dataset, processed_dataset = utils.extract_dataset_parts(multirun.dataset.dataset)

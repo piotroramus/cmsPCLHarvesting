@@ -63,7 +63,7 @@ if __name__ == '__main__':
     else:
         logger.info("Proceeding with payload upload for multirun {}".format(multirun.id))
 
-        min_run = min(run.number for run in multirun.run_numbers)
+        min_run = min(run.number for run in multirun.runs)
 
         dropbox_failed_state = session \
             .query(model.MultirunState) \

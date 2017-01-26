@@ -68,7 +68,7 @@ def prepare_multirun_environment(config, config_file, jenkins_build_url):
         multirun.state = processing_state
 
         filenames = [f.filename for f in multirun.filenames]
-        runs = [run.number for run in multirun.run_numbers]
+        runs = [run.number for run in multirun.runs]
 
         multirun_info = dict()
         multirun_info['id'] = multirun.id
