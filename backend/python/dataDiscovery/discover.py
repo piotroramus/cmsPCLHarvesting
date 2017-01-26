@@ -34,12 +34,14 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
     # this is because sometimes short runs with lower numbers are completed before the earlier longer ones
     # in consequence multi-runs could consist of non-contiguous runs which should not be allowed
 
-    stream_timeout = datetime.date \
-        .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout']) \
-        .strftime("%Y-%m-%d")
-
     complete_stream_runs = [run.number for run in local_runs if run.stream_completed]
     incomplete_stream_runs = [run.number for run in local_runs if not run.stream_completed]
+
+    # 1 day is subtracted because it is a run startTime (not stopTime when the stream )
+    # and the timeout is always truncated to the midnight anyway
+    stream_timeout = datetime.date \
+        .fromordinal(datetime.date.today().toordinal() - config['run_stream_timeout'] - 1) \
+        .strftime("%Y-%m-%d")
 
     logger.info("Updating local database with newly fetched runs")
     for run in recent_runs:
@@ -63,7 +65,7 @@ def update_runs(logger, session, t0api, config, local_runs, recent_runs):
                 run_to_update.stream_completed = True
             else:
                 logger.info("Stream for run {} is still not completed".format(run[u'runnumber']))
-                if run[u'starttime'] < stream_timeout:  # TODO: test
+                if run[u'starttime'] < stream_timeout:
                     logger.warning("Stream for run {} is not completed for {} days now.".
                                    format(run[u'runnumber'], config['run_stream_timeout']))
                     logger.warning("Run will be processed with the data it has for the moment")
