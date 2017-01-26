@@ -57,7 +57,7 @@ class RRApiWrapper(object):
         # convert results to the same format as v4 so the 'API' is not broken
         result = []
         for run in recent_runs:
-            r = {}
+            r = dict()
             r[u'runnumber'] = run[u'number']
             r[u'starttime'] = datetime.datetime.strptime(run[u'startTime'], "%a %d-%m-%y %H:%M:%S") \
                 .strftime("%Y-%m-%d %H:%M:%S")
