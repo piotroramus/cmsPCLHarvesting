@@ -5,7 +5,7 @@
 
         <th></th>
         <th ng-repeat="(id, col) in mh.columns" ng-show="col['show']" id="thvert1">
-            <a href="#" ng-click="vm.sortBy(id)">
+            <a href="#" ng-click="mh.sortBy(id)">
                 {{ col['name'] }}
             </a>
         </th>
