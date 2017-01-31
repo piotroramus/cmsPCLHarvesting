@@ -110,7 +110,7 @@ if __name__ == '__main__':
         if result != 0:
             multirun.state = dropbox_failed_state
             session.commit()
-            sys.exit(1)
+            sys.exit(result)
 
         uploads_ok_state = session \
             .query(model.MultirunState) \

@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 .one()
             multirun.state = dqm_failed_state
             session.commit()
-            sys.exit(1)
+            sys.exit(result)
 
         dqm_upload_ok = session \
             .query(model.MultirunState) \
