@@ -2,6 +2,7 @@ import logging
 import json
 import subprocess
 import os
+import sys
 
 import utils.other as utils
 import logs.logger as logs
@@ -124,4 +125,7 @@ def prepare_multirun_environment(config, config_file, jenkins_build_url):
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         cmd = "{} {}".format(shell_script_path, shell_props_file)
         logger.info("Invoking script:\n\t {}".format(cmd))
-        subprocess.call(cmd, shell=True)
+        result = subprocess.call(cmd, shell=True)
+        if result != 0:
+            logger.error("CMS Run exit with non-zero code: {}".format(result))
+            sys.exit(result)
