@@ -40,7 +40,7 @@ days_old_runs: 7
 run_stream_timeout: 3
 
 # how many times multirun should be processed if cmsRun exits with non-zero code
-max_failure_retries: 5
+max_failure_retries: 3
 
 # for every workflow that should be processed specify:
 #  - minimal number of events for a multi-run to be processed
