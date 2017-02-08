@@ -26,8 +26,8 @@ class Tier0Api(object):
         response = self.session.send(self.request, verify=False, cert=(cert, cert))
 
         # if there is a problem with the service (usually 503) print the reason
-        if response.status_code >= 400:
-            response.raise_for_status()
+        response.raise_for_status()
+
         return response.json()
 
     def get_run_express_config(self, run_number):
