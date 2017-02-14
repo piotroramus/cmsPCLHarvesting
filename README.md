@@ -88,11 +88,5 @@ python -m unittest discover
 The web part is meant to be launched within the keeper environment.
 For setting up the keeper environment see: https://cms-conddb-dev.cern.ch/docs/
 
-Before launching the instance, a configuration file needs to be passed:
-`export MULTIRUN_CONFIG=/path/to/config.yml`
-This should be exactly the same config file that is used for the backend jobs.
-It tells the application where to look for the database, EOS storage space and DQM instance dedicated for this deployment.
-
-
 If everything is set up properly, then the following should start the service:
 `/data/services/keeper/keeper.py start cmsDbMultiRunHarvesting`
