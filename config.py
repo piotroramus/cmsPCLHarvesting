@@ -32,9 +32,9 @@ class Config():
     LOGGING_DIR = os.path.join(BASE_DIR, 'logs/cmsDbMultiRunHarvesting/')
     LOGGING_FILE = os.path.join(LOGGING_DIR, 'log')
 
-    # env variable should be set before running the web application
-    # in other case a default 'local' config is used
-    multirun_config_path = os.getenv('MULTIRUN_CONFIG', 'resources/referenceBackendCfgs/local.yml')
+    # config is determined by the host (defined in the secrets)
+    multirun_config_path = "resources/referenceBackendCfgs/{}".format(getConnections('config'))
+
     MULTIRUN_CFG = configReader.read(multirun_config_path)
 
     # get connection to DB from secrets
