@@ -18,21 +18,21 @@ auth = HTTPBasicAuth()
 
 # --- GET index
 
-@app.route('/')
-@app.route('/index')
+@app.route('/cmsDbMultiRunHarvesting/')
+@app.route('/cmsDbMultiRunHarvesting/index')
 def index():
     return redirect(url_for('display'))
 
 
 # --- diagnostics
-@app.route('/heartbeat')
+@app.route('/cmsDbMultiRunHarvesting/heartbeat')
 def heartbeat():
     gitInfo = run_in_shell('/usr/local/bin/git describe --all --long', shell=True)
     return jsonify({'lastUpdate': datetime.utcnow(), 'gitInfo': gitInfo})
 
 
 # a simple "echo" method
-@app.route('/echo/<string:what>', methods=['POST'])
+@app.route('/cmsDbMultiRunHarvesting/echo/<string:what>', methods=['POST'])
 def echo(what):
     return jsonify({'echo': str(what)})
 
@@ -77,29 +77,29 @@ def error404():
 
 
 # --- Multirun Harvesting concerned methods
-@app.route('/test/')
+@app.route('/cmsDbMultiRunHarvesting/test/')
 def test():
     print(get_multiruns_from_db(), file=sys.stderr)
     return "Have a look into logs..."
 
 
-@app.route('/plain_display/')
+@app.route('/cmsDbMultiRunHarvesting/plain_display/')
 def display_plain():
     multiruns = get_multiruns_from_db()
     return render_template('plain_table.html', multiruns=multiruns)
 
 
-@app.route('/basic_template/')
+@app.route('/cmsDbMultiRunHarvesting/basic_template/')
 def multirun_new():
     return app.send_static_file('templates/basic.html')
 
 
-@app.route('/display/')
+@app.route('/cmsDbMultiRunHarvesting/display/')
 def display():
     return app.send_static_file('templates/index.html')
 
 
-@app.route('/multiruns/')
+@app.route('/cmsDbMultiRunHarvesting/multiruns/')
 def get_multiruns():
     offset = int(request.args.get('offset', default=0))
     limit = int(request.args.get('limit', default=25))
@@ -110,7 +110,7 @@ def get_multiruns():
                    total=multiruns_total())
 
 
-@app.route('/multiruns_by_workflow/')
+@app.route('/cmsDbMultiRunHarvesting/multiruns_by_workflow/')
 def get_multiruns_by_workflow():
     offset = int(request.args.get('offset', default=0))
     limit = int(request.args.get('limit', default=25))
@@ -129,17 +129,17 @@ def get_multiruns_by_workflow():
                    total=multiruns_total())
 
 
-@app.route('/multiruns_total/')
+@app.route('/cmsDbMultiRunHarvesting/multiruns_total/')
 def mtotal():
     return jsonify(total=multiruns_total())
 
 
-@app.route('/color_test/')
+@app.route('/cmsDbMultiRunHarvesting/color_test/')
 def color_test():
     return app.send_static_file('templates/color_test.html')
 
 
-@app.route('/configuration/')
+@app.route('/cmsDbMultiRunHarvesting/configuration/')
 def get_config():
     # This method can expose a sensitive data, so it in this shape
     # should be only used for debugging!
