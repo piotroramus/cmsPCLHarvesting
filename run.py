@@ -19,10 +19,17 @@ if __name__ == "__main__":
         print "please specify a listening port (-p) ... "
         sys.exit(-1)
 
-    # SSL setup
-    cert = "{}/hostcert.pem".format(secretsDir)
-    private_key = "{}/hostkey.pem".format(secretsDir)
-    context = (cert, private_key)
+    # --- SSL
+    PRIVATE_KEY_FILE = None
+    CERTIFICATE_FILE = None
+    if os.path.isfile(secretsDir + '/hostkey.pem'):
+        PRIVATE_KEY_FILE = secretsDir + '/hostkey.pem'
+    if os.path.isfile(secretsDir + '/hostcert.pem'):
+        CERTIFICATE_FILE = secretsDir + '/hostcert.pem'
+
+    context = None
+    if PRIVATE_KEY_FILE and CERTIFICATE_FILE:
+        context = (CERTIFICATE_FILE, PRIVATE_KEY_FILE)
 
     app.run(host='0.0.0.0', port=service.settings['listeningPort'], debug=app.config['DEBUG'], ssl_context=context)
 
