@@ -13,6 +13,7 @@ function MultirunController($scope, $http) {
     vm.multiruns = []
     vm.multirunsByWorkflow = []
     vm.splitByWorkflows = false;
+    vm.showAbout = false;
 
     vm.currentPage = 1;
     vm.itemsPerPage = 25;
@@ -24,7 +25,7 @@ function MultirunController($scope, $http) {
     vm.rowColor = rowColor;
     vm.sortBy = sortBy;
     vm.splitButtonText = splitButtonText;
-    vm.switchView = switchView;
+    vm.switchMultirunView = switchMultirunView;
     vm.showDQMPlots = showDQMPlots;
     vm.visibleCols = visibleCols;
     vm.eosDirValue = eosDirValue;
@@ -42,6 +43,7 @@ function MultirunController($scope, $http) {
     }
 
     function pageChanged() {
+        vm.showAbout = false;
         if (vm.splitByWorkflows === true)
             vm.getMultirunsByWorkflow();
         else
@@ -49,6 +51,7 @@ function MultirunController($scope, $http) {
     };
 
     function refreshPage() {
+        vm.showAbout = false;
         location.reload();
     }
 
@@ -69,11 +72,14 @@ function MultirunController($scope, $http) {
         return vm.splitByWorkflows ? doNotSplitText : splitText;
     }
 
-    function switchView() {
+    function switchMultirunView() {
+        vm.showAbout = false;
         vm.splitByWorkflows = (vm.splitByWorkflows === true) ? false : true;
     }
 
     function showDQMPlots(state) {
+        // the DQM reference will only be valid when the multirun is in one of the three states,
+        // so the DQM upload have already been performed
         switch (state) {
             case 'DQM upload OK':
             case 'Dropbox upload failed':
@@ -119,7 +125,7 @@ function MultirunController($scope, $http) {
     }
 
     function getMultiruns() {
-        var murl = "/multiruns?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage;
+        var murl = "/cmsDbMultiRunHarvesting/multiruns?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage;
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
                 vm.multiruns = data['multiruns'];
@@ -136,7 +142,7 @@ function MultirunController($scope, $http) {
     }
 
     function getMultirunsByWorkflow() {
-        var murl = "/multiruns_by_workflow?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage;
+        var murl = "/cmsDbMultiRunHarvesting/multiruns_by_workflow?limit="+vm.itemsPerPage+"&offset="+(vm.currentPage-1)*vm.itemsPerPage;
         $http({method: 'GET', url: murl})
             .success(function(data, status) {
                 vm.multirunsByWorkflow = data['multiruns'];
