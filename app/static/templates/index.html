@@ -7,15 +7,15 @@
     <title>Multirun Harvesting Overview</title>
 
     <!-- CSS -->
-    <link href="/static/css/external/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/custom.css" rel="stylesheet">
+    <link href="/cmsDbMultiRunHarvesting/static/css/external/bootstrap.min.css" rel="stylesheet">
+    <link href="/cmsDbMultiRunHarvesting/static/css/custom.css" rel="stylesheet">
 
     <!-- JS -->
-    <script src="/static/js/external/jquery.min.js"></script>
-    <script src="/static/js/external/bootstrap.min.js"></script>
-    <script src="/static/js/external/angular.min.js"></script>
-    <script src="/static/js/external/ui-bootstrap-tpls-2.2.0.js"></script>
-    <script src="/static/js/index.js"></script>
+    <script src="/cmsDbMultiRunHarvesting/static/js/external/jquery.min.js"></script>
+    <script src="/cmsDbMultiRunHarvesting/static/js/external/bootstrap.min.js"></script>
+    <script src="/cmsDbMultiRunHarvesting/static/js/external/angular.min.js"></script>
+    <script src="/cmsDbMultiRunHarvesting/static/js/external/ui-bootstrap-tpls-2.2.0.js"></script>
+    <script src="/cmsDbMultiRunHarvesting/static/js/index.js"></script>
 
 </head>
 
@@ -36,10 +36,10 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li ng-click="mh.switchView()">
+                <li ng-click="mh.switchMultirunView()">
                     <a href="#">{{ mh.splitButtonText() }}</a>
                 </li>
-                <li><a href="#about">About</a></li>
+                <li ng-click="mh.showAbout=true"><a href="#about">About</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="true">Legend <span class="caret"></span></a>
@@ -64,37 +64,44 @@
 
 <div class="container tabcontainer">
 
-    <span ng-if="mh.splitByWorkflows == true">
-        <span ng-init="mh.getMultirunsByWorkflow()"></span>
+    <div ng-if="mh.showAbout === false">
+        <span ng-if="mh.splitByWorkflows == true">
+            <span ng-init="mh.getMultirunsByWorkflow()"></span>
 
-        <div class="multiruntab" ng-repeat="(workflow, multiruns) in mh.multirunsByWorkflow">
+            <div class="multiruntab" ng-repeat="(workflow, multiruns) in mh.multirunsByWorkflow">
 
-            <h2>{{ workflow }}</h2>
-            <div ng-include="'/static/templates/mtable.html'"></div>
+                <h2>{{ workflow }}</h2>
+                <div ng-include="'/cmsDbMultiRunHarvesting/static/templates/mtable.html'"></div>
 
+            </div>
+        </span>
+
+        <span ng-if="mh.splitByWorkflows == false">
+            <span ng-init="mh.getMultiruns()"></span>
+
+            <div class="multiruntab" ng-include="'/cmsDbMultiRunHarvesting/static/templates/mtable.html'"></div>
+        </span>
+
+        <div class="centeredPag">
+            <ul uib-pagination
+                total-items="mh.totalItems" ng-model="mh.currentPage"
+                ng-change="mh.pageChanged()" items-per-page="mh.itemsPerPage"
+                boundary-links="true" rotate="true" force-ellipses="true"
+                max-size="9" previous-text="&lsaquo;" next-text="&rsaquo;"
+                first-text="&laquo;" last-text="&raquo;"
+                boundary-link-numbers="true">
+            </ul>
         </div>
-    </span>
 
-    <span ng-if="mh.splitByWorkflows == false">
-        <span ng-init="mh.getMultiruns()"></span>
+        <div class="itemsFormDiv">
+            <span>Items per page:</span>
+            <input type="text" class="itemsPerPageForm" ng-model="mh.itemsPerPage" ng-change="mh.pageChanged()">
+        </div>
 
-        <div class="multiruntab" ng-include="'/static/templates/mtable.html'"></div>
-    </span>
-
-    <div class="centered">
-        <ul uib-pagination
-            total-items="mh.totalItems" ng-model="mh.currentPage"
-            ng-change="mh.pageChanged()" items-per-page="mh.itemsPerPage"
-            boundary-links="true" rotate="true" force-ellipses="true"
-            max-size="9" previous-text="&lsaquo;" next-text="&rsaquo;"
-            first-text="&laquo;" last-text="&raquo;"
-            boundary-link-numbers="true">
-        </ul>
     </div>
 
-    <div class="itemsFormDiv">
-        <span>Items per page:</span>
-        <input type="text" class="itemsPerPageForm" ng-model="mh.itemsPerPage" ng-change="mh.pageChanged()">
+    <div ng-show="mh.showAbout === true">
+        <span ng-include="'/cmsDbMultiRunHarvesting/static/templates/about.html'"></span>
     </div>
 </div>
 </body>

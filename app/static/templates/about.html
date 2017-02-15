@@ -1,0 +1,47 @@
+<div class="about">
+
+    <div>
+        <h2>What is the multi-run harvesting?</h2>
+        <p>
+            The multi-run harvesting aims to combine statistics from multiple runs into one single output and use them for
+            Data Qualilty Monitoring as well as producing alignment and calibration results based on broader input.
+
+            Documentation on how to technically perform the DQM multi-run harvesting can be found here:
+            <a href="https://twiki.cern.ch/twiki/bin/viewauth/CMS/DQMOffline#MultiRun">https://twiki.cern.ch/twiki/bin/viewauth/CMS/DQMOffline#MultiRun</a>
+        </p>
+        <h2>How does it work?</h2>
+        <p>
+            The service displays the results of the performed processing for the Prompt Calibration Loop.
+            Provided multi-run infrastructure for PCL resides on top of the Tier0 implementation and CMSSW, being an independent work.
+        </p>
+        <h2>Multi-run states</h2>
+        <p>
+            The multi-run can be assigned one of a few states. The state machine and possible transitions are shown in the
+            picture.
+        </p>
+
+        <img src="/cmsDbMultiRunHarvesting/static/img/state_machine-5.png" alt="State transitions schema" class="centeredImage">
+
+        <p>
+            The state can be identified by a color of the entry.
+            In principle green states are assigned to success end-states and red/yellow ones indicate problems.
+            The state-color dependence can also be consulted with the legend.
+        </p>
+        <h2>Retries</h2>
+        <p>
+            TODO
+        </p>
+        <h2>Authors</h2>
+        <p>
+            Copyright @ 2016-2017 <a href="mailto:piotr.oramus@cern.ch">Piotr Oramus</a> and
+            <a href="mailto:gianluca.cerminara@cern.ch">Gianluca Cerminara</a> for the CMS collaboration
+        </p>
+
+
+
+    </div>
+    <!--<div>-->
+    <!--</div>-->
+
+
+</div>

@@ -25,10 +25,27 @@
     font-weight: bold
 }
 
-.centered {
+.centeredPag {
     display: flex;
     justify-content: center;
     height: 40px;
+}
+
+.about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+}
+
+.centeredImage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.aboutItem {
+    display: flex;
 }
 
 .cleantd {

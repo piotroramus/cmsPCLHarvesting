@@ -17,7 +17,7 @@ from logging.handlers import RotatingFileHandler
 
 from config import config
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/cmsDbMultiRunHarvesting/static')
 app.config.from_object(config['default'])
 
 db = SQLAlchemy(app)
