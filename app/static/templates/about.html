@@ -1,6 +1,5 @@
 <div class="about">
 
-    <div>
         <h2>What is the multi-run harvesting?</h2>
         <p>
             The multi-run harvesting aims to combine statistics from multiple runs into one single output and use them for
@@ -20,28 +19,31 @@
             picture.
         </p>
 
-        <img src="/cmsDbMultiRunHarvesting/static/img/state_machine-5.png" alt="State transitions schema" class="centeredImage">
-
+        <div class="centeredImage">
+            <img src="/cmsDbMultiRunHarvesting/static/img/state_machine-5.png" alt="State transitions schema">
+        </div>
         <p>
-            The state can be identified by a color of the entry.
-            In principle green states are assigned to success end-states and red/yellow ones indicate problems.
-            The state-color dependence can also be consulted with the legend.
+            To improve the readability the the state can be identified by the color of the entry, what can be consulted with the legend.
+
+            There are three end states:
+            <ul>
+                <li>Processing failed - AlCa Harvesting fails continuously, manual supervision required</li>
+                <li>DQM Upload OK - success, no payload upload is forseen</li>
+                <li>Uploads OK - full success</li>
+            </ul>
+
+
         </p>
         <h2>Retries</h2>
         <p>
-            TODO
+            The AlCa Harvesting step and the Uploads can be repeated after failure occurs.
+            This will happen automatically until the maximum failures threshold is exceeded.
+            The threshold can be configured for the specific deployment.
         </p>
         <h2>Authors</h2>
         <p>
             Copyright @ 2016-2017 <a href="mailto:piotr.oramus@cern.ch">Piotr Oramus</a> and
             <a href="mailto:gianluca.cerminara@cern.ch">Gianluca Cerminara</a> for the CMS collaboration
         </p>
-
-
-
-    </div>
-    <!--<div>-->
-    <!--</div>-->
-
 
 </div>
