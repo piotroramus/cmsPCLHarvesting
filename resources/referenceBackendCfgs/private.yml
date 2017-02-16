@@ -13,7 +13,7 @@ rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
 db_vendor: sqlite
 
 # path to sqlite DB file (when of using one)
-sqlite_db_path: test.db
+sqlite_db_path: /afs/cern.ch/user/p/pclprod/data/sqlite/private/database.db
 
 # where to copy files of every AlCa Harvesting processing
 eos_workspace_path: /eos/cms/store/group/alca_global/multiruns/results/local

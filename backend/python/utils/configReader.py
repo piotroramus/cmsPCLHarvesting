@@ -30,4 +30,4 @@ def read(config_file=None):
 def get_default_config_filename():
     # directory containing THIS script
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(dir_path, "../../../resources/referenceBackendCfgs/local.yml")
+    return os.path.join(dir_path, "../../../resources/referenceBackendCfgs/private.yml")
