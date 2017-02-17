@@ -1,8 +1,8 @@
 /*
- *  This script is meant to wipe the database out of the multirun data. *
- *  It simply drops all the tables along with the data.                 *
- *  To use it go to the directory where it is located, log into the     *
- *  database shell (using sqlplus) and type "@drop_multirun_data.sql"   *
+ *  This script is meant to wipe the Oracle database out of the multirun data. *
+ *  It simply drops all the tables along with the data.                        *
+ *  To use it go to the directory where it is located, log into the            *
+ *  database shell (using sqlplus) and type "@drop_multirun_data.sql"          *
 /*
 
 DROP TABLE dataset           CASCADE CONSTRAINTS PURGE;

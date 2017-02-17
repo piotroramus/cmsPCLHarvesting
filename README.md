@@ -90,3 +90,10 @@ For setting up the keeper environment see: https://cms-conddb-dev.cern.ch/docs/
 
 If everything is set up properly, then the following should start the service:
 `/data/services/keeper/keeper.py start cmsDbMultiRunHarvesting`
+
+
+## Resetting instance
+
+In order to delete all the data produced for the deployed instance two things have to be done:
+- deleting data from database - for Oracle DB just use the `drop_multirun_data.sql` script from utils
+- scratching the correspoding EOS space
