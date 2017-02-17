@@ -15,15 +15,20 @@ logs.setup_logging()
 logger = logging.getLogger(__name__)
 
 
-def dataset_with_runs_range(dataset, runs_range):
+def dataset_with_dqm_info(dataset, runs_range, dqm_appendix):
     import re
+    # for production deployment
+    if dqm_appendix == "None":
+        dqm_appendix = ""
     pattern = r'(?P<slice>.*)/ALCAPROMPT'
-    substitution = r'\g<slice>-{}/ALCAPROMPT'.format(runs_range)
+    substitution = r'\g<slice>{}-{}/ALCAPROMPT'.format(dqm_appendix, runs_range)
     result = re.sub(pattern, substitution, dataset)
     return result
 
 
-def prepare_config(params_file, alca_config_file="alcaConfig.py", job_report_file="FrameworkJobReport.xml"):
+def prepare_config(params_file, dqm_appendix, alca_config_file="alcaConfig.py", job_report_file="FrameworkJobReport.xml"):
+
+    # this function needs the CMSSW environment to be sourced, so it is called from the shell script
     from configBuilder import AlCaHarvestingCfgBuilder
     multirun_info = None
     with open(params_file, 'r') as f:
@@ -40,7 +45,7 @@ def prepare_config(params_file, alca_config_file="alcaConfig.py", job_report_fil
     runs_range = "{}-{}".format(min_run, max_run)
 
     builder = AlCaHarvestingCfgBuilder()
-    dataset_with_rr = dataset_with_runs_range(str(dataset), runs_range)
+    dataset_with_rr = dataset_with_dqm_info(str(dataset), runs_range, dqm_appendix)
     builder.build(dataset_with_rr, utils.extract_workflow(dataset), input_files, scenario, global_tag,
                   alca_config_file, job_report_file)
 
@@ -115,12 +120,14 @@ def prepare_multirun_environment(config, config_file, jenkins_build_url):
             f.write("CONFIG_FILE={}\n".format(config_file))
             f.write("JENKINS_BUILD_URL={}\n".format(jenkins_build_url))
             f.write("ORACLE_SECRET_FILE={}\n".format(config['oracle_secret']))
+            f.write("DQM_APPENDIX={}\n".format(config['dqm_appendix']))
 
         # commit is down here to assure that state will be changed to 'processing' after serialisation goes well
         session.commit()
 
-        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="harvesting", config=config,
-                                         session=session)
+        if jenkins_build_url:
+            jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="harvesting", config=config,
+                                             session=session)
 
         shell_script_path = script_path.replace("/python/alcaHarvesting", "/bin/cmssw_env_setup.sh")
         cmd = "{} {}".format(shell_script_path, shell_props_file)

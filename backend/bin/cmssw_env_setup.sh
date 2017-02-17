@@ -85,7 +85,7 @@ mv ${MULTIRUN_PROPS_FILE_PWD} .
 mv ${PROPERTIES_FILE_PWD} .
 
 # create cmsRun config for AlCaHarvesting step
-python ${PYTHON_DIR_PATH}/configPreparator.py ${MULTIRUN_PROPS_FILE} ${ALCA_CONFIG_FILE} ${JOB_REPORT_FILE}
+python ${PYTHON_DIR_PATH}/configPreparator.py ${MULTIRUN_PROPS_FILE} ${DQM_APPENDIX} ${ALCA_CONFIG_FILE} ${JOB_REPORT_FILE}
 
 # update multi-run processing start time
 python ${PYTHON_DIR_PATH}/updateProcessingTime.py ${MULTIRUN_ID} ${CONFIG_FILE} start --oracleSecret ${ORACLE_SECRET_FILE}

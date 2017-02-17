@@ -64,8 +64,12 @@ if __name__ == '__main__':
 
         primary_dataset, processed_dataset = utils.extract_dataset_parts(multirun.dataset.dataset)
 
-        dqm_filename = 'DQM_V0001_R000999999__{}__{}-{}-{}__ALCAPROMPT.root' \
-            .format(primary_dataset, processed_dataset, min_run, max_run)
+        dqm_appendix = config['dqm_appendix']
+        if dqm_appendix == "None":
+            dqm_appendix = ""
+
+        dqm_filename = 'DQM_V0001_R000999999__{}__{}{}-{}-{}__ALCAPROMPT.root' \
+            .format(primary_dataset, processed_dataset, dqm_appendix, min_run, max_run)
 
         multirun_dir = multirun.id
         if multirun.failure_retries > 0 or multirun.no_payload_retries:
@@ -82,8 +86,9 @@ if __name__ == '__main__':
                                          multirun.id, script_path)
         result = subprocess.call(cmd, shell=True)
 
-        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="dqm_upload",
-                                         config=config, session=session)
+        if jenkins_build_url:
+            jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="dqm_upload",
+                                             config=config, session=session)
 
         if result != 0:
             dqm_failed_state = session \

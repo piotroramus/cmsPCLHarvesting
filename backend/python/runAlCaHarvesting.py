@@ -16,6 +16,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config_file = args.config
+    if not config_file:
+        # need to set it explicitly, because it is then passed further
+        config_file = configReader.get_default_config_filename()
+
     jenkins_build_url = args.jenkinsBuildUrl
     oracle_secret = args.oracleSecret
 

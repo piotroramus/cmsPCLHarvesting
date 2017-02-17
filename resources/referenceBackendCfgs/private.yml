@@ -12,7 +12,7 @@ rrapiv3_url: http://runregistry.web.cern.ch/runregistry/
 # sqlite - useful for development/debugging
 db_vendor: sqlite
 
-# path to sqlite DB file (when of using one)
+# absolute path to sqlite DB file (only relevant when using one)
 sqlite_db_path: /afs/cern.ch/user/p/pclprod/data/sqlite/private/database.db
 
 # where to copy files of every AlCa Harvesting processing
@@ -29,6 +29,12 @@ cms_run_output: cmsRunOutput.txt
 
 # where to upload resultant DQM file
 dqm_upload_host: http://piotri.cern.ch:8060/dqm/dev
+
+# a phrase appended to the DQM filename indentifying the instance
+# it will be appended to the processed dataset version
+# needed when multiple instances (like dev and private) are uploading to the same GUI
+# for empty appendix please use 'None' (usually for production)
+dqm_appendix: _private
 
 # how far in the past should we look for new runs
 days_old_runs: 10

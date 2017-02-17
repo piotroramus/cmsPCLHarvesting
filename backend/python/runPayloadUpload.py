@@ -88,8 +88,9 @@ if __name__ == '__main__':
 
         result = subprocess.call(cmd, shell=True)
 
-        jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="payload_upload",
-                                         config=config, session=session)
+        if jenkins_build_url:
+            jenkins.update_jenkins_build_url(multirun.id, jenkins_build_url, job_type="payload_upload",
+                                             config=config, session=session)
 
         logger.info("Collecting log URL from the log file...")
         if not os.path.isfile(log_file):
